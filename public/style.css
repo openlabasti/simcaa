@@ -1,0 +1,172 @@
+.footer {
+    position:fixed !important;
+    bottom:0px;
+    width:100%;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.colorTextInput > input , .colorTextInput > input:active, .colorTextInput > input:focus {
+    color: #000000 !important;
+}
+
+.colorBackgroundInput > input , .colorBackgroundInput > input:active, .colorBackgroundInput > input:focus {
+    background-color: #FFFFFF !important;
+}
+
+.ui.label {
+    display: block !important;
+    margin-bottom: 3px !important;
+}
+
+/* Paddding Card Content Image */
+.imgpadding1 {
+    padding: 1em !important;
+}
+
+.imgpadding2 {
+    padding: 2em !important;
+}
+
+.imgpadding3 {
+    padding: 3em !important;
+}
+
+.imgpadding4 {
+    padding: 4em !important;
+}
+
+.imgpadding5 {
+    padding: 5em !important;
+}
+
+.imgpadding6 {
+    padding: 6em !important;
+}
+
+.ui.disabled.input {
+    opacity: 1 !important;
+}
+
+/* Font Size Style */
+.uppercaseInput > input {
+    text-transform: uppercase;
+}
+
+.lowercaseInput > input {
+    text-transform: lowercase;
+}
+
+.freeInput > input {
+    text-transform: none;
+}
+
+/* Font-weight Style */
+.weightNormalInput > input {
+    font-weight: normal;
+}
+
+.weightThickInput > input {
+    font-weight: bold;
+}
+
+/* Font decoration Style */
+.decorationNormalInput > input {
+    text-decoration: none;
+}
+
+.decorationOverlineInput > input {
+    text-decoration: overline;
+}
+
+.decorationUnderlineInput > input {
+    text-decoration: underline;
+}
+
+/* Font Style */
+.styleNormalInput > input {
+    font-style: normal;
+}
+
+.styleItalicInput > input {
+    font-style: italic;
+}
+
+.styleObliqueInput > input {
+    font-style: oblique;
+}
+
+.disabled {
+    pointer-events:none;
+}
+
+.cardUI {
+    margin: 15px 0px 5px 20px !important;
+    min-width: 50% !important;
+    text-align: center;
+}
+
+.cardUI input {
+    text-align: center !important;
+    width: 100%;
+}
+
+.imgFullWidth {
+    min-width: 100%;
+}
+
+.viewMode {
+    display: none !important;
+}
+
+body {
+    background-color: #f6f6f6;
+}
+
+.ui.card {
+    width: auto;
+}
+
+.uicardlayout {
+    min-height: 100% !important;
+}
+
+@media print
+{
+    .no-print
+    {
+        display: none !important;
+    }
+}
+
+@page {
+    margin: 0mm;
+}
+
+.A4-portrait {
+    width: 210mm;
+    height: 297mm;
+    margin: auto!important;
+}
+
+/* Fix Navbar CSS problem */
+.navbar-button > .ui.segment {
+    padding: 0px;
+}
+.navbar-icon i {
+    width: 2em !important;
+    float: inherit !important;
+}
+
+/* Da testare su MS, Opera e Safari*/
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    pointer-events: none;
+}

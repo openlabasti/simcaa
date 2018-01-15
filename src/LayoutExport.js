@@ -3,6 +3,7 @@ import { Segment, Button, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
+import CustomImgsDnDUpload from './CustomImgsDnDUpload'
 import { translate, Trans } from 'react-i18next'
 
 class LayoutExport extends Component {
@@ -160,6 +161,7 @@ class LayoutExport extends Component {
                             <Button color='blue' disabled>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link} to='/'>{t("HEAD_BTN_RETURN")}</Button>
+                            <CustomImgsDnDUpload/>
                         </Segment>
                         <Segment>
                             <Dropdown placeholder={t("TYPO_FRM_PLACEHOLDER")} selection

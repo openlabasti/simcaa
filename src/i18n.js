@@ -27,9 +27,14 @@ i18n
                     // LAYOUT/TYPO
                     "HEAD_BTN_RESET": "Resetta il layout",
                     "HEAD_BTN_EXPORTPDF": "Esporta come PDF",
+                    "HEAD_BTN_ADD_IMGS": "Aggiungi immagini personali",
                     "HEAD_BTN_PRINT": "Stampa",
                     "HEAD_BTN_RETURN": "Ritorna al Progetto",
                     "TYPO_FRM_PLACEHOLDER": "Seleziona la dimensione delle immagini",
+
+                    //MODAL TO UPLOAD IMGS VIA DnD
+                    "MODAL_IMGS_DND_HEADER": "Caricamento di immagini personali!",
+                    "MODAL_IMGS_DND_HELPER": "Trascina l'immagine nel riquadro per caricarla",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Modifica Impostazioni",
@@ -96,9 +101,14 @@ i18n
                     // LAYOUT/TYPO
                     "HEAD_BTN_RESET": "Reset the layout",
                     "HEAD_BTN_EXPORTPDF": "Export as PDF",
+                    "HEAD_BTN_ADD_IMGS": "Add custom images",
                     "HEAD_BTN_PRINT": "Print",
                     "HEAD_BTN_RETURN": "Return to Project",
                     "TYPO_FRM_PLACEHOLDER": "Select image size",
+
+                    //MODAL TO UPLOAD IMGS VIA DnD
+                    "MODAL_IMGS_DND_HEADER": "Upload custom images!",
+                    "MODAL_IMGS_DND_HELPER": "Drag & Drop your image to upload it",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Edit Options",

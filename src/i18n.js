@@ -35,6 +35,10 @@ i18n
                     //MODAL TO UPLOAD IMGS VIA DnD
                     "MODAL_IMGS_DND_HEADER": "Caricamento di immagini personali!",
                     "MODAL_IMGS_DND_HELPER": "Trascina l'immagine nel riquadro per caricarla",
+                    "MODAL_IMGS_DND_DROPZONE_HELPER": "Trascina qui l'immagine, oppure clicca il riquadro",
+                    "MODAL_IMGS_DND_WRONG_FILETYPE": "Attenzione, puoi caricare soltanto immagini!",
+                    "MODAL_IMGS_DND_UPLOADED": "Immagine caricata correttamente!",
+                    "MODAL_IMGS_DND_UPLOADED_LIST": "Immagini caricate:",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Modifica Impostazioni",
@@ -109,6 +113,10 @@ i18n
                     //MODAL TO UPLOAD IMGS VIA DnD
                     "MODAL_IMGS_DND_HEADER": "Upload custom images!",
                     "MODAL_IMGS_DND_HELPER": "Drag & Drop your image to upload it",
+                    "MODAL_IMGS_DND_DROPZONE_HELPER": "Drag & Drop here, or click to upload",
+                    "MODAL_IMGS_DND_WRONG_FILETYPE" : "Sorry, you can upload only images",
+                    "MODAL_IMGS_DND_UPLOADED": "Cheers, image uploaded correctly!",
+                    "MODAL_IMGS_DND_UPLOADED_LIST": "Images uploaded:",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Edit Options",

@@ -6,12 +6,24 @@ import Dropzone from 'react-dropzone'
 class CustomImgsDnDUpload extends Component{
   constructor() {
     super()
-    this.state = { files: [] }
+    this.state = {
+      message: "MODAL_IMGS_DND_HELPER",
+      files: []
+   }
   }
-  onDrop(files) {
-    this.setState({
-      files
-    });
+  onDrop(file) {
+    if(file.type==='image/jpeg' || 'image/png'){
+        this.setState((state)=>{
+          message: "MODAL_IMGS_DND_UPLOADED",
+          files: state.files.push(files)
+        })
+        //qua mando l'immagine al server GESTIONE ASYNC!!!
+      }else{
+        this.setState((state)=>{
+          message: "MODAL_IMGS_DND_WRONG_FILETYPE",
+          files: state.files
+        })
+      }
   }
   render(){
     const { t, i18n } = this.props
@@ -19,24 +31,26 @@ class CustomImgsDnDUpload extends Component{
       <Modal trigger={<Button color='yellow'>{t("HEAD_BTN_ADD_IMGS")}</Button>}>
         <Modal.Header>{t("MODAL_IMGS_DND_HEADER")}</Modal.Header>
         <Modal.Content>
-          <Modal.Description>
-            {t("MODAL_IMGS_DND_HELPER")}
+          <div className="ui center grid">
+            {t(this.state.message)}
             <section>
               <div className="dropzone">
                 <Dropzone onDrop={this.onDrop.bind(this)}>
-                  <p>Try dropping some files here, or click to select files to upload.</p>
+                  <p>{t("MODAL_IMGS_DND_DROPZONE_HELPER")}</p>
                 </Dropzone>
               </div>
-              <aside>
-                <h2>Dropped files</h2>
-                <ul>
+            </section>
+            <section>
+              {t("MODAL_IMGS_DND_UPLOADED_LIST")}
+                  {console.log(this.state.files)}
+              <ul>
                   {
+
                     this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
                   }
-                </ul>
-              </aside>
+              </ul>
             </section>
-          </Modal.Description>
+          </div>
         </Modal.Content>
       </Modal>
     )

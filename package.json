@@ -9,6 +9,7 @@
     "react": "^15.6.1",
     "react-color": "^2.13.8",
     "react-dom": "^15.6.1",
+    "react-dropzone": "^4.2.5",
     "react-i18next": "^6.1.0",
     "react-rnd": "^7.1.5",
     "react-router-dom": "^4.2.2",

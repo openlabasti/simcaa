@@ -38,7 +38,9 @@ i18n
                     "MODAL_IMGS_DND_DROPZONE_HELPER": "Trascina qui l'immagine, oppure clicca il riquadro",
                     "MODAL_IMGS_DND_WRONG_FILETYPE": "Attenzione, puoi caricare soltanto immagini!",
                     "MODAL_IMGS_DND_UPLOADED": "Immagine caricata correttamente!",
+                    "MODAL_IMGS_DND_UPERROR": "Errore nel caricamento dell'ultima immagine, riprova",
                     "MODAL_IMGS_DND_UPLOADED_LIST": "Immagini caricate:",
+                    "MODAL_IMGS_DND_UPLOADING": "Sto caricando....",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Modifica Impostazioni",
@@ -116,7 +118,9 @@ i18n
                     "MODAL_IMGS_DND_DROPZONE_HELPER": "Drag & Drop here, or click to upload",
                     "MODAL_IMGS_DND_WRONG_FILETYPE" : "Sorry, you can upload only images",
                     "MODAL_IMGS_DND_UPLOADED": "Cheers, image uploaded correctly!",
+                    "MODAL_IMGS_DND_UPERROR": "There are issues with the last image, try again",
                     "MODAL_IMGS_DND_UPLOADED_LIST": "Images uploaded:",
+                    "MODAL_IMGS_DND_UPLOADING": "Uploading....",
 
                     // OPTIONS
                     "OPT_LBL_EDITOPTIONS": "Edit Options",

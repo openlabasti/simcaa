@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Button, Dropdown } from 'semantic-ui-react'
+import { Segment, Button, Dropdown, Image } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
@@ -9,6 +9,7 @@ import { translate, Trans } from 'react-i18next'
 class LayoutExport extends Component {
     constructor(props) {
         super(props)
+        this.handler = this.handler.bind(this)
         this.state = {
             savedProject: [],
             cards: [],
@@ -23,6 +24,7 @@ class LayoutExport extends Component {
                         {type: 'imgsize', value: 960, text: 'massive'}],
             x: 0,
             y: 0,
+            customImgs: []
         }
     }
 
@@ -89,14 +91,42 @@ class LayoutExport extends Component {
         localCard[item.id].y = d.y
         this.setState({ cards: localCard })
     }
-
+    dragImg(item, index, e, d){
+      let localImgs = this.state.customImgs
+      localImgs[index].x = d.x
+      localImgs[index].y = d.y
+      this.setState({ customImgs: localImgs})
+    }
     resize(item, e, direction, ref, delta, position, event) {
         let localCard = this.state.cards
         localCard[item.id].rndWidth = ref.offsetWidth
         localCard[item.id].rndHeight = ref.offsetHeight
         this.setState({cards: localCard})
     }
-
+    resizeImg(item, index, e, direction, ref, dimensions, position){
+      console.log(dimensions)
+      let localImgs = this.state.customImgs
+      localImgs[index].height += dimensions.height
+      localImgs[index].width += dimensions.width
+      this.setState({customImgs: localImgs})
+    }
+    handler(imgs){
+      //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
+      let localImgs = this.state.customImgs
+      imgs.map((img)=>{
+        //costruisco oggetto che rappresenta immagine, nome+(x,y)
+        let imgWithPos = {
+          name: img.name,
+          x: 0,
+          y: 0,
+          height: 'auto',
+          width: 'auto'
+        }
+        //lo aggiungo ad array nello state
+        localImgs.push(imgWithPos)
+      })
+      this.setState({customImgs: localImgs})
+    }
     render() {
         const { t, i18n } = this.props
         if (this.state.savedProject.length === 0) {
@@ -114,6 +144,22 @@ class LayoutExport extends Component {
                 Verbo: {color: '',size: '1',type: ''},
                 Altro: {color: '',size: '1',type: ''}
             }
+            let customImgsLayout = this.state.customImgs
+            customImgsLayout = customImgsLayout.map((img,index) => {
+              //stampo le immagini custom
+              return(
+                <Rnd
+                    key={index}
+                    style={{background: '#ddd'}}
+                    position={{ x: img.x, y: img.y}}
+                    size={{ height: img.height, width: img.width}}
+                    onDragStop={this.dragImg.bind(this, img, index)}
+                    onResize={this.resizeImg.bind(this, img, index)}
+                    >
+                      <Image src={"http://www.radis-svil.it/simcaa/laravel-imageupload/public/uploads/images/"+img.name}/>
+                </Rnd>
+              )
+            })
             let cardsLayout = this.state.cards
             cardsLayout = cardsLayout.map((item, index) => {
                 return (
@@ -161,7 +207,7 @@ class LayoutExport extends Component {
                             <Button color='blue' disabled>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link} to='/'>{t("HEAD_BTN_RETURN")}</Button>
-                            <CustomImgsDnDUpload/>
+                            <CustomImgsDnDUpload handler={this.handler}/>
                         </Segment>
                         <Segment>
                             <Dropdown placeholder={t("TYPO_FRM_PLACEHOLDER")} selection
@@ -171,6 +217,7 @@ class LayoutExport extends Component {
                         </Segment>
                     </Segment.Group>
                     <Segment className={this.state.classSheet}>
+                        {customImgsLayout}
                         {cardsLayout}
                     </Segment>
                 </div>

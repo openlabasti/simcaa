@@ -18,14 +18,8 @@ class CustomImgsDnDUpload extends Component{
         //incapsulo immagine in oggetto form-data
         let imgToSend = new FormData()
         imgToSend.append('img',file[0])
-        //setto i parametri della richiesta
-        let myHeaders = new Headers({
-            'Accept': 'application/json',
-            'Content-Type' : 'multipart/form-data',
-            "Cache-Control": "no-cache"
-        })
+
         let request = new Request('http://www.radis-svil.it/simcaa/laravel-imageupload/public/imageupload',{
-            headers: myHeaders,
             method : 'POST',
             mode: 'cors',
             mimeType: 'multipart/form-data',
@@ -45,18 +39,22 @@ class CustomImgsDnDUpload extends Component{
             files: state.files.concat(file),
             loading: false
           }))
+          this.props.handler(this.state.files)
         }).catch((error)=>{
           //errore, lo comunico all'utente
+          console.log('errore di upload ->'+error)
           this.setState(state=>({
             message: "MODAL_IMGS_DND_UPERROR",
-            files: state.files
+            files: state.files,
+            loading: false
           }))
         })
 
       }else{
         this.setState(state=>({
           message: "MODAL_IMGS_DND_WRONG_FILETYPE",
-          files: state.files
+          files: state.files,
+          loading: false
         }))
       }
   }
@@ -78,7 +76,6 @@ class CustomImgsDnDUpload extends Component{
             </section>
             <section>
               {t("MODAL_IMGS_DND_UPLOADED_LIST")}
-                  {console.log(this.state.files)}
               <ul>
                   {
 
@@ -105,7 +102,6 @@ class CustomImgsDnDUpload extends Component{
             </section>
             <section>
               {t("MODAL_IMGS_DND_UPLOADED_LIST")}
-                  {console.log(this.state.files)}
               <ul>
                   {
 

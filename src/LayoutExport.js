@@ -7,6 +7,7 @@ import CustomImgsDnDUpload from './CustomImgsDnDUpload'
 import { translate, Trans } from 'react-i18next'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+
 class LayoutExport extends Component {
     constructor(props) {
         super(props)
@@ -130,7 +131,11 @@ class LayoutExport extends Component {
     }
     printDocument() {
       const input = document.getElementById('printable-div');
-      html2canvas(document.body)
+//      let clone = input.cloneNode(true)
+  //    clone.style.position = "absolute"
+    //  clone.style.top = "0"
+
+      html2canvas(input)
         .then((canvas) => {
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF();

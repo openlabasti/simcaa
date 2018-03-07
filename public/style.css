@@ -158,6 +158,11 @@ body {
     float: inherit !important;
 }
 
+/*  Cursor Pointer per le icone */
+.icon-pointer {
+    cursor: pointer;
+}
+
 /* Da testare su MS, Opera e Safari*/
 img {
     -webkit-user-drag: none;
@@ -169,4 +174,18 @@ img {
     -webkit-user-select: none;
     -moz-user-select: none;
     pointer-events: none;
+}
+
+/*  Per allineare centralmente la login form */
+/*  TODO: DA RIATTIVARE UNA VOLTA TOLTO IL MESSAGE NELLA LOGIN*/
+/* body > div,
+body > div > div,
+body > div > div > div,
+body > div > div div > div.login-form { */
+    /* height: 100%;
+} */
+
+/* fix per but modale causato dalla regola sopra */
+.ui.modal {
+    height: auto;
 }

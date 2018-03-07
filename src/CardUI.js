@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Input, Image, Label, Transition, Segment } from 'semantic-ui-react'
+import { withApolloFetch } from './withApolloFetch'
+import { withRouter } from 'react-router-dom'
 
 class CardUI extends Component {
     constructor(props) {
@@ -25,6 +27,7 @@ class CardUI extends Component {
                     codClass: 'Altro',
                     complex: '0',
                 },
+            chapter: {},
             borderCard: {},
             imgDiv: [],
             imgDivId: 0,
@@ -56,8 +59,40 @@ class CardUI extends Component {
     }
 
     componentWillMount() {
+        // Controllo se c'è una card fissa
         if (this.checkPropsCard() === true) {
             this.setState({card: this.props.Card})
+        }
+        else {
+            let query = `
+                query CurrentChapter {
+                    chapters (id: ${this.props.match.params.chapterid}) {
+                        data {
+                            id
+                            caa_project_id
+                            chapt_title
+                            chapt_content
+                            chapt_layout
+                            chapt_user_block
+                        }
+                    }
+                }
+            `
+            this.props.apolloFetch({ query })
+                .then((data) => {
+                    let chapter = data.data.chapters.data [0]
+                    let content = chapter.chapt_content
+                    content = content.length === 0 ? '' : JSON.parse(content)
+                    if(Object.keys(content).length !== 0 && typeof(content) === 'object') {
+                        this.setState({chapter: chapter, card: content})
+                    }
+                    else {
+                        this.setState({chapter: chapter})
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         }
     }
 
@@ -68,6 +103,7 @@ class CardUI extends Component {
             }
         }
 
+        // TODO: rivedere per creare funzione con stessa codice sopra
         // Cambia i bordi in tempo reale
         let styleCard = nextProps.borderCard ?
         {
@@ -84,6 +120,29 @@ class CardUI extends Component {
         } :
         this.state.borderCard
         this.setState({borderCard: styleCard})
+
+        // Trigger NavBar button
+        if (nextProps.triggerImg !== this.props.triggerImg) {
+            this.toggleVisibilityImg()
+        }
+        if (nextProps.shiftLeft !== this.props.shiftLeft) {
+            this.mergeCard(null, 'left')
+        }
+        if (nextProps.shiftRight !== this.props.shiftRight) {
+            this.mergeCard(null, 'right')
+        }
+        if (nextProps.linkCard !== this.props.linkCard) {
+            this.unlinkCard()
+        }
+        if (nextProps.lockCard !== this.props.lockCard) {
+            this.handleBlock()
+        }
+        if (nextProps.copyCard !== this.props.copyCard) {
+            this.copyCard()
+        }
+        if (nextProps.deleteCard !== this.props.deleteCard) {
+            this.deleteCard()
+        }
     }
 
     componentDidUpdate() {
@@ -104,12 +163,14 @@ class CardUI extends Component {
         }
     }
 
+    // Cambio il lemma in base alla input
     handleChange(currentCard, input) {
         let localCard = this.state.card
         localCard[currentCard.id].lemma = input.target.value
         this.setState({ card: localCard })
     }
 
+    // Main loop onKeyDown
     handleSetCard(currentCard, input) {
         var localCards = this.state.card
         var index = localCards[currentCard.id].id
@@ -165,6 +226,7 @@ class CardUI extends Component {
         this.setState({card: localCards})
     }
 
+    // handle del blocco della card
     handleBlock(input) {
         let currentCard = this.state.focusedCard
         var localCards = this.state.card
@@ -173,6 +235,7 @@ class CardUI extends Component {
         this.setFocusedCard(localCards[currentCard.id])
     }
 
+    // handle della dimensione della input
     handleExpandInput(currentCard, input) {
         let textId = 'text-' + currentCard.id
         let cardId = 'card-' + currentCard.id
@@ -189,25 +252,34 @@ class CardUI extends Component {
         }
     }
 
+    // Chiamata al db per cercare il simbolo associato al lemma
     setImg(array, index, lemma) {
         lemma = lemma.toLowerCase()
-        let url = this.props.urlRest + this.props.imgType + '/' + lemma
-        let myHeaders = new Headers({
-            'Accept': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
-        })
 
-        let request = new Request(url,{
-            header: myHeaders,
-            mode: 'cors',
-            method: 'GET'
-        })
-
-        fetch(request)
-            .then((response) => { return response.json() })
+        let query = `
+        query FatchLemma {
+            query_view (voice_master: "${lemma}"){
+                data {
+                    voice_master
+                    voice_human
+                    voice_last
+                    symbol_sign
+                    idclass
+                    lexical_expr
+                    imgcolor
+                    idstyle
+                }
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
             .then((data) => {
-                switch (data[0].idclass) {
+                let newDataSorting = data.data.query_view.data
+                let completeOrderedArray = this.prioritySort(newDataSorting, lemma)
+
+                // TODO: Cambiare una volta aggiunto il multilingua
+                // Identifica la classe del lemma
+                switch (completeOrderedArray[0].idclass) {
                     case 2:
                         array[index].codClass = 'Aggettivo'
                     break
@@ -242,16 +314,16 @@ class CardUI extends Component {
                     break
                 }
                 array[index].lemmaPrevious = array[index].lemma
-                array[index].sinonimi = data.length
-                array[index].img = data[0].symbol_sign
+                array[index].sinonimi = completeOrderedArray.length
+                array[index].img = completeOrderedArray[0].symbol_sign
                 array[index].imgAlt = []
-                array[index].complex = data[0].lexical_expr
-                for (let i=0; i<data.length; i++) {
-                    array[index].imgAlt.splice(i, 0, {voice_human: data[i].voice_human,
-                                                    voice_start: data[i].voice_master,
-                                                    voice_last: data[i].voice_last,
-                                                    img: data[i].symbol_sign,
-                                                    complex: data[i].lexical_expr
+                array[index].complex = completeOrderedArray[0].lexical_expr
+                for (let i=0; i<completeOrderedArray.length; i++) {
+                    array[index].imgAlt.splice(i, 0, {voice_human: completeOrderedArray[i].voice_human,
+                                                    voice_start: completeOrderedArray[i].voice_master,
+                                                    voice_last: completeOrderedArray[i].voice_last,
+                                                    img: completeOrderedArray[i].symbol_sign,
+                                                    complex: completeOrderedArray[i].lexical_expr
                                                     })
                 }
                 this.setState({card: array})
@@ -264,38 +336,97 @@ class CardUI extends Component {
                 array[index].img = 'placeholder.png'
                 this.setState({card: array})
             })
-
     }
 
+    // handle per i verbi composti/complessi
     setComplexVerbs(currentCard) {
         let localCards = this.state.card
-        let previusId = currentCard.id - 1
+        let previousId = currentCard.id - 1
         let self = this
         setTimeout(function() {
-            if (previusId > -1 && localCards[previusId].codClass === 'Verbo' && currentCard.codClass === 'Verbo' && localCards[previusId].lock === 'unlock') {
-                let url = self.props.urlRest + self.props.imgType + '/' + localCards[previusId].lemma + ' ' + currentCard.lemma
-                let request = new Request(url,{
-                    mode: 'cors',
-                    method: 'GET'
-                })
-                fetch(request)
-                    .then((response) => { return response.json() })
-                    .then((data) => {
-                        if (data.length > 0) {
-                            self.mergeCard(localCards[previusId], 'right', null)
-                            self.setFocus(currentCard.id + 1)
+            if (previousId > -1 && localCards[previousId].codClass === 'Verbo' && currentCard.codClass === 'Verbo' && localCards[previousId].lock === 'unlock') {
+                let complexLemma = localCards[previousId].lemma + ' ' + currentCard.lemma
+                let query = `
+                query CheckComplex {
+                    query_view(voice_master: "${complexLemma}") {
+                        data {
+                            idheadword
+                            voice_master
                         }
+                    }
+                }
+                `
+                self.props.apolloFetch({ query })
+                    .then((data) => {
+                        if (data.data.query_view.data.length > 0) {
+                            self.mergeCard(localCards[previousId], 'left', null)
+                            self.setFocus(currentCard.id)
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
                     })
             }
         }, 100)
     }
 
+    // Ordina in base alla priorità
+    prioritySort(newDataSorting, lemma) {
+        let count = 0
+        for (let item of newDataSorting) {
+            if (item.voice_human === lemma) {
+                count++
+            }
+        }
+        newDataSorting
+            .sort((a, b) => {
+                return a.lexical_expr - b.lexical_expr
+            })
+        let arrayInnerLemma, arrayOuterLemma
+        if (count === newDataSorting.length) {
+            arrayInnerLemma = newDataSorting
+            arrayOuterLemma = []
+        } else {
+            arrayInnerLemma = newDataSorting.slice(0,count/2)
+            arrayOuterLemma = newDataSorting.slice(count/2)
+        }
+        for (let i = 0; i < arrayInnerLemma.length; i++) {
+            arrayInnerLemma[i].tmpOrder = {color: '', type: ''}
+            arrayInnerLemma[i].finalOrder = ''
+            if (arrayInnerLemma[i].imgcolor === this.props.imgType) {
+                arrayInnerLemma[i].tmpOrder.color = '1'
+            } else {
+                arrayInnerLemma[i].tmpOrder.color = '0'
+            }
+            if (arrayInnerLemma[i].idstyle === this.props.imgStyle) {
+                arrayInnerLemma[i].tmpOrder.type = '1'
+            } else {
+                arrayInnerLemma[i].tmpOrder.type = '0'
+            }
+            for (let j = 0; j < this.props.priorityOrder.length; j++) {
+                arrayInnerLemma[i].finalOrder += arrayInnerLemma[i].tmpOrder[this.props.priorityOrder[j].text]
+            }
+        }
+        arrayInnerLemma
+            .sort((a, b) => {
+                return parseInt(b.finalOrder) - parseInt(a.finalOrder)
+            })
+        for (let i = 0; i < arrayInnerLemma.length; i++) {
+            delete arrayInnerLemma[i].tmpOrder
+            delete arrayInnerLemma[i].finalOrder
+        }
+        let finalArray = arrayInnerLemma.concat(arrayOuterLemma)
+        return finalArray
+    }
+
+    // riordina gli ID nell'array delle card
     reorderIds(cards) {
         for (let i=0; i< cards.length; i++) {
             cards[i].id = i
         }
     }
 
+    // setta il focus sulla input richiamata
     setFocus(index) {
         var idText = "text-" + index
         setTimeout(function() {
@@ -303,6 +434,7 @@ class CardUI extends Component {
         }, 50)
     }
 
+    // handle del cambio di immagine
     setNewImg(currentImg, input) {
         var localCards = this.state.card
         let index = this.state.imgDivId
@@ -326,6 +458,7 @@ class CardUI extends Component {
         this.setState({card: localCards, visibleImg: !this.state.visibleImg})
     }
 
+    // handle della copia della card
     copyCard(input) {
         var localCards = this.state.card
         let currentCard = this.state.focusedCard
@@ -343,6 +476,7 @@ class CardUI extends Component {
         this.setState({card: localCards})
     }
 
+    // handle del unlink delle card
     unlinkCard(input) {
         let currentCard = this.state.focusedCard
         let lockStatus = currentCard.codClass === 'Verbo' ? 'lock' : 'unlock'
@@ -370,7 +504,8 @@ class CardUI extends Component {
         }, 300)
     }
 
-    mergeCard(direction, input) {
+    // handel del merge delle card
+    mergeCard(input, direction) {
         let currentCard = this.state.focusedCard
         var localCards = this.state.card
         if (direction === 'right' && localCards[currentCard.id+1]) {
@@ -385,6 +520,7 @@ class CardUI extends Component {
         this.setState({card: localCards})
     }
 
+    // handle del delete della card
     deleteCard(input) {
         let currentCard = this.state.focusedCard
         var localCards = this.state.card
@@ -397,7 +533,8 @@ class CardUI extends Component {
         this.setState({card: localCards})
     }
 
-    toggleVisibilityImg(input) {
+    // toggle della visibilità delle immagini alternative della card
+    toggleVisibilityImg() {
         let currentCard = this.state.focusedCard
         if (!this.state.visibleImg) {
             this.setState({ visibleImg: !this.state.visibleImg, imgDiv: currentCard.imgAlt, imgDivId: currentCard.id})
@@ -407,13 +544,14 @@ class CardUI extends Component {
         }
     }
 
+    // post al db per salvare il capitolo
     handleSaveProject() {
-        let localProject = this.props.project[0]
-        localProject.card_array = JSON.stringify(this.state.card)
-        let url = this.props.urlProject + localProject.id
+        let localProject = { "id":  this.props.match.params.chapterid, "chapt_content": ""}
+        localProject.chapt_content = JSON.stringify(this.state.card)
+        let url = window.env.RestApiCard
         var self = this
-        var data = JSON.stringify(localProject);
-        var xhr = new XMLHttpRequest();
+        var data = JSON.stringify(localProject)
+        var xhr = new XMLHttpRequest()
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             if (this.status === 200) {
@@ -421,11 +559,12 @@ class CardUI extends Component {
             }
           }
         });
-        xhr.open("PUT", url);
-        xhr.setRequestHeader("content-type", "application/json");
-        xhr.send(data);
+        xhr.open("POST", url)
+        xhr.setRequestHeader("content-type", "application/json")
+        xhr.send(data)
     }
 
+    // focus della card nella navbar
     setFocusedCard(currentCard, input) {
         this.setState({focusedCard: currentCard})
         this.props.setNavbarCard(currentCard)
@@ -450,8 +589,6 @@ class CardUI extends Component {
                 styles = this.state.borderCard[item.codClass]
             }
 
-            // Move this under onKeyDown of Card when fixed
-            // onKeyUp={this.handleExpandInput.bind(this, item)}
             let cardInput = <Card.Content>
                         <Input
                             size= {this.props.sizeInput}
@@ -539,4 +676,4 @@ class CardUI extends Component {
         )}
 }
 
-export default CardUI
+export default withRouter(withApolloFetch(CardUI))

@@ -1,0 +1,201 @@
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import { Button, Menu, Card, Confirm, Loader } from 'semantic-ui-react'
+import { withApolloFetch } from './withApolloFetch'
+import { translate, Trans } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
+import { withCurrentProject } from './withCurrentProject'
+
+import NewProfileForm from './NewProfileForm'
+import NewChapterForm from './NewChapterForm'
+
+class Project extends Component {
+    constructor(props) {
+        super(props)
+        this.state= {
+            openConfirm: false,
+            deleteChaptId: 0,
+            chapters: [{}],
+            fetchFinished: false
+        }
+    }
+
+    componentWillMount() {
+        let currentProjectId = this.props.match.params.projectid
+        let query = `
+        query currentChapthers {
+            chapters(caa_project_id: ${currentProjectId}) {
+                data {
+                    id
+                    chapt_title
+                    chapt_user_block
+                }
+            }
+        }
+        `
+        let self = this
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                self.setState({chapters: data.data.chapters.data, fetchFinished: true})
+            })
+    }
+
+    handleOpenConfirm(id, event) {
+        this.setState({openConfirm: true, deleteChaptId: id})
+    }
+
+    handleCancel() {
+        this.setState({openConfirm: false})
+    }
+
+    handleConfirm() {
+        this.setState({openConfirm: false})
+        this.deleteChapter()
+    }
+
+    createNewChapter(title) {
+        let currentProjectId = this.props.match.params.projectid
+        let query = `
+        mutation NewChapter {
+            createCaaChapter(caa_project_id: ${currentProjectId},
+                            chapt_title: "${title}",
+                            chapt_content: "",
+                            chapt_layout: "layout"
+                            chapt_user_block: 0) {
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                this.componentWillMount()
+            })
+    }
+
+    deleteChapter(id, event) {
+        let query = `
+        mutation DeleteChapter {
+            deleteCaaChapter(id: ${this.state.deleteChaptId}) {
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                this.componentWillMount()
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    updateProjectProfile(data) {
+        let proj_profile = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let query = `
+        mutation updateProject {
+            updateCaaProject(id: ${this.props.project.id},
+                            proj_name: "${this.props.project.proj_name}",
+                            proj_owner: ${this.props.project.proj_owner},
+                            proj_share: ${this.props.project.proj_share},
+                            proj_profile: "${proj_profile}",
+                            proj_blocked: ${this.props.project.proj_blocked},
+                            proj_note: "${this.props.project.proj_note}"){
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                this.componentWillMount()
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    render() {
+        const { t, i18n } = this.props
+
+        let localChapters = this.state.chapters
+        localChapters = localChapters.map((item, index) => {
+            return (
+                <Card style={{'textAlign': 'center', 'width': 'auto'}} key={index}>
+                    <Card.Content header={'Chapt id: ' + item.id}/>
+                    <Card.Content>
+                        {item.chapt_title}
+                    </Card.Content>
+                    <Card.Content extra>
+                        <Button.Group>
+                            <Button color='green'
+                                as={Link}
+                                disabled={item.chapt_user_block === 0 ? false : true}
+                                to={'/basic/edit/' + this.props.match.params.projectid + '/' + item.id}
+                            >{t("PRJ_BTN_EDIT")}</Button>
+                            <Button.Or />
+                            <Button color='blue' disabled>{t("PRJ_BTN_OPTIONS")}</Button>
+                            <Button.Or />
+                            <Button color='red' onClick={this.handleOpenConfirm.bind(this, item.id)}>
+                                {t("PRJ_BTN_DELETE")}
+                            </Button>
+                        </Button.Group>
+                    </Card.Content>
+                </Card>
+            )
+        })
+
+        if (!this.state.fetchFinished) {
+            return (
+                <div>
+                    <Loader active inline='centered' size='massive'/>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <Menu>
+                        <Menu.Item>
+                            <Button color='red' as={Link} to='/home'>{t("PRJ_MNU_BACK")}</Button>
+                        </Menu.Item>
+
+                        <Menu.Item>
+                            <NewProfileForm
+                                className='icon-pointer'
+                                size='big'
+                                edit='button'
+                                data={this.props.project.proj_profile}
+                                updateProfile={this.updateProjectProfile.bind(this)}
+                            />
+                        </Menu.Item>
+                    </Menu>
+
+                    <Card.Group>
+                        {localChapters}
+                        <Card style={{'textAlign': 'center'}}>
+                            <Card.Content header={t("PRJ_LBL_NEWCHAPT")}/>
+                            <Card.Content>
+                                <NewChapterForm
+                                    className='icon-pointer'
+                                    name='add square'
+                                    size='huge'
+                                    createChapter={this.createNewChapter.bind(this)}
+                                />
+                            </Card.Content>
+                            <Card.Content extra>
+                                {t("PRJ_LBL_INFO")}
+                            </Card.Content>
+                        </Card>
+                    </Card.Group>
+                    <Confirm
+                        open={this.state.openConfirm}
+                        header='This action cannot be reversed'
+                        content='Are you sure to want to delete this chapter?'
+                        onCancel={this.handleCancel.bind(this)}
+                        onConfirm={this.handleConfirm.bind(this)}
+                    />
+                </div>
+            )
+        }
+    }
+}
+
+export default withRouter(withApolloFetch(translate('translations')(withCurrentProject(Project))))

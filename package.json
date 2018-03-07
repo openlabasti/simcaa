@@ -4,6 +4,9 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
+    "apollo-fetch": "^0.7.0",
+    "graphql": "^0.12.3",
+    "graphql-tag": "^2.6.1",
     "halogen": "^0.2.0",
     "i18next": "^10.0.7",
     "i18next-browser-languagedetector": "^2.1.0",

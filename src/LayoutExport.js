@@ -131,18 +131,19 @@ class LayoutExport extends Component {
     }
     printDocument() {
       const input = document.getElementById('printable-div');
-//      let clone = input.cloneNode(true)
-  //    clone.style.position = "absolute"
-    //  clone.style.top = "0"
 
-      html2canvas(input)
-        .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF();
-          pdf.addImage(imgData, 'JPEG', 0, 0);
-          // pdf.output('dataurlnewwindow');
-          pdf.save("download.pdf");
-        })
+      html2canvas(input, {allowTaint:true, useCORS:true})
+        .then(function(canvas){
+          console.log('aaaaaaargh');
+          let imgData = canvas.toDataURL()
+          console.log('cacca '+imgData);
+          let doc = new jsPDF('p','mm')
+          console.log('vaffanculo');
+          doc.addImage(imgData, 'PNG', 10, 10)
+          doc.save('caccablu.pdf')
+          }
+        )
+
     }
     render() {
         const { t, i18n } = this.props

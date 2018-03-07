@@ -5,7 +5,8 @@ import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
 import CustomImgsDnDUpload from './CustomImgsDnDUpload'
 import { translate, Trans } from 'react-i18next'
-
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 class LayoutExport extends Component {
     constructor(props) {
         super(props)
@@ -127,6 +128,17 @@ class LayoutExport extends Component {
       })
       this.setState({customImgs: localImgs})
     }
+    printDocument() {
+      const input = document.getElementById('printable-div');
+      html2canvas(document.body)
+        .then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF();
+          pdf.addImage(imgData, 'JPEG', 0, 0);
+          // pdf.output('dataurlnewwindow');
+          pdf.save("download.pdf");
+        })
+    }
     render() {
         const { t, i18n } = this.props
         if (this.state.savedProject.length === 0) {
@@ -204,7 +216,7 @@ class LayoutExport extends Component {
                     <Segment.Group className='no-print'>
                         <Segment>
                             <Button color='blue' disabled>{t("HEAD_BTN_RESET")}</Button>
-                            <Button color='blue' disabled>{t("HEAD_BTN_EXPORTPDF")}</Button>
+                            <Button color='blue' onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link} to='/'>{t("HEAD_BTN_RETURN")}</Button>
                             <CustomImgsDnDUpload handler={this.handler}/>
@@ -216,7 +228,7 @@ class LayoutExport extends Component {
                             />
                         </Segment>
                     </Segment.Group>
-                    <Segment className={this.state.classSheet}>
+                    <Segment className={this.state.classSheet} id='printable-div'>
                         {customImgsLayout}
                         {cardsLayout}
                     </Segment>

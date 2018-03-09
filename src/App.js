@@ -35,7 +35,7 @@ class App extends Component {
                     <Route path="/home" render={this.isLogged.bind(this, RootComponent)}/>
                     <Route path="/basic/:view?/:projectid?/:chapterid?" render={this.isLogged.bind(this, BasicProject)} />
                     <Route path="/project/:projectid?" render={this.isLogged.bind(this, Project)} />
-                    <Route path="/:projectid?/layout/" render={this.isLogged.bind(this, LayoutExport)} />
+                    <Route path="/layout/:chapterid?" render={this.isLogged.bind(this, LayoutExport)} />
                     <Route path="/login" render={() => (
                         <Login checkLogin={this.login} />
                     )}/>

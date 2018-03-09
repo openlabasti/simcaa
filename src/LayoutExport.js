@@ -7,6 +7,9 @@ import CustomImgsDnDUpload from './CustomImgsDnDUpload'
 import { translate, Trans } from 'react-i18next'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { withApolloFetch } from './withApolloFetch'
+import { withRouter } from 'react-router-dom'
+
 class LayoutExport extends Component {
     constructor(props) {
         super(props)
@@ -30,21 +33,21 @@ class LayoutExport extends Component {
     }
 
     componentWillMount() {
-        let url = window.env.RestApiProject + '0'
+        let query = `
+        query Chapter {
+            chapters (id: ${this.props.match.params.chapterid}) {
+                data {
+                    id
+                    chapt_content
+                    chapt_layout
+                }
+            }
+        }
+        `
 
-        let request = new Request(url,{
-            mode: 'cors',
-            method: 'GET',
-            headers: {
-                "Accept": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-
-        fetch(request)
-            .then((response) => { return response.json() })
+        this.props.apolloFetch({ query })
             .then((data) => {
-                let stateCard = JSON.parse(data[0].card_array)
+                let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
                 let numCardRow = Math.floor(794 / 200)
                 let xCard = 200
                 let yCard = 0
@@ -70,11 +73,11 @@ class LayoutExport extends Component {
                     stateCard[i].rndWidth = 178
                     stateCard[i].rndHeight = 226
                 }
-                this.setState({savedProject: data[0], cards: stateCard})
+                this.setState({savedProject: data.data.chapters.data[0], cards: stateCard})
             })
-            // .catch((error) => {
-            //     console.log('Cannot retrieve Project Data')
-            // })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     onChangeDropdown(event, data) {
@@ -130,13 +133,13 @@ class LayoutExport extends Component {
     }
     printDocument() {
       const input = document.getElementById('printable-div');
-      html2canvas(document.body)
+      html2canvas(document.body, {allowTaint: true})
         .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF();
-          pdf.addImage(imgData, 'JPEG', 0, 0);
-          // pdf.output('dataurlnewwindow');
-          pdf.save("download.pdf");
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF();
+            pdf.addImage(imgData, 'png', 0, 0);
+            // pdf.output('dataurlnewwindow');
+            // pdf.save("download.pdf");
         })
     }
     render() {
@@ -238,4 +241,4 @@ class LayoutExport extends Component {
     }
 }
 
-export default translate('translations')(LayoutExport)
+export default translate('translations')(withApolloFetch(withRouter(LayoutExport)))

@@ -237,19 +237,29 @@ class CardUI extends Component {
 
     // handle della dimensione della input
     handleExpandInput(currentCard, input) {
-        let textId = 'text-' + currentCard.id
-        let cardId = 'card-' + currentCard.id
-        let cardResize = document.getElementById(cardId)
-        let inputResize = document.getElementById(textId)
-        inputResize.style.minWidth = '50px'
-        inputResize.style.width = '0';
-        cardResize.style.width = 'auto'
-        let newWidth = inputResize.scrollWidth + 20;
-        if(inputResize.scrollWidth > inputResize.clientWidth){
-            newWidth += 20;
-            cardResize.style.width = 'auto'
-            inputResize.style.width = newWidth + 'px';
-        }
+        // let textId = 'text-' + currentCard.id
+        // let cardId = 'card-' + currentCard.id
+        // let cardResize = document.getElementById(cardId)
+        // let inputResize = document.getElementById(textId)
+        // inputResize.style.minWidth = '50px'
+        // inputResize.style.width = '0'
+        // cardResize.style.width = 'auto'
+        // let newWidth = inputResize.scrollWidth + 20
+        // console.log(inputResize);
+        // if(inputResize.scrollWidth > inputResize.clientWidth){
+        //     newWidth += 20
+        //     cardResize.style.width = 'auto'
+        //     inputResize.style.width = newWidth + 'px'
+        // }
+
+        // let textId = 'text-' + currentCard.id
+        // let cardId = 'card-' + currentCard.id
+        // let cardResize = document.getElementById(cardId)
+        // let inputResize = document.getElementById(textId)
+        // inputResize.style.width = '0px'
+        // if (inputResize.scrollWidth > inputResize.clientWidth) {
+        //     inputResize.style.width = inputResize.scrollWidth + 20 + 'px'
+        // }
     }
 
     // Chiamata al db per cercare il simbolo associato al lemma
@@ -258,7 +268,7 @@ class CardUI extends Component {
 
         let query = `
         query FatchLemma {
-            query_view (voice_master: "${lemma}"){
+            query_view (voice_master: "${lemma}", limit: 100){
                 data {
                     voice_master
                     voice_human
@@ -504,16 +514,18 @@ class CardUI extends Component {
         }, 300)
     }
 
-    // handel del merge delle card
+    // handle del merge delle card
     mergeCard(input, direction) {
         let currentCard = this.state.focusedCard
         var localCards = this.state.card
         if (direction === 'right' && localCards[currentCard.id+1]) {
             localCards[currentCard.id+1].lemma = currentCard.lemma + ' ' + localCards[currentCard.id+1].lemma
+            this.handleExpandInput(localCards[currentCard.id+1])
             localCards.splice(currentCard.id, 1)
         }
         else if (direction === 'left' && localCards[currentCard.id-1]) {
             localCards[currentCard.id-1].lemma += ' ' + currentCard.lemma
+            this.handleExpandInput(localCards[currentCard.id-1])
             localCards.splice(currentCard.id, 1)
         }
         this.reorderIds(localCards)

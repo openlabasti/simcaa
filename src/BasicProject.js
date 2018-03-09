@@ -56,7 +56,7 @@ class BasicProject extends Component {
                 Verbo: {color: '',size: '1',type: ''},
                 Altro: {color: '',size: '1',type: ''}
             },
-            urlRest: window.env.RestApiLemmi,
+            urlRest: window.env.GraphQLServer,
             urlImg: window.env.PathImages,
             // Triger NavBar
             triggerImg: false,
@@ -106,12 +106,12 @@ class BasicProject extends Component {
         setTimeout(function() {
             self.props.apolloFetch({ query })
             .then((data) => {
-                
+
             })
             .catch((error) => {
                 console.log(error);
             })
-        }, 3000)
+        }, 2000)
 
         // TODO: Rivedere questa parte per eliminare il timeout
         setTimeout(function() {
@@ -222,7 +222,7 @@ class BasicProject extends Component {
                     imgPadding={this.state.imgPadding}
                     imgType={this.state.imgType}
                     imgStyle={this.state.imgStyle}
-                    borderCard={this.state.SavedBorderCard}
+                    borderCard={this.state.borderCard}
                     urlRest={this.state.urlRest}
                     urlImg={this.state.urlImg}
                     priorityOrder={this.state.priorityOrder}

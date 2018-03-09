@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Header, Image, Modal } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
+import { withApolloFetch } from './withApolloFetch'
 import Dropzone from 'react-dropzone'
 import Loader from 'halogen/MoonLoader'
 
@@ -59,6 +60,7 @@ class CustomImgsDnDUpload extends Component{
       }
   }
   render(){
+      console.log(this.props);
     const { t, i18n } = this.props
     if(!this.state.loading){
     return(
@@ -116,4 +118,4 @@ class CustomImgsDnDUpload extends Component{
   }
   }
 }
-export default translate('translations') (CustomImgsDnDUpload)
+export default translate('translations') (withApolloFetch(CustomImgsDnDUpload))

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Dropdown, Segment, Icon } from 'semantic-ui-react'
+import { Form, Dropdown, Segment, Icon, Loader } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 
@@ -12,6 +12,7 @@ class ImageOptions extends Component {
                         {type: 'imgtype', value: 2, text: props.t("OPT_FRM_COLOR")}],
             imageStyle: [{type: 'imgstyle', value: 0, text: 'random'}],
             order: [{}],
+            fetchFinished: false,
         }
 
     }
@@ -37,7 +38,7 @@ class ImageOptions extends Component {
                                             text: arrayData[i].paramstyle,
                                     })
                 }
-                this.setState({imageStyle: localImgStyle, order: this.props.order})
+                this.setState({imageStyle: localImgStyle, order: this.props.order, fetchFinished: true})
             })
             .catch((error) => {
                 console.log(error);
@@ -80,6 +81,14 @@ class ImageOptions extends Component {
                 </Segment>
             )
         })
+
+        if (!this.state.fetchFinished) {
+            return (
+                <div>
+                    <Loader active inline='centered' size='massive'/>
+                </div>
+            )
+        }
         return (
             <div>
                 <Segment.Group horizontal>

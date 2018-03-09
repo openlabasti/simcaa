@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm } from 'semantic-ui-react'
+import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader } from 'semantic-ui-react'
 import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
@@ -18,6 +18,7 @@ class RootComponent extends Component {
             deleteProjectId: 0,
             deleteProfileId: 0,
             optionsProfiles: [{}],
+            fetchFinished: false,
         }
     }
 
@@ -53,7 +54,8 @@ class RootComponent extends Component {
                 }
                 this.setState({projects: data.data.projects.data,
                                 profiles: data.data.profiles.data,
-                                optionsProfiles: localOptionsProfile})
+                                optionsProfiles: localOptionsProfile,
+                                fetchFinished: true})
             })
             .catch((error) => {
                 console.log(error);
@@ -93,6 +95,7 @@ class RootComponent extends Component {
         this.deleteProfile()
     }
 
+    // Crea un nuovo progetto
     createProject(title, notes, share, profile) {
         let proj_owner = this.props.user.id
         let proj_share = share === false ? 0 : 1
@@ -165,6 +168,7 @@ class RootComponent extends Component {
             })
     }
 
+    // Crea un nuovo profilo
     createProfile(data) {
         let profile_name = JSON.stringify(data.newProfileName)
         let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
@@ -187,6 +191,7 @@ class RootComponent extends Component {
             })
     }
 
+    // Aggiorna un profilo preesistente
     updateProfile(id, data) {
         let profile_name = JSON.stringify(data.newProfileName)
         let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
@@ -210,6 +215,7 @@ class RootComponent extends Component {
             })
     }
 
+    // Deleta il profilo
     deleteProfile() {
         let query = `
             mutation deleteProfile {
@@ -246,7 +252,7 @@ class RootComponent extends Component {
                         </Link>
                     </Table.Cell>
                     <Table.Cell>{item.proj_note}</Table.Cell>
-                    <Table.Cell>{item.proj_share}</Table.Cell>
+                    <Table.Cell collapsing>{item.proj_share === 0 ? 'Private' : 'Public'}</Table.Cell>
                     <Table.Cell collapsing textAlign='right'>
                         <Icon name='trash' color='red' size='big'
                             className='icon-pointer'
@@ -282,6 +288,15 @@ class RootComponent extends Component {
                 </Table.Row>
             )
         })
+
+        // Renderizza il Loader se non ha ancora finito le chiamate al db
+        if (!this.state.fetchFinished) {
+            return (
+                <div>
+                    <Loader active inline='centered' size='massive'/>
+                </div>
+            )
+        }
         return (
             <Container>
                 <Grid columns='equal' style={{padding: '10px'}}>
@@ -366,7 +381,7 @@ class RootComponent extends Component {
                 <Confirm
                     open={this.state.openConfirmProfile}
                     header='This action cannot be reversed'
-                    content='Are you sure to want to delete this chapter?'
+                    content='Are you sure to want to delete this profile?'
                     onCancel={this.handleCancel.bind(this)}
                     onConfirm={this.handleConfirmProfile.bind(this)}
                 />

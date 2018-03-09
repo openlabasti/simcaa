@@ -28,18 +28,18 @@ class NavBar extends Component {
             }
         }
         `
-        let self = this
-            self.props.apolloFetch({ query })
-            .then((data) => {
-                this.props.history.push('/project/' + this.props.match.params.projectid)
-            })
-            .catch((error) => {
-                console.log(error);
-            })
+        this.props.apolloFetch({ query })
+        .then((data) => {
+            this.props.history.push('/project/' + this.props.match.params.projectid)
+        })
+        .catch((error) => {
+            console.log(error);
+        })
     }
 
     render() {
         const { t, i18n } = this.props
+        console.log(this.props);
         let mode = this.props.checked ? t("HEAD_BTN_EDIT") : t("HEAD_BTN_VIEW")
         if (this.state.push) {
             return (
@@ -54,7 +54,7 @@ class NavBar extends Component {
                 <Button color='green' onClick={this.triggerSaveProject.bind(this)}>{t("HEAD_BTN_SAVE")}</Button>
                 <Button color='red' onClick={this.closeChapter.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                 <Button color='blue' onClick={this.props.checkMode}>{mode}</Button>
-                <Button color='violet' onClick={this.redirect.bind(this)}>{t("HEAD_BTN_TYPO")}</Button>
+                <Button color='violet' as={Link} to={'/layout/' + this.props.match.params.chapterid}>{t("HEAD_BTN_TYPO")}</Button>
             </Segment>
         )
     }

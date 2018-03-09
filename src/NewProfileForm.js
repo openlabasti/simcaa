@@ -46,7 +46,7 @@ class NewProfileForm extends Component {
                 Verbo: {color: '',size: '1',type: ''},
                 Altro: {color: '',size: '1',type: ''}
             },
-            urlRest: window.env.RestApiLemmi,
+            urlRest: window.env.GraphQLServer,
             urlImg: window.env.PathImages,
         }
         // Handle Form Options

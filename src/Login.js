@@ -89,6 +89,14 @@ class Login extends Component {
                 </Grid>
 
                 <Segment style={{'maxWidth': '50%', 'left': '50%', 'transform': 'translateX(-50%)'}}>
+                <Message
+                    color='blue'
+                    size='massive'
+                >
+                <Message.Header>To test this Demo</Message.Header>
+                    <p>Email: user@demo.com</p>
+                    Password: user
+                </Message>
                     <Message
                         color='purple'
                         size='massive'

@@ -133,7 +133,7 @@ class LayoutExport extends Component {
     }
     printDocument() {
       const input = document.getElementById('printable-div');
-      html2canvas(document.body, {allowTaint: true})
+      html2canvas(document.body, {allowTaint: true, useCORS: true, proxy:'127.0.0.1'})
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF();

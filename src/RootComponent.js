@@ -367,6 +367,7 @@ class RootComponent extends Component {
                         <Grid.Column>
                             <Segment>
                                 <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
+                                <Button color='blue' as={Link} to="/administration">Admin</Button>
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>

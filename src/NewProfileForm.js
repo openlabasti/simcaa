@@ -136,8 +136,8 @@ class NewProfileForm extends Component {
                 // TODO: Rivedere e forse eliminare
                 let localStyle = JSON.parse(JSON.stringify(this.state.cardStyle));
                 if (data.value === 'mini') {
-                    // localStyle.width = '50%'
-                    localStyle.width = 'auto'
+                    localStyle.width = '50%'
+                    // localStyle.width = 'auto'
                 } else if (data.value === 'tiny') {
                     // localStyle.width = '70%'
                     localStyle.width = 'auto'

@@ -25,7 +25,7 @@ class RootComponent extends Component {
     componentWillMount() {
         let query = `
         query allProjects {
-            projects(proj_owner: ${this.props.user.id}) {
+            projects(proj_owner: ${this.props.user.id}, is_public: ${true}) {
                 data {
                     id
                     proj_name

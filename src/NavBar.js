@@ -39,7 +39,6 @@ class NavBar extends Component {
 
     render() {
         const { t, i18n } = this.props
-        console.log(this.props);
         let mode = this.props.checked ? t("HEAD_BTN_EDIT") : t("HEAD_BTN_VIEW")
         if (this.state.push) {
             return (

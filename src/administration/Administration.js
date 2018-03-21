@@ -3,17 +3,19 @@ import { withApolloFetch } from '../withApolloFetch'
 import { withRouter } from 'react-router-dom'
 import { withCurrentUser} from '../withCurrentUser'
 import { translate, Trans } from 'react-i18next'
-import { Container, Menu } from 'semantic-ui-react'
+import { Container, Menu, Segment } from 'semantic-ui-react'
 import AdminMenu from './Menu'
 import AllUsers from './AllUsers'
 import AllGroups from './AllGroups'
 import Helper from './Helper'
+import UsrConfig from './UsrConfig'
 class Admin extends Component{
   constructor(props){
     super(props)
     this.state = {
       action: 0
     }
+    this.handleSelection = this.handleSelection.bind(this)
   }
   handleSelection(n){
     switch(n){
@@ -25,8 +27,10 @@ class Admin extends Component{
         //usr ha selezionato l'item 'Gruppi'
         this.setState({action:2})
         break
+
     }
   }
+
   render(){
     const { t, i18n } = this.props
     switch(this.state.action){
@@ -34,7 +38,9 @@ class Admin extends Component{
         return(
            <div>
              <AdminMenu action={this.handleSelection}/>
-             <AllUsers/>
+             <Segment>
+              <Helper/>
+             </Segment>
            </div>
          )
          break
@@ -57,4 +63,4 @@ class Admin extends Component{
     }
   }
 }
-export default withRouter(translate('translations')(withApolloFetch(withCurrentUser(Admin))))
+export default withRouter(translate('translations')(withRouter(withApolloFetch(withCurrentUser(Admin)))))

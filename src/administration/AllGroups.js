@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import {Container, Header} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
+
 
 class AllGroups extends Component{
   render(){

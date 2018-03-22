@@ -27,6 +27,9 @@ class Admin extends Component{
         //usr ha selezionato l'item 'Gruppi'
         this.setState({action:2})
         break
+      case 12:
+        this.setState({action:12})
+        break
 
     }
   }
@@ -48,10 +51,17 @@ class Admin extends Component{
         return(
            <div>
              <AdminMenu action={this.handleSelection}/>
-             <AllUsers/>
+             <AllUsers action={this.handleSelection}/>
            </div>
          )
          break
+      case 12:
+        return(
+          <div>
+            <AdminMenu action={this.handleSelection}/>
+            <UsrConfig id={this.state.usrConfigId}/>
+          </div>
+        )
       case 2:
       return(
          <div>

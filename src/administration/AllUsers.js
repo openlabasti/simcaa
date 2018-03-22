@@ -1,16 +1,17 @@
 import React, { Component, Link } from 'react'
-import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon} from 'semantic-ui-react'
+import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon, Confirm} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import {withApolloFetch} from '../withApolloFetch'
 import { withRouter } from 'react-router-dom'
+import UsrConfig from './UsrConfig'
 
 class AllUsers extends Component{
   constructor(props){
     super(props)
-    this.redirect = this.redirect.bind(this)
     this.state={
       lock: 0,
-      users: []
+      users: [],
+      openConfirmDelete: false
     }
   }
   componentWillMount(){
@@ -32,9 +33,15 @@ class AllUsers extends Component{
       this.setState({lock:1, users: data.data.caa_users.data})
     })
   }
-  redirect(path){
-    console.log(path);
-    this.props.history.push(path)
+
+  openConfirm(){
+    this.setState({openConfirmDelete: true})
+  }
+  handleDelete(){
+    console.log('confermato, parte delete!');
+  }
+  handleCancel(){
+    this.setState({openConfirmDelete: false})
   }
   render(){
     if(this.state.lock===1){
@@ -58,11 +65,16 @@ class AllUsers extends Component{
             </Table.Cell>
             <Table.Cell>
               <Popup
-                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} />}
+                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm()}/>}
                 content= 'Elimina utente'
                 />
               <Popup
-                trigger={<Button circular icon={<Icon name='configure' size='large'/>} onClick={()=>this.redirect('/administration/usrconfig/'+item.id)}/>}
+                trigger={<UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
+                id={item.id}
+                name={item.name}
+                email={item.email}
+                organization = {item.organization}
+                link_web = {item.link_web} />}
                 content= 'Configura utente'
 
                 />
@@ -72,6 +84,7 @@ class AllUsers extends Component{
         )
       })
       return(
+        <div>
         <Container>
           <Table celled padded textAlign='center'>
             <Table.Header>
@@ -89,6 +102,14 @@ class AllUsers extends Component{
             </Table.Body>
           </Table>
         </Container>
+        <Confirm
+            open={this.state.openConfirmDelete}
+            header='This action cannot be reversed'
+            content="Sei sicuro di  voler eliminare l'utente?"
+            onCancel={this.handleCancel.bind(this)}
+            onConfirm={this.handleDelete.bind(this)}
+        />
+        </div>
         )
     }else{
       return(

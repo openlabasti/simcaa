@@ -41,7 +41,6 @@ class App extends Component {
                         <Login checkLogin={this.login} />
                     )}/>
                     <Route path="/administration" render={this.isLogged.bind(this, Admin)} />
-                    <Route path="/administration/usrconfig/:usrId?" render={this.isLogged.bind(this, UsrConfig)} />
                 </div>
             </HashRouter>
         )

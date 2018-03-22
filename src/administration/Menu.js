@@ -17,7 +17,6 @@ class AdminMenu extends Component{
   }
   render(){
     const { t, i18n } = this.props
-console.log(this.props);
    return(
         <Menu id='navbar'>
             <Menu.Item name='header'>

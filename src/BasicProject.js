@@ -12,7 +12,6 @@ class BasicProject extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cardRow: [{row: 0}],
             visibleOption: false,
             mode: false,
             saveProject: false,
@@ -94,24 +93,28 @@ class BasicProject extends Component {
     }
 
     componentDidMount() {
-        // Blocca il capitolo, TODO: rivedere per eliminare il timeout
-        let query = `
-        mutation BlockChapter {
-            updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
-                id
-            }
-        }
-        `
         let self = this
-        setTimeout(function() {
-            self.props.apolloFetch({ query })
+        // Setta la mode to view se l'url è quello della view
+        if (this.props.match.params.mode === 'view') {
+            this.handleMode()
+        } else {
+            // Blocca il capitolo, TODO: rivedere per eliminare il timeout
+            let query = `
+            mutation BlockChapter {
+                updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
+                    id
+                }
+            }
+            `
+            this.props.apolloFetch({ query })
             .then((data) => {
 
             })
             .catch((error) => {
                 console.log(error);
             })
-        }, 2000)
+        }
+
 
         // TODO: Rivedere questa parte per eliminare il timeout
         setTimeout(function() {
@@ -122,12 +125,12 @@ class BasicProject extends Component {
         }, 50)
     }
 
+    // HANDLE EDIT-VIEW MODE
     handleMode() {
         let navbar = document.getElementById("navbar-icon")
         if (this.state.mode === false) {
             navbar.classList.add("viewMode")
-        }
-        else {
+        } else {
             navbar.classList.remove("viewMode")
         }
         let elem = document.getElementById('navbar')
@@ -150,7 +153,7 @@ class BasicProject extends Component {
         });
     }
 
-    // SLEEP
+    // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
     }
@@ -196,47 +199,6 @@ class BasicProject extends Component {
         //     event.returnValue = "Confirm to exit";
         // })
 
-        let cardRow = this.state.cardRow
-        cardRow = cardRow.map((item, index) => {
-            return (
-                <CardUI
-                    Style={this.state.cardStyle}
-                    setNavbarCard={this.setNavbarCard}
-                    key={index}
-                    saveComplete={this.savedSuccessfully}
-                    project={this.state.currentProject}
-                    saveToDb={this.state.saveProject}
-                    newLine={this.state.newLine}
-                    mode={this.state.mode}
-                    row={item.row}
-                    transparent={this.state.styleInput}
-                    sizeInput={this.state.sizeInput}
-                    posInput={this.state.posInput}
-                    formatInput={this.state.formatInput}
-                    weightInput={this.state.weightInput}
-                    decorationInput={this.state.decorationInput}
-                    fontStyleInput={this.state.fontStyleInput}
-                    colorTextInput={this.state.colorTextInput}
-                    colorBackgroundInput={this.state.colorBackgroundInput}
-                    imgSize={this.state.imgSize}
-                    imgPadding={this.state.imgPadding}
-                    imgType={this.state.imgType}
-                    imgStyle={this.state.imgStyle}
-                    borderCard={this.state.borderCard}
-                    urlRest={this.state.urlRest}
-                    urlImg={this.state.urlImg}
-                    priorityOrder={this.state.priorityOrder}
-
-                    triggerImg={this.state.triggerImg}
-                    shiftLeft={this.state.shiftLeft}
-                    shiftRight={this.state.shiftRight}
-                    linkCard={this.state.linkCard}
-                    lockCard={this.state.lockCard}
-                    copyCard={this.state.copyCard}
-                    deleteCard={this.state.deleteCard}
-                />
-            )
-        })
         if (this.state.currentProject.length === 0 ) {
             return (<p>Loading...</p>)
         }
@@ -321,8 +283,40 @@ class BasicProject extends Component {
                     icon={'save'}
                     header='Projet Saved'
                 />
-                {cardRow}
+                <CardUI
+                    Style={this.state.cardStyle}
+                    setNavbarCard={this.setNavbarCard}
+                    saveComplete={this.savedSuccessfully}
+                    project={this.state.currentProject}
+                    saveToDb={this.state.saveProject}
+                    newLine={this.state.newLine}
+                    mode={this.state.mode}
+                    transparent={this.state.styleInput}
+                    sizeInput={this.state.sizeInput}
+                    posInput={this.state.posInput}
+                    formatInput={this.state.formatInput}
+                    weightInput={this.state.weightInput}
+                    decorationInput={this.state.decorationInput}
+                    fontStyleInput={this.state.fontStyleInput}
+                    colorTextInput={this.state.colorTextInput}
+                    colorBackgroundInput={this.state.colorBackgroundInput}
+                    imgSize={this.state.imgSize}
+                    imgPadding={this.state.imgPadding}
+                    imgType={this.state.imgType}
+                    imgStyle={this.state.imgStyle}
+                    borderCard={this.state.borderCard}
+                    urlRest={this.state.urlRest}
+                    urlImg={this.state.urlImg}
+                    priorityOrder={this.state.priorityOrder}
 
+                    triggerImg={this.state.triggerImg}
+                    shiftLeft={this.state.shiftLeft}
+                    shiftRight={this.state.shiftRight}
+                    linkCard={this.state.linkCard}
+                    lockCard={this.state.lockCard}
+                    copyCard={this.state.copyCard}
+                    deleteCard={this.state.deleteCard}
+                />
             </div>
         );
     }

@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 import { withCurrentUser } from './withCurrentUser'
+import LanguageSwitcher from './LanguageSwitcher'
 import NewProjectForm from './NewProjectForm'
 import NewProfileForm from './NewProfileForm'
 
@@ -22,6 +23,7 @@ class RootComponent extends Component {
         }
     }
 
+    // Richiama i profili e i progetti pubblici o dell'utente
     componentWillMount() {
         let query = `
         query allProjects {
@@ -97,15 +99,38 @@ class RootComponent extends Component {
 
     // Crea un nuovo progetto
     createProject(title, notes, share, profile) {
+        let proj_name = this.escapeQuotes(title)
+        let proj_note = this.escapeQuotes(notes)
         let proj_owner = this.props.user.id
         let proj_share = share === false ? 0 : 1
-        let proj_profile = JSON.stringify(profile.replace(/"/g, "\""))
+        let proj_profile = this.escapeQuotes(profile)
         let proj_blocked = 0
         let query = `
         mutation createProject {
-            createCaaProject(proj_name: "${title}", proj_owner: ${proj_owner},
-                                proj_share: ${proj_share}, proj_profile: ${proj_profile},
-                                proj_blocked: ${proj_blocked}, proj_note: "${notes}"){
+            createCaaProject(proj_name: "${proj_name}", proj_owner: ${proj_owner},
+                                proj_share: ${proj_share}, proj_profile: "${proj_profile}",
+                                proj_blocked: ${proj_blocked}, proj_note: "${proj_note}"){
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                this.componentWillMount()
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    // Aggiorna un progetto preesistente
+    updateProject(id, title, notes, share) {
+        let escapedNotes = this.escapeQuotes(notes)
+        let escapedTitle = this.escapeQuotes(title)
+        let proj_share = share === false ? 0 : 1
+        let query = `
+        mutation updateProject {
+            updateCaaProject(id: ${id}, proj_name: "${escapedTitle}", proj_share: ${proj_share}, proj_note: "${escapedNotes}"){
                 id
             }
         }
@@ -170,11 +195,13 @@ class RootComponent extends Component {
 
     // Crea un nuovo profilo
     createProfile(data) {
-        let profile_name = JSON.stringify(data.newProfileName)
-        let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let newData = data
+        newData.newProfileName = data.newProfileName.replace(/"/g, '')
+        let profile_name = data.newProfileName
+        let profile_conf = this.escapeQuotes(newData)
         let query = `
         mutation createNewProfile {
-            createCaaProfile(profile_name: ${profile_name},
+            createCaaProfile(profile_name: "${profile_name}",
                             profile_system: 0,
                             profile_conf: "${profile_conf}",
                             profile_user_id: ${this.props.user.id}) {
@@ -193,12 +220,14 @@ class RootComponent extends Component {
 
     // Aggiorna un profilo preesistente
     updateProfile(id, data) {
-        let profile_name = JSON.stringify(data.newProfileName)
-        let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let newData = data
+        newData.newProfileName = data.newProfileName.replace(/"/g, '')
+        let profile_name = data.newProfileName
+        let profile_conf = this.escapeQuotes(newData)
         let query = `
         mutation updateProfile {
             updateCaaProfile(id: ${id},
-                            profile_name: ${profile_name},
+                            profile_name: "${profile_name}",
                             profile_system: 0,
                             profile_conf: "${profile_conf}",
                             profile_user_id: ${this.props.user.id}) {
@@ -233,7 +262,16 @@ class RootComponent extends Component {
             })
     }
 
-    //  Logout....cancella il jwt dal session storage e redirige sulla login
+    // Escape quotes if needed
+    escapeQuotes(item) {
+        if (typeof item === 'string' || item instanceof String) {
+            return item.replace(/\\([\s\S])|(")/g,"\\$1$2")
+        } else {
+            return JSON.stringify(item).replace(/\\([\s\S])|(")/g,"\\$1$2")
+        }
+    }
+
+    //  Logout...cancella il jwt dal session storage e redirige sulla login
     Logout() {
         sessionStorage.removeItem('jwt')
         this.props.history.push('/')
@@ -252,8 +290,16 @@ class RootComponent extends Component {
                         </Link>
                     </Table.Cell>
                     <Table.Cell>{item.proj_note}</Table.Cell>
-                    <Table.Cell collapsing>{item.proj_share === 0 ? 'Private' : 'Public'}</Table.Cell>
+                    <Table.Cell collapsing>{item.proj_share === 0 ? t("MAIN_TBL_PRIVATE") : t("MAIN_TBL_PUBLIC")}</Table.Cell>
                     <Table.Cell collapsing textAlign='right'>
+                        <NewProjectForm
+                            className='icon-pointer'
+                            size='big'
+                            edit='icon'
+                            data={item}
+                            updateProject={this.updateProject.bind(this)}
+                            optionsProfiles={this.state.optionsProfiles}
+                        />
                         <Icon name='trash' color='red' size='big'
                             className='icon-pointer'
                             disabled={this.props.user.id !== item.proj_owner ? true : false}
@@ -317,7 +363,7 @@ class RootComponent extends Component {
                                         <Table.Row>
                                             <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_NOTES")}</Table.HeaderCell>
-                                            <Table.HeaderCell>Share</Table.HeaderCell>
+                                            <Table.HeaderCell>{t("MAIN_TBL_SHARE")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -359,14 +405,18 @@ class RootComponent extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
+                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
+                            </Segment>
+                            <Segment>
+                                <Header>Cambia lingua / Change language</Header>
+                                <LanguageSwitcher />
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
+                                <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>

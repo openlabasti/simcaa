@@ -6,14 +6,14 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            email: '',
+            user: '',
             password: '',
             error: { code: 0, text: 'Fill the form to Login into the App', view: false, header: 'Welcome to SimCAA'}
         }
     }
 
     changeFormEmail(event, input) {
-        this.setState({email: input.value})
+        this.setState({user: input.value})
     }
 
     changeFormPassword(event, input) {
@@ -21,7 +21,7 @@ class Login extends Component {
     }
 
     login() {
-        let data = JSON.stringify({email: this.state.email, password: this.state.password})
+        let data = JSON.stringify({user: this.state.user, password: this.state.password})
         let url = window.env.GraphQLLogin
         let xhr = new XMLHttpRequest();
         let self = this
@@ -69,8 +69,8 @@ class Login extends Component {
                                     fluid
                                     icon='user'
                                     iconPosition='left'
-                                    placeholder='E-mail address'
-                                    value={this.state.email}
+                                    placeholder='Username'
+                                    value={this.state.user}
                                     onChange={this.changeFormEmail.bind(this)}
                                 />
                                 <Form.Input
@@ -94,7 +94,7 @@ class Login extends Component {
                     size='massive'
                 >
                 <Message.Header>To test this Demo</Message.Header>
-                    <p>Email: user@demo.com</p>
+                    <p>Username: user</p>
                     Password: user
                 </Message>
                     <Message
@@ -102,17 +102,16 @@ class Login extends Component {
                         size='massive'
                     >
                     <Message.Header>OpenLab Asti</Message.Header>
-                        Stiamo sviluppando l'applicazione (nome provvisorio SIMCAA) <br />
-                        "Scrittura Inclusiva Multimodale Comunicazione Aumentativa Aperta" <br /><br />
-                        Questo sito è un ambiente di demo/sviluppo di
-                        <a href='http://openlabasti.it'> OpenLab Asti </a>, serve principalmente
-                        per testare l'applicazione in ambiente web puro. <br />
-                        SIMCAA è in corso di sviluppo, quindi soggetta ad aggiornamenti e modifiche
-                        continue, le funzionalità sono incomplete e non sono garantite. <br />
-                        I simboli usati da SIMCAA sono proprietà di
-                        <a href='http://www.arasaac.org/'> CATEDU </a> sotto licenza
-                        <a href='https://it.wikipedia.org/wiki/Creative_Commons'> Creative Common</a> e sono
-                        stati creati da Sergio Palao.
+                        Stiamo sviluppando l&#39;applicazione SIMCAA
+                        "Scrittura Inclusiva Multimodale Comunicazione Aumentativa Aperta"
+                        Questo sito è un ambiente di demo/test di <a href='http://openlabasti.it'> OpenLab Asti </a>.
+                        SIMCAA è in corso di sviluppo, quindi soggetta ad aggiornamenti e
+                        modifiche continue, le funzionalità sono incomplete e non sono garantite,
+                        è possibile l&#39;interruzione temporanea del servizio.
+                        Non si assicura la persistenza dei documenti caricati.
+                        I simboli usati sono di proprietà del Governo di Aragona,
+                        creati da Sergio Palao per <a href='http://arasaac.org'> ARASAAC</a> e distribuiti con Licenza
+                        <a href='https://it.wikipedia.org/wiki/Creative_Commons'> Creative Common</a> (BY-NC-SA)
                     </Message>
                 </Segment>
 

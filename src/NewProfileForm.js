@@ -12,6 +12,7 @@ class NewProfileForm extends Component {
     constructor(props) {
         super(props)
         this.state= {
+            // If something changes here check the save and update profile functions
             modalVisible: false,
             errorMessage: true,
             share: false,
@@ -44,7 +45,8 @@ class NewProfileForm extends Component {
                 Preposizione: {color: '',size: '1',type: ''},
                 Sostantivo: {color: '',size: '1',type: ''},
                 Verbo: {color: '',size: '1',type: ''},
-                Altro: {color: '',size: '1',type: ''}
+                Altro: {color: '',size: '1',type: ''},
+                Tutti: {color: '',size: '1',type: ''}
             },
             urlRest: window.env.GraphQLServer,
             urlImg: window.env.PathImages,
@@ -66,12 +68,22 @@ class NewProfileForm extends Component {
         }
     }
 
-    handleOpenCloseModal() {
+    handleOpenCloseModal(action) {
         let name
-        if (this.props.edit && this.props.data) {
-            name = this.state.newProfileName
+        if (action === 'open') {
+            if (this.props.edit && this.props.data) {
+                name = this.state.newProfileName.replace(/\"/g, "")
+            } else {
+                name = ''
+            }
         } else {
-            name = ''
+            if (this.props.edit && this.props.data) {
+                name = JSON.parse(this.props.data).newProfileName
+                let data = JSON.parse(this.props.data)
+                this.setState({...data})
+            } else {
+                name = ''
+            }
         }
         this.setState({modalVisible: !this.state.modalVisible, newProfileName: name, indexForm: 0})
     }
@@ -82,16 +94,6 @@ class NewProfileForm extends Component {
 
     handleCheckboxChange(e) {
         this.setState({share: !this.state.share})
-    }
-
-    handleForm() {
-        if(this.state.newProjectTitle === '') {
-            this.setState({errorMessage: false})
-        }
-        else {
-            this.props.createProject(this.state.newProjectTitle, this.state.newProjectNote, this.state.share)
-            this.setState({errorMessage: true, modalVisible: !this.state.modalVisible})
-        }
     }
 
     handleForwardForm() {
@@ -168,9 +170,17 @@ class NewProfileForm extends Component {
 
     handleChangeBorder(data, item) {
         let localBorderCard = this.state.borderCard
-        data.options[0].type === 'bordertype' ?
-        localBorderCard[item.text].type = data.value :
-        localBorderCard[item.text].size = data.value
+        if (item.text === 'Tutti') {
+            for (let index in localBorderCard) {
+                data.options[0].type === 'bordertype' ?
+                localBorderCard[index].type = data.value :
+                localBorderCard[index].size = data.value
+            }
+        } else {
+            data.options[0].type === 'bordertype' ?
+            localBorderCard[item.text].type = data.value :
+            localBorderCard[item.text].size = data.value
+        }
         this.setState({ borderCard: localBorderCard })
     }
 
@@ -184,7 +194,13 @@ class NewProfileForm extends Component {
 
     handleChangeColorBorder(color, item) {
         let localBorderCard = this.state.borderCard
-        localBorderCard[item.text].color = color.hex
+        if (item.text === 'Tutti') {
+            for (let index in localBorderCard) {
+                localBorderCard[index].color = color.hex
+            }
+        } else {
+            localBorderCard[item.text].color = color.hex
+        }
         this.setState({ borderCard: localBorderCard })
     }
 
@@ -217,10 +233,10 @@ class NewProfileForm extends Component {
                 style={this.props.style}
                 className={this.props.className}
                 size={this.props.size}
-                onClick={this.handleOpenCloseModal.bind(this)}
+                onClick={this.handleOpenCloseModal.bind(this, 'open')}
             />
         } else if (this.props.edit && this.props.edit === 'button') {
-            iconModal = <Button onClick={this.handleOpenCloseModal.bind(this)}>
+            iconModal = <Button onClick={this.handleOpenCloseModal.bind(this, 'open')}>
                             {t("PRJ_MNU_OPTIONS")}
                         </Button>
         } else {
@@ -231,7 +247,7 @@ class NewProfileForm extends Component {
                 color={this.state.iconColor}
                 onMouseOver={this.onMouseOverIcon.bind(this)}
                 onMouseOut={this.onMouseOverIcon.bind(this)}
-                onClick={this.handleOpenCloseModal.bind(this)}
+                onClick={this.handleOpenCloseModal.bind(this, 'open')}
             />
         }
 
@@ -330,7 +346,7 @@ class NewProfileForm extends Component {
                 {t("MAIN_BTN_FORWARD")}
             </Button>
             <Button.Or />
-            <Button color='red' onClick={this.handleOpenCloseModal.bind(this)}>
+            <Button color='red' onClick={this.handleOpenCloseModal.bind(this, 'close')}>
                 {t("MAIN_BTN_CLOSE")}
             </Button>
         </Button.Group>
@@ -344,7 +360,7 @@ class NewProfileForm extends Component {
                 {t("MAIN_BTN_FORWARD")}
             </Button>
             <Button.Or />
-            <Button color='red' onClick={this.handleOpenCloseModal.bind(this)}>
+            <Button color='red' onClick={this.handleOpenCloseModal.bind(this, 'close')}>
                 {t("MAIN_BTN_CLOSE")}
             </Button>
         </Button.Group>
@@ -358,7 +374,7 @@ class NewProfileForm extends Component {
                 {this.props.edit ? t("MAIN_BTN_UPDATEPROFILE") : t("MAIN_BTN_CREATEPROFILE")}
             </Button>
             <Button.Or />
-            <Button color='red' onClick={this.handleOpenCloseModal.bind(this)}>
+            <Button color='red' onClick={this.handleOpenCloseModal.bind(this, 'close')}>
                 {t("MAIN_BTN_CLOSE")}
             </Button>
         </Button.Group>

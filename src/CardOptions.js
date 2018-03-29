@@ -8,7 +8,7 @@ class CardOptions extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            optionIndex: 0,
+            optionIndex: 10,
             labelItem: [{text: 'Aggettivo', value: 0},
                         {text: 'Articolo', value: 1},
                         {text: 'Avverbio', value: 2},
@@ -18,7 +18,8 @@ class CardOptions extends Component {
                         {text: 'Preposizione', value: 6},
                         {text: 'Sostantivo', value: 7},
                         {text: 'Verbo', value: 8},
-                        {text: 'Altro', value: 9}],
+                        {text: 'Altro', value: 9},
+                        {text: 'Tutti', value: 10}],
             borderSize: [{type: 'bordersize', value: '1', text: '1px'},
                         {type: 'bordersize', value: '2', text: '2px'},
                         {type: 'bordersize', value: '3', text: '3px'},
@@ -122,6 +123,7 @@ class CardOptions extends Component {
                     selection
                     options={this.state.labelItem}
                     placeholder='Select category type'
+                    defaultValue={10}
                     onChange={this.onChangeCategory.bind(this)}
                 />
                 <Divider hidden />

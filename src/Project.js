@@ -56,10 +56,11 @@ class Project extends Component {
 
     createNewChapter(title) {
         let currentProjectId = this.props.match.params.projectid
+        let escapedTitle = this.escapeQuotes(title)
         let query = `
         mutation NewChapter {
             createCaaChapter(caa_project_id: ${currentProjectId},
-                            chapt_title: "${title}",
+                            chapt_title: "${escapedTitle}",
                             chapt_content: "",
                             chapt_layout: "layout"
                             chapt_user_block: 0) {
@@ -91,16 +92,18 @@ class Project extends Component {
     }
 
     updateProjectProfile(data) {
-        let proj_profile = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let proj_profile = this.escapeQuotes(data)
+        let proj_name = this.escapeQuotes(this.props.project.proj_name)
+        let proj_note = this.escapeQuotes(this.props.project.proj_note)
         let query = `
         mutation updateProject {
             updateCaaProject(id: ${this.props.project.id},
-                            proj_name: "${this.props.project.proj_name}",
+                            proj_name: "${proj_name}",
                             proj_owner: ${this.props.project.proj_owner},
                             proj_share: ${this.props.project.proj_share},
                             proj_profile: "${proj_profile}",
                             proj_blocked: ${this.props.project.proj_blocked},
-                            proj_note: "${this.props.project.proj_note}"){
+                            proj_note: "${proj_note}"){
                 id
             }
         }
@@ -130,6 +133,15 @@ class Project extends Component {
         .catch((error) => {
             console.log(error);
         })
+    }
+
+    // Escape quotes if needed
+    escapeQuotes(item) {
+        if (typeof item === 'string' || item instanceof String) {
+            return item.replace(/\\([\s\S])|(")/g,"\\$1$2")
+        } else {
+            return JSON.stringify(item).replace(/\\([\s\S])|(")/g,"\\$1$2")
+        }
     }
 
     render() {
@@ -167,7 +179,12 @@ class Project extends Component {
                         <Button.Group>
                             {contentButton}
                             <Button.Or />
-                            <Button color='blue' disabled>{t("PRJ_BTN_OPTIONS")}</Button>
+                            <Button color='blue'
+                                as={Link}
+                                to={'/basic/view/' + this.props.match.params.projectid + '/' + item.id}
+                            >
+                                {t("PRJ_BTN_VIEW")}
+                            </Button>
                             <Button.Or />
                             <Button color='red'
                                 disabled={ifBlocked}

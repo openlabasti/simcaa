@@ -214,6 +214,7 @@ class LayoutExport extends Component {
                     </Rnd>
                 )
             })
+            console.log(this.props);
             return (
                 <div>
                     <Segment.Group className='no-print'>
@@ -221,7 +222,11 @@ class LayoutExport extends Component {
                             <Button color='blue' disabled>{t("HEAD_BTN_RESET")}</Button>
                             <Button color='blue' onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
-                            <Button color='red' as={Link} to='/'>{t("HEAD_BTN_RETURN")}</Button>
+                            <Button color='red' as={Link}
+                                to={'/basic/edit/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
+                            >
+                                {t("HEAD_BTN_RETURN")}
+                            </Button>
                             <CustomImgsDnDUpload handler={this.handler}/>
                         </Segment>
                         <Segment>

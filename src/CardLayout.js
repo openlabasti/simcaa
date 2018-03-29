@@ -75,7 +75,8 @@ class CardLayout extends Component {
             styles = Object.assign({}, this.props.Style, this.state.borderCard[this.state.card.codClass]);
         }
         else if (this.props.Style) {
-            let {top, ...styles} = this.props.Style
+            let {top, ...other} = this.props.Style
+            styles = other
         }
         else if (this.props.borderCard) {
             styles = this.state.borderCard[this.state.card.codClass]

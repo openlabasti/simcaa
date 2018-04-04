@@ -34,11 +34,26 @@ class AllUsers extends Component{
     })
   }
 
-  openConfirm(){
-    this.setState({openConfirmDelete: true})
+  openConfirm(id){
+    this.setState({idToDelete: id},()=>{
+      this.setState({openConfirmDelete: true})
+    })
   }
   handleDelete(){
     console.log('confermato, parte delete!');
+    let query = `
+    mutation delUser {
+        deleteCaaUser(id: ${this.state.idTodelete}){
+          id
+    }
+    `
+    this.props.apolloFetch({ query })
+        .then((data) => {
+            this.componentWillMount()
+        })
+        .catch((error) => {
+            console.log(error);
+        })
   }
   handleCancel(){
     this.setState({openConfirmDelete: false})
@@ -65,7 +80,7 @@ class AllUsers extends Component{
             </Table.Cell>
             <Table.Cell>
               <Popup
-                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm()}/>}
+                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
                 content= 'Elimina utente'
                 />
               <Popup

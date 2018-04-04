@@ -7,27 +7,81 @@ import { withRouter } from 'react-router-dom'
 class UsrConfig extends Component{
   constructor(props){
     super(props)
+    this.handleNameInput = this.handleNameInput.bind(this)
+    this.handleEmailInput = this.handleEmailInput.bind(this)
+    this.handleOrgInput = this.handleOrgInput.bind(this)
+    this.handleWebInput = this.handleWebInput.bind(this)
+    this.state={
+      newName: '',
+      newEmail: '',
+      newOrganization: '',
+      newWeb: ''
+    }
   }
 
-  modData(which, value){
+  modData(which){
+    let paramToUpdate = "";
+    let value = "";
     switch(which){
       case 0:
-
+        paramToUpdate = "profile_name"
+        value = this.state.newName
+        break;
+      case 1:
+        paramToUpdate = "profile_email"
+        value = this.state.newEmail
+        break;
+      case 2:
+        paramToUpdate = "profile_organization"
+        value = this.state.newOrganization
+        break;
+      case 3:
+        paramToUpdate = "profile_link_web"
+        value = this.state.newWeb
+        break;
+      default:
+        paramToUpdate = ""
+        break;
     }
     let query = `
     mutation updateProfile {
-        updateCaaProfile(id: cacca,
-                        profile_name: blu,
-
+        updateCaaProfile(id: ${this.props.id},
+                        ${paramToUpdate}: ${value}){
+            id
+        }
     }
     `
+    console.log(this.state);
     this.props.apolloFetch({ query })
         .then((data) => {
-            this.componentWillMount()
+            this.render()
         })
         .catch((error) => {
             console.log(error);
         })
+  }
+
+
+  handleNameInput(e){
+    console.log(e);
+    this.setState({
+      newName: e.target.value
+    })
+  }
+  handleEmailInput(e){
+    this.setState({
+      newEmail: e.target.value
+    })
+  }
+  handleOrgInput(e){
+    this.setState({
+      newOrganization: e.target.value
+    })
+  }
+  handleWebInput(e){
+    this.setState({
+      newWeb: e.target.value
+    })
   }
   render(){
 
@@ -53,10 +107,10 @@ class UsrConfig extends Component{
                   {this.props.name}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....'/>
+                  <Input placeholder='....' onChange={()=>this.handleNameInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button animated>
+                  <Button animated onClick={()=>this.modData(0)}>
                     <Button.Content visible> Modifica </Button.Content>
                     <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                   </Button>
@@ -70,10 +124,10 @@ class UsrConfig extends Component{
                   {this.props.email}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....'/>
+                  <Input placeholder='....' onChange={()=>this.handleEmailInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button animated>
+                  <Button animated onClick={()=>this.modData(1)}>
                     <Button.Content visible> Modifica </Button.Content>
                     <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                   </Button>
@@ -87,10 +141,10 @@ class UsrConfig extends Component{
                   {this.props.organization}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....'/>
+                  <Input placeholder='....' onChange={()=>this.handleOrgInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button animated>
+                  <Button animated onClick={()=>this.modData(2)}>
                     <Button.Content visible> Modifica </Button.Content>
                     <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                   </Button>
@@ -104,10 +158,10 @@ class UsrConfig extends Component{
                   {this.props.link_web}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....'/>
+                  <Input placeholder='....' onChange={()=>this.handleWebInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button animated>
+                  <Button animated onClick={()=>this.modData(3)}>
                     <Button.Content visible> Modifica </Button.Content>
                     <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                   </Button>

@@ -6,14 +6,14 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            email: '',
+            user: '',
             password: '',
             error: { code: 0, text: 'Fill the form to Login into the App', view: false, header: 'Welcome to SimCAA'}
         }
     }
 
     changeFormEmail(event, input) {
-        this.setState({email: input.value})
+        this.setState({user: input.value})
     }
 
     changeFormPassword(event, input) {
@@ -21,7 +21,7 @@ class Login extends Component {
     }
 
     login() {
-        let data = JSON.stringify({email: this.state.email, password: this.state.password})
+        let data = JSON.stringify({user: this.state.user, password: this.state.password})
         let url = window.env.GraphQLLogin
         let xhr = new XMLHttpRequest();
         let self = this
@@ -70,7 +70,7 @@ class Login extends Component {
                                     icon='user'
                                     iconPosition='left'
                                     placeholder='E-mail address'
-                                    value={this.state.email}
+                                    value={this.state.user}
                                     onChange={this.changeFormEmail.bind(this)}
                                 />
                                 <Form.Input

@@ -80,7 +80,7 @@ class UsrConfig extends Component{
                 })
                 break;
             }
-            this.props.triggerUpdate()
+            this.props.update();
         })
         .catch((error) => {
             console.log(error);
@@ -109,7 +109,6 @@ class UsrConfig extends Component{
     })
   }
   render(){
-
     return(
       <Modal trigger={this.props.trigger}>
         <Modal.Header>Modifica Utente</Modal.Header>

@@ -8,7 +8,7 @@ import UsrConfig from './UsrConfig'
 class AllUsers extends Component{
   constructor(props){
     super(props)
-    this.triggerUpdate = this.triggerUpdate.bind(this)
+    this.update = this.update.bind(this)
     this.state={
       lock: 0,
       users: [],
@@ -63,7 +63,7 @@ class AllUsers extends Component{
   handleCancel(){
     this.setState({openConfirmDelete: false})
   }
-  triggerUpdate(){
+  update(){
     this.componentWillMount();
   }
   render(){
@@ -92,14 +92,17 @@ class AllUsers extends Component{
                 content= 'Elimina utente'
                 />
               <Popup
-                trigger={<UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
-                id={item.id}
-                name={item.name}
-                email={item.email}
-                organization = {item.organization}
-                link_web = {item.link_web} />}
+                trigger={
+                  <UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
+                    id={item.id}
+                    name={item.name}
+                    email={item.email}
+                    organization = {item.organization}
+                    link_web = {item.link_web}
+                    update = {()=>{this.update()}}
+                  />
+                }
                 content= 'Configura utente'
-                triggerUpdate = {this.triggerUpdate}
                 />
 
             </Table.Cell>

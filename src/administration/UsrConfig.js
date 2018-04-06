@@ -15,7 +15,11 @@ class UsrConfig extends Component{
       newName: '',
       newEmail: '',
       newOrganization: '',
-      newWeb: ''
+      newWeb: '',
+      name: this.props.name,
+      email: this.props.email,
+      organization: this.props.organization,
+      web: this.props.link_web
     }
   }
 
@@ -24,19 +28,19 @@ class UsrConfig extends Component{
     let value = "";
     switch(which){
       case 0:
-        paramToUpdate = "profile_name"
+        paramToUpdate = "name"
         value = this.state.newName
         break;
       case 1:
-        paramToUpdate = "profile_email"
+        paramToUpdate = "email"
         value = this.state.newEmail
         break;
       case 2:
-        paramToUpdate = "profile_organization"
+        paramToUpdate = "organization"
         value = this.state.newOrganization
         break;
       case 3:
-        paramToUpdate = "profile_link_web"
+        paramToUpdate = "link_web"
         value = this.state.newWeb
         break;
       default:
@@ -44,17 +48,39 @@ class UsrConfig extends Component{
         break;
     }
     let query = `
-    mutation updateProfile {
-        updateCaaProfile(id: ${this.props.id},
-                        ${paramToUpdate}: ${value}){
+    mutation updateUser {
+        updateCaaUser(id: ${this.props.id},
+                        ${paramToUpdate}: \"${value}\"){
             id
         }
     }
     `
-    console.log(this.state);
     this.props.apolloFetch({ query })
         .then((data) => {
-            this.render()
+            console.log(data)
+            switch(which){
+              case 0:
+                this.setState({
+                  name: value
+                })
+                break;
+              case 1:
+                this.setState({
+                  email: value
+                })
+                break;
+              case 2:
+                this.setState({
+                  organization: value
+                })
+                break;
+              case 3:
+                this.setState({
+                  web: value
+                })
+                break;
+            }
+            this.props.triggerUpdate()
         })
         .catch((error) => {
             console.log(error);
@@ -63,7 +89,6 @@ class UsrConfig extends Component{
 
 
   handleNameInput(e){
-    console.log(e);
     this.setState({
       newName: e.target.value
     })
@@ -104,10 +129,10 @@ class UsrConfig extends Component{
                   Nome
                 </Table.Cell>
                 <Table.Cell>
-                  {this.props.name}
+                  {this.state.name}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....' onChange={()=>this.handleNameInput.bind(this)}/>
+                  <Input placeholder='....' onChange={this.handleNameInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
                   <Button animated onClick={()=>this.modData(0)}>
@@ -121,10 +146,10 @@ class UsrConfig extends Component{
                   Email
                 </Table.Cell>
                 <Table.Cell>
-                  {this.props.email}
+                  {this.state.email}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....' onChange={()=>this.handleEmailInput.bind(this)}/>
+                  <Input placeholder='....' onChange={this.handleEmailInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
                   <Button animated onClick={()=>this.modData(1)}>
@@ -138,10 +163,10 @@ class UsrConfig extends Component{
                   Organizzazione
                 </Table.Cell>
                 <Table.Cell>
-                  {this.props.organization}
+                  {this.state.organization}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....' onChange={()=>this.handleOrgInput.bind(this)}/>
+                  <Input placeholder='....' onChange={this.handleOrgInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
                   <Button animated onClick={()=>this.modData(2)}>
@@ -155,10 +180,10 @@ class UsrConfig extends Component{
                   Sito Web
                 </Table.Cell>
                 <Table.Cell>
-                  {this.props.link_web}
+                  {this.state.web}
                 </Table.Cell>
                 <Table.Cell>
-                  <Input placeholder='....' onChange={()=>this.handleWebInput.bind(this)}/>
+                  <Input placeholder='....' onChange={this.handleWebInput.bind(this)}/>
                 </Table.Cell>
                 <Table.Cell>
                   <Button animated onClick={()=>this.modData(3)}>

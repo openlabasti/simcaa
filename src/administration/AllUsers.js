@@ -8,6 +8,7 @@ import UsrConfig from './UsrConfig'
 class AllUsers extends Component{
   constructor(props){
     super(props)
+    this.triggerUpdate = this.triggerUpdate.bind(this)
     this.state={
       lock: 0,
       users: [],
@@ -28,9 +29,13 @@ class AllUsers extends Component{
         }
       }
     `
+    console.log('sto facendo query')
     this.props.apolloFetch({query})
     .then((data)=>{
       this.setState({lock:1, users: data.data.caa_users.data})
+    })
+    .catch((error)=>{
+      console.log(error);
     })
   }
 
@@ -39,8 +44,8 @@ class AllUsers extends Component{
       this.setState({openConfirmDelete: true})
     })
   }
+
   handleDelete(){
-    console.log('confermato, parte delete!');
     let query = `
     mutation delUser {
         deleteCaaUser(id: ${this.state.idTodelete}){
@@ -57,6 +62,9 @@ class AllUsers extends Component{
   }
   handleCancel(){
     this.setState({openConfirmDelete: false})
+  }
+  triggerUpdate(){
+    this.componentWillMount();
   }
   render(){
     if(this.state.lock===1){
@@ -91,7 +99,7 @@ class AllUsers extends Component{
                 organization = {item.organization}
                 link_web = {item.link_web} />}
                 content= 'Configura utente'
-
+                triggerUpdate = {this.triggerUpdate}
                 />
 
             </Table.Cell>

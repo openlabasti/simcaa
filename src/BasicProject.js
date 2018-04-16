@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Message, Menu, Icon, Popup } from 'semantic-ui-react'
+import { Message, Menu, Icon, Popup, Button } from 'semantic-ui-react'
 import NavBar from './NavBar'
 import CardUI from './CardUI'
+import PreviewA4Portrait from './PreviewA4Portrait'
 import { translate, Trans } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import { withCurrentProject } from './withCurrentProject'
@@ -14,7 +15,8 @@ class BasicProject extends Component {
         this.state = {
             visibleOption: false,
             mode: false,
-            saveProject: false,
+            previewPage: false,
+            saveProject: 'false',
             currentProject: {},
             saveMessage: true,
             navbarCard: {id:0 ,
@@ -64,6 +66,9 @@ class BasicProject extends Component {
             linkCard: false,
             lockCard: false,
             copyCard: false,
+            searchLemma: false,
+            addCardAfter: false,
+            addCardBefore: false,
             deleteCard: false,
         }
         this.handleMode = this.handleMode.bind(this)
@@ -82,7 +87,13 @@ class BasicProject extends Component {
         this.linkCard = this.linkCard.bind(this)
         this.lockCard = this.lockCard.bind(this)
         this.copyCard = this.copyCard.bind(this)
+        this.searchLemma = this.searchLemma.bind(this)
+        this.addCardAfter = this.addCardAfter.bind(this)
+        this.addCardBefore = this.addCardBefore.bind(this)
         this.deleteCard = this.deleteCard.bind(this)
+
+        // Preview Modal
+        this.openPreviewA4 = this.openPreviewA4.bind(this)
     }
 
     componentWillMount() {
@@ -141,15 +152,24 @@ class BasicProject extends Component {
     }
 
     // TRIGGER SAVE
-    triggerSave(value) {
-        this.setState({saveProject: value})
+    triggerSave(value = null) {
+        if (value !== null) {
+            this.setState({saveProject: value})
+        } else {
+            this.setState({saveProject: 'true'})
+        }
     }
 
     // SHOW THE SAVED MESSAGE
-    savedSuccessfully() {
-        this.setState({saveMessage: false, saveProject: false})
+    savedSuccessfully(toPage = null) {
+        this.setState({saveMessage: !this.state.saveMessage, saveProject: 'false'})
         this.sleep(1000).then(() => {
-            this.setState({saveMessage: true})
+            this.setState({saveMessage: !this.state.saveMessage})
+            if (toPage === 'preview') {
+                this.openPreviewA4()
+            } else if (toPage === 'typo') {
+                this.props.history.push('/layout/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
+            }
         });
     }
 
@@ -186,10 +206,26 @@ class BasicProject extends Component {
         this.setState({copyCard: !this.state.copyCard})
     }
 
+    searchLemma() {
+        this.setState({searchLemma: !this.state.searchLemma})
+    }
+
+    addCardAfter() {
+        this.setState({addCardAfter: !this.state.addCardAfter})
+    }
+
+    addCardBefore() {
+        this.setState({addCardBefore: !this.state.addCardBefore})
+    }
+
     deleteCard() {
         this.setState({deleteCard: !this.state.deleteCard})
     }
 
+    // PREVIEW MODAL
+    openPreviewA4() {
+        this.setState({previewPage: !this.state.previewPage})
+    }
 
     render() {
         const { t, i18n } = this.props
@@ -201,6 +237,29 @@ class BasicProject extends Component {
 
         if (this.state.currentProject.length === 0 ) {
             return (<p>Loading...</p>)
+        }
+
+        if (this.state.previewPage) {
+            // Prendo e calcolo width e height delle card per passarle alla Preview
+            let numCard = document.getElementsByClassName('cardUI');
+            let cardHeight = document.getElementById('card-0').offsetHeight
+            let cardWidth = []
+            for (let i = 0; i < numCard.length; i++) {
+                cardWidth[i] = document.getElementById('card-' + i).offsetWidth
+            }
+            return (
+                <div>
+                    <Menu className='no-print'>
+                        <Menu.Item>
+                            <Button primary onClick={() => {window.print()}}>Print</Button>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Button negative onClick={this.openPreviewA4.bind(this)}>Return to Chapter</Button>
+                        </Menu.Item>
+                    </Menu>
+                    <PreviewA4Portrait cardWidth={cardWidth} cardHeight={cardHeight} />
+                </div>
+            )
         }
 
         return (
@@ -215,6 +274,7 @@ class BasicProject extends Component {
                                 checkMode={this.handleMode}
                                 checked={this.state.mode}
                                 save={this.triggerSave}
+                                openPreviewA4={this.openPreviewA4}
                             />
                         </Menu.Item>
                         <Menu.Item className='navbar-icon' id='navbar-icon'>
@@ -251,11 +311,39 @@ class BasicProject extends Component {
                                 onClick={() => {this.lockCard()}}/>
                             <Popup
                                 trigger={
-                                    <Icon name='copy' bordered inverted color="teal"
+                                    <Icon name='clone' bordered inverted color="teal"
                                         size='large'
                                         onClick={() => {this.copyCard()}}/>
                                 }
                                 content='Copy current Card'
+                            />
+                            <Icon
+                                name='search'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.searchLemma()}}
+                                style={{cursor: 'pointer'}}
+                            />
+                            <Icon
+                                name='external share'
+                                flipped='horizontally'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.addCardBefore()}}
+                                style={{cursor: 'pointer'}}
+                            />
+                            <Icon
+                                name='external share'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.addCardAfter()}}
+                                style={{cursor: 'pointer'}}
                             />
                             <Icon
                                 name='delete'
@@ -315,6 +403,9 @@ class BasicProject extends Component {
                     linkCard={this.state.linkCard}
                     lockCard={this.state.lockCard}
                     copyCard={this.state.copyCard}
+                    searchLemma={this.state.searchLemma}
+                    addCardAfter={this.state.addCardAfter}
+                    addCardBefore={this.state.addCardBefore}
                     deleteCard={this.state.deleteCard}
                 />
             </div>

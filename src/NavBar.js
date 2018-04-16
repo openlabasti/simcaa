@@ -6,8 +6,8 @@ import { withApolloFetch } from './withApolloFetch'
 
 class NavBar extends Component {
     // Triggera il salvataggio del progetto
-    triggerSaveProject() {
-        this.props.save(true)
+    triggerSaveProject(page, e) {
+        this.props.save(page)
     }
 
     // Sblocca il capitolo alla sua chiusura
@@ -49,11 +49,8 @@ class NavBar extends Component {
                     <Button color='green' onClick={this.triggerSaveProject.bind(this)}>{t("HEAD_BTN_SAVE")}</Button>
                     <Button color='red' onClick={this.closeChapter.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                     <Button color='blue' onClick={this.props.checkMode}>{mode}</Button>
-                    <Button color='violet' as={Link}
-                        to={'/layout/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
-                    >
-                        {t("HEAD_BTN_TYPO")}
-                    </Button>
+                    <Button color='blue' onClick={this.triggerSaveProject.bind(this, 'preview')}>A4 Preview</Button>
+                    <Button color='violet' onClick={this.triggerSaveProject.bind(this, 'typo')}>{t("HEAD_BTN_TYPO")}</Button>
                 </Segment>
             )
         }

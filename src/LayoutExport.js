@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Button, Dropdown, Image } from 'semantic-ui-react'
+import { Segment, Button, Dropdown, Image, Message } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
@@ -16,6 +16,7 @@ class LayoutExport extends Component {
         this.handler = this.handler.bind(this)
         this.state = {
             savedProject: [],
+            profile: {},
             cards: [],
             classSheet: 'A4-portrait',
             imageSize: [{type: 'imgsize', value: 35, text: 'mini'},
@@ -28,17 +29,27 @@ class LayoutExport extends Component {
                         {type: 'imgsize', value: 960, text: 'massive'}],
             x: 0,
             y: 0,
-            customImgs: []
+            customImgs: [],
+            multipleDrag: false,
+            listMultipleDragIds: [],
+            saveMessage: true,
         }
     }
 
     componentWillMount() {
         let query = `
         query Chapter {
+            projects (id: ${this.props.match.params.projectid}) {
+                data {
+                    id
+                    proj_profile
+                }
+            }
             chapters (id: ${this.props.match.params.chapterid}) {
                 data {
                     id
                     chapt_content
+                    chapt_typo
                     chapt_layout
                 }
             }
@@ -47,33 +58,44 @@ class LayoutExport extends Component {
 
         this.props.apolloFetch({ query })
             .then((data) => {
-                let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
-                let numCardRow = Math.floor(794 / 200)
-                let xCard = 200
-                let yCard = 0
-                let k = 0
-                for (let i = 0; i < stateCard.length; i++) {
-                    if (!stateCard[i].lemma) {
-                        stateCard.splice(i, 1)
-                        i--
-                    }
-                }
-                for (let i = 0; i < stateCard.length; i++) {
-                    stateCard[i].id = i
-                }
+                let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
+                let profile = JSON.parse(data.data.projects.data[0].proj_profile)
 
-                for (let i = 0, j = 0; i < stateCard.length; i++, j++) {
-                    if (i % numCardRow === 0 && i > 0) {
-                        k++
-                        j = 0
-                        yCard = 240 * k
+                if (savedTypo === null || savedTypo.length === 0) {
+                    let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
+                    let numCardRow = Math.floor(794 / 200)
+                    let xCard = 200
+                    let yCard = 0
+                    let k = 0
+                    for (let i = 0; i < stateCard.length; i++) {
+                        if (!stateCard[i].lemma) {
+                            stateCard.splice(i, 1)
+                            i--
+                        }
                     }
-                    stateCard[i].x = xCard * j
-                    stateCard[i].y = yCard
-                    stateCard[i].rndWidth = 178
-                    stateCard[i].rndHeight = 226
+                    for (let i = 0; i < stateCard.length; i++) {
+                        stateCard[i].id = i
+                    }
+
+                    for (let i = 0, j = 0; i < stateCard.length; i++, j++) {
+                        if (i % numCardRow === 0 && i > 0) {
+                            k++
+                            j = 0
+                            yCard = 240 * k
+                        }
+                        stateCard[i].x = xCard * j
+                        stateCard[i].y = yCard
+                        stateCard[i].rndWidth = 178
+                        stateCard[i].rndHeight = 226
+                        stateCard[i].lastX = stateCard[i].x
+                        stateCard[i].lastY = stateCard[i].y
+                    }
+                    this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile})
+                } else {
+                    let typoCard = savedTypo.card
+                    let typoImg = savedTypo.img
+                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, customImgs: typoImg, profile})
                 }
-                this.setState({savedProject: data.data.chapters.data[0], cards: stateCard})
             })
             .catch((error) => {
                 console.log(error)
@@ -89,17 +111,55 @@ class LayoutExport extends Component {
         this.setState({cards: localCard})
     }
 
-    drag(item, e, d, event) {
+    drag(item, e, d) {
         let localCard = this.state.cards
-        localCard[item.id].x = d.x
-        localCard[item.id].y = d.y
-        this.setState({ cards: localCard })
+        let localListIds = this.state.listMultipleDragIds
+        if (localListIds.indexOf(item.id) > -1) {
+            let deltaX = d.x - item.lastX
+            let deltaY = d.y - item.lastY
+            for (let i = 0; i < localListIds.length; i++) {
+                let tmpX = localCard[localListIds[i]].lastX + deltaX
+                let tmpY = localCard[localListIds[i]].lastY + deltaY
+                if (tmpX < 0) {
+                    localCard[localListIds[i]].x = 0
+                } else if (tmpX + localCard[localListIds[i]].rndWidth > 794) {
+                    localCard[localListIds[i]].x = 794 - localCard[localListIds[i]].rndWidth
+                } else {
+                    localCard[localListIds[i]].x = tmpX
+                }
+                localCard[localListIds[i]].y = tmpY < 0 ? 0 : tmpY
+                localCard[localListIds[i]].lastX = localCard[localListIds[i]].x
+                localCard[localListIds[i]].lastY = localCard[localListIds[i]].y
+            }
+        } else {
+            let deltaX = d.x - item.lastX
+            let deltaY = d.y - item.lastY
+            let tmpX = localCard[item.id].lastX + deltaX
+            let tmpY = localCard[item.id].lastY + deltaY
+            if (tmpX < 0) {
+                localCard[item.id].x = 0
+            } else if (tmpX + localCard[item.id].rndWidth > 794) {
+                localCard[item.id].x = 794 - localCard[item.id].rndWidth
+            } else {
+                localCard[item.id].x = tmpX
+            }
+            localCard[item.id].y = tmpY < 0 ? 0 : tmpY
+            localCard[item.id].lastX = localCard[item.id].x
+            localCard[item.id].lastY = localCard[item.id].y
+        }
+        this.setState({cards: localCard})
     }
     dragImg(item, index, e, d){
-      let localImgs = this.state.customImgs
-      localImgs[index].x = d.x
-      localImgs[index].y = d.y
-      this.setState({ customImgs: localImgs})
+        let localImgs = this.state.customImgs
+        if (d.x < 0) {
+            localImgs[index].x = 0
+        } else if (d.x + localImgs[index].width > 794) {
+            localImgs[index].x = 794 - localImgs[index].width
+        } else {
+            localImgs[index].x = d.x
+        }
+        localImgs[index].y = d.y < 0 ? 0 : d.y
+        this.setState({customImgs: localImgs})
     }
     resize(item, e, direction, ref, delta, position, event) {
         let localCard = this.state.cards
@@ -108,32 +168,62 @@ class LayoutExport extends Component {
         this.setState({cards: localCard})
     }
     resizeImg(item, index, e, direction, ref, dimensions, position){
-      console.log(dimensions)
-      let localImgs = this.state.customImgs
-      localImgs[index].height += dimensions.height
-      localImgs[index].width += dimensions.width
-      this.setState({customImgs: localImgs})
+        let localImgs = this.state.customImgs
+        localImgs[index].height = document.getElementById('dndImg-' + index).height
+        localImgs[index].width = document.getElementById('dndImg-' + index).width
+        this.setState({customImgs: localImgs})
     }
     handler(imgs){
-      //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
-      let localImgs = this.state.customImgs
-      imgs.map((img)=>{
-        //costruisco oggetto che rappresenta immagine, nome+(x,y)
-        let imgWithPos = {
-          name: img.name,
-          x: 0,
-          y: 0,
-          height: 'auto',
-          width: 'auto'
-        }
-        //lo aggiungo ad array nello state
-        localImgs.push(imgWithPos)
-      })
-      this.setState({customImgs: localImgs})
+        //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
+        let localImgs = this.state.customImgs
+        imgs.map((img, index)=>{
+            //costruisco oggetto che rappresenta immagine, nome+(x,y)
+            let imgWithPos = {
+                name: img.name,
+                x: 0,
+                y: 0,
+                height: 'auto',
+                width: 'auto'
+            }
+            //lo aggiungo ad array nello state
+            localImgs.push(imgWithPos)
+        })
+        // console.log(localImgs);
+        this.setState({customImgs: localImgs})
     }
+
+    setMultipleDrag(e) {
+        if (e.shiftKey) {
+            this.setState({multipleDrag: true})
+        } else {
+            this.setState({multipleDrag: false})
+        }
+        if (e.shiftKey && e.ctrlKey) {
+            for (let i = 0; i < this.state.listMultipleDragIds.length; i++) {
+                document.getElementById('layout-' + this.state.listMultipleDragIds[i]).classList.remove('multipleDrag')
+            }
+            this.setState({multipleDrag: false, listMultipleDragIds: []})
+        }
+    }
+
+    checkMultipleDrag(item, e) {
+        if (this.state.multipleDrag) {
+            let localListIds = this.state.listMultipleDragIds
+            let ifInList = localListIds.indexOf(item.id)
+            if (ifInList < 0) {
+                document.getElementById('layout-' + item.id).classList.add('multipleDrag')
+                localListIds.push(item.id)
+            } else {
+                document.getElementById('layout-' + item.id).classList.remove('multipleDrag')
+                localListIds.splice(ifInList, 1)
+            }
+            this.setState({listMultipleDragIds: localListIds})
+        }
+    }
+
     printDocument() {
-      const input = document.getElementById('printable-div');
-      html2canvas(document.body, {allowTaint: true})
+        const input = document.getElementById('printable-div');
+        html2canvas(document.body, {allowTaint: true})
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF();
@@ -142,85 +232,133 @@ class LayoutExport extends Component {
             // pdf.save("download.pdf");
         })
     }
+
+    // Save the current Typo configuration
+    saveTypo() {
+        let localProject = { "id":  this.props.match.params.chapterid, "chapt_typo": {"card": this.state.cards, "img": this.state.customImgs}}
+        localProject.chapt_typo = JSON.stringify(localProject.chapt_typo)
+        let url = window.env.RestApiCard
+        let self = this
+        let data = JSON.stringify(localProject)
+        let xhr = new XMLHttpRequest()
+        xhr.addEventListener("readystatechange", function () {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+                self.setState({saveMessage: false})
+                self.sleep(1000).then(() => {
+                    self.setState({saveMessage: true})
+                });
+
+            }
+          }
+        })
+        xhr.open("POST", url)
+        xhr.setRequestHeader("content-type", "application/json")
+        xhr.send(data)
+    }
+
+    // Reset the layout to null
+    resetTypo() {
+        let self = this
+        let query = `
+        mutation resetTypo {
+            updateCaaChapter (id: ${this.props.match.params.chapterid}, chapt_typo: "null") {
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                self.componentWillMount()
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    // SLEEP (is a test instead of classic setTimeout)
+    sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
     render() {
         const { t, i18n } = this.props
+
         if (this.state.savedProject.length === 0) {
             return (<p>Loading...</p>)
         } else {
-            let borderCard = {
-                Aggettivo: {color: '',size: '1',type: ''},
-                Articolo: {color: '',size: '1',type: ''},
-                Avverbio: {color: '',size: '1',type: ''},
-                Congiunzione: {color: '',size: '1',type: ''},
-                Interiezione: {color: '',size: '1',type: ''},
-                Pronome: {color: '',size: '1',type: ''},
-                Preposizione: {color: '',size: '1',type: ''},
-                Sostantivo: {color: '',size: '1',type: ''},
-                Verbo: {color: '',size: '1',type: ''},
-                Altro: {color: '',size: '1',type: ''}
-            }
             let customImgsLayout = this.state.customImgs
             customImgsLayout = customImgsLayout.map((img,index) => {
-              //stampo le immagini custom
-              return(
+                // Build Src Path for the images
+                let tmpProjectId = this.props.match.params.projectid
+                let tmpChapterId = this.props.match.params.chapterid
+                let fileName = tmpProjectId + '_' + tmpChapterId + '_' + img.name
+                let composedSrc = window.env.MediaImage + tmpProjectId + '/' + fileName
+
+                //stampo le immagini custom
+                return(
                 <Rnd
                     key={index}
                     style={{background: '#ddd'}}
+                    bounds='parent'
                     position={{ x: img.x, y: img.y}}
                     size={{ height: img.height, width: img.width}}
                     onDragStop={this.dragImg.bind(this, img, index)}
                     onResize={this.resizeImg.bind(this, img, index)}
-                    >
-                      <Image src={"http://www.radis-svil.it/simcaa/laravel-imageupload/public/uploads/images/"+img.name}/>
+                >
+                    <Image id={'dndImg-' + index} style={{'height': '100%'}} className='imgFullWidth' src={composedSrc}/>
                 </Rnd>
-              )
+                )
             })
             let cardsLayout = this.state.cards
             cardsLayout = cardsLayout.map((item, index) => {
                 return (
                     <Rnd
                         key={index}
-                        style={{ background: '#ddd' }}
-                        bounds="parent"
+                        style={{ background: '#ddd'}}
+                        z = {99}
                         size={{ width: item.rndWidth,
                                 height: item.rndHeight }}
-                                position={{ x: item.x, y: item.y }}
+                        position={{ x: item.x, y: item.y }}
                         onDragStop={this.drag.bind(this, item)}
                         onResize={this.resize.bind(this, item)}
                         minHeight= '150'
                         minWidth= '100'
                     >
-                        <CardLayout
-                            Card={item}
-                            isTypo={true}
-                            imgFullWidth={true}
-                            mode={true}
-                            posInput= {'bottom'}
-                            sizeInput= {'small'}
-                            styleInput= {'normal'}
-                            formatInput= {'freeInput'}
-                            colorTextInput= {'#000000'}
-                            colorBackgroundInput= {'#FFFFFF'}
-                            weightInput= {'weightNormalInput'}
-                            decorationInput= {'decorationNormalInput'}
-                            fontStyleInput= {'styleNormalInput'}
-                            imgSize= {'small'}
-                            imgPadding= {'imgpadding1'}
-                            imgType= {'color'}
-                            borderCard= {borderCard}
-                            urlRest= {window.env.RestApiLemmi}
-                            urlImg= {window.env.PathImages}
-                        />
+                        <div style={{"width": "100%", "height":"100%"}} onClick={this.checkMultipleDrag.bind(this, item)}>
+                            <CardLayout
+                                Card={item}
+                                isTypo={true}
+                                imgFullWidth={true}
+                                mode={true}
+                                posInput= {this.state.profile.posInput}
+                                sizeInput= {this.state.profile.sizeInput}
+                                styleInput= {this.state.profile.styleInput}
+                                formatInput= {this.state.profile.formatInput}
+                                colorTextInput= {this.state.profile.colorTextInput}
+                                colorBackgroundInput= {this.state.profile.colorBackgroundInput}
+                                weightInput= {this.state.profile.weightInput}
+                                decorationInput= {this.state.profile.decorationInput}
+                                fontStyleInput= {this.state.profile.fontStyleInput}
+                                imgSize= {this.state.profile.imgSize}
+                                imgPadding= {this.state.profile.imgPadding}
+                                imgType= {this.state.profile.imgType}
+                                borderCard= {this.state.profile.borderCard}
+                                urlRest= {window.env.GraphQLServer}
+                                urlImg= {window.env.PathImages}
+                            />
+                        </div>
                     </Rnd>
                 )
             })
-            console.log(this.props);
+
             return (
-                <div>
+                <div onKeyDown={this.setMultipleDrag.bind(this)} onKeyUp={this.setMultipleDrag.bind(this)} tabIndex="0">
                     <Segment.Group className='no-print'>
                         <Segment>
-                            <Button color='blue' disabled>{t("HEAD_BTN_RESET")}</Button>
-                            <Button color='blue' onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
+                            <Button color='blue' onClick={this.resetTypo.bind(this)}>{t("HEAD_BTN_RESET")}</Button>
+                            <Button color='green' onClick={this.saveTypo.bind(this)}>{t("HEAD_BTN_SAVE")}</Button>
+                            <Button color='blue' disabled onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link}
                                 to={'/basic/edit/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
@@ -236,9 +374,20 @@ class LayoutExport extends Component {
                             />
                         </Segment>
                     </Segment.Group>
+                    <Message
+                        positive
+                        compact={true}
+                        hidden={this.state.saveMessage}
+                        icon={'save'}
+                        header='Projet Saved'
+                    />
                     <Segment className={this.state.classSheet} id='printable-div'>
                         {customImgsLayout}
                         {cardsLayout}
+                    </Segment>
+                    <br className='no-print' />
+                    <Segment className={this.state.classSheet} id='printable-div'>
+
                     </Segment>
                 </div>
             )

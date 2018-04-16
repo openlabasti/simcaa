@@ -151,7 +151,7 @@ class Project extends Component {
         localChapters = localChapters.map((item, index) => {
             let ifBlocked = item.chapt_user_block === 0 ? false : true
             let contentButton
-            if (ifBlocked === true && (item.chapt_user_block === this.props.user.id || this.props.user.user === 'admin')) {
+            if (ifBlocked === true && (item.chapt_user_block === this.props.user.id || this.props.user.group_id === 1)) {
                 ifBlocked = false
                 contentButton = <Button color='green'
                     disabled={ifBlocked}

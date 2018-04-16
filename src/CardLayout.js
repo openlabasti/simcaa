@@ -88,7 +88,7 @@ class CardLayout extends Component {
                                 disabled={this.props.mode}
                                 transparent={inputBorder}
                                 className={this.props.formatInput + ' ' + this.props.weightInput + ' ' + this.props.decorationInput + ' ' + this.props.fontStyleInput + ' colorTextInput colorBackgroundInput'}
-                                id = {'text-' + this.state.card.id}
+                                id = {'textLayout-' + this.state.card.id}
                                 value = {this.state.card.lemma}
                             />
                         </Card.Content>
@@ -100,11 +100,10 @@ class CardLayout extends Component {
                                 className={imgFullWidth}
                             />
                         </Card.Content>
-
         if (this.props.posInput === 'bottom' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'card-' + this.state.card.id}
+                    id={'layout-' + this.state.card.id}
                     style={{...styles}}
                     className='uicardlayout'
                 >
@@ -116,7 +115,7 @@ class CardLayout extends Component {
         else if (this.props.posInput === 'top' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'card-' + this.state.card.id}
+                    id={'layout-' + this.state.card.id}
                     style={{...styles}}
                     className="uicardlayout"
                 >
@@ -130,7 +129,7 @@ class CardLayout extends Component {
                 <Card.Group>
                     <div className={this.props.disabledCard}>
                         <Card
-                            id={'card-' + this.state.card.id}
+                            id={'layout-' + this.state.card.id}
                             style={{...styles}}
                             className='cardUI'
                         >
@@ -146,7 +145,7 @@ class CardLayout extends Component {
                 <Card.Group>
                     <div className={this.props.disabledCard}>
                         <Card
-                            id={'card-' + this.state.card.id}
+                            id={'layout-' + this.state.card.id}
                             style={{...styles}}
                             className="cardUI"
                         >

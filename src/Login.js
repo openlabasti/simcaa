@@ -49,6 +49,14 @@ class Login extends Component {
         xhr.send(data)
     }
 
+    // TODO: DELETE WHEN MESSAGE BECOME USELESS
+    componentDidMount() {
+        let blueContent = document.getElementById('blue_content')
+        let violetContent = document.getElementById('violet_content')
+        blueContent.innerHTML = window.env.blue_text_content
+        violetContent.innerHTML = window.env.violet_text_content
+    }
+
     render() {
         return (
             <div>
@@ -89,29 +97,23 @@ class Login extends Component {
                 </Grid>
 
                 <Segment style={{'maxWidth': '50%', 'left': '50%', 'transform': 'translateX(-50%)'}}>
-                <Message
-                    color='blue'
-                    size='massive'
-                >
-                <Message.Header>To test this Demo</Message.Header>
-                    <p>Username: user</p>
-                    Password: user
-                </Message>
+                    <Message
+                        color='blue'
+                        size='massive'
+                    >
+                    <Message.Header>
+                        {window.env.blue_text_header}
+                    </Message.Header>
+                    <Message.Content id='blue_content'>
+                    </Message.Content>
+                    </Message>
                     <Message
                         color='purple'
                         size='massive'
                     >
-                    <Message.Header>OpenLab Asti</Message.Header>
-                        Stiamo sviluppando l&#39;applicazione SIMCAA
-                        "Scrittura Inclusiva Multimodale Comunicazione Aumentativa Aperta"
-                        Questo sito è un ambiente di demo/test di <a href='http://openlabasti.it'> OpenLab Asti </a>.
-                        SIMCAA è in corso di sviluppo, quindi soggetta ad aggiornamenti e
-                        modifiche continue, le funzionalità sono incomplete e non sono garantite,
-                        è possibile l&#39;interruzione temporanea del servizio.
-                        Non si assicura la persistenza dei documenti caricati.
-                        I simboli usati sono di proprietà del Governo di Aragona,
-                        creati da Sergio Palao per <a href='http://arasaac.org'> ARASAAC</a> e distribuiti con Licenza
-                        <a href='https://it.wikipedia.org/wiki/Creative_Commons'> Creative Common</a> (BY-NC-SA)
+                    <Message.Header>{window.env.violet_text_header}</Message.Header>
+                    <Message.Content id='violet_content'>
+                    </Message.Content>
                     </Message>
                 </Segment>
 

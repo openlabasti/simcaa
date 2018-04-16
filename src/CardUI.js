@@ -145,6 +145,15 @@ class CardUI extends Component {
         if (nextProps.copyCard !== this.props.copyCard) {
             this.copyCard()
         }
+        if (nextProps.searchLemma !== this.props.searchLemma) {
+            this.searchLemma()
+        }
+        if (nextProps.addCardAfter !== this.props.addCardAfter) {
+            this.addCardAfter()
+        }
+        if (nextProps.addCardBefore !== this.props.addCardBefore) {
+            this.addCardBefore()
+        }
         if (nextProps.deleteCard !== this.props.deleteCard) {
             this.deleteCard()
         }
@@ -263,11 +272,12 @@ class CardUI extends Component {
         this.setExpandAll()
     }
 
-    // handle del blocco della card
+    // handle del blocco della card, elimina eventuali spazi iniziali e finali dal lemma
     handleBlock(input) {
         let currentCard = this.state.focusedCard
         var localCards = this.state.card
         localCards[currentCard.id].lock === 'lock' ? localCards[currentCard.id].lock = 'unlock' : localCards[currentCard.id].lock = 'lock'
+        localCards[currentCard.id].lemma = localCards[currentCard.id].lemma.trim()
         this.setState({card: localCards})
         this.setFocusedCard(localCards[currentCard.id])
     }
@@ -475,7 +485,7 @@ class CardUI extends Component {
         let self = this
         setTimeout(function() {
             if (document.getElementById(idText)) {
-                self.setFocusedCard(localCard[index-1])
+                self.setFocusedCard(localCard[index])
                 document.getElementById(idText).focus()
             }
         }, 50)
@@ -597,6 +607,55 @@ class CardUI extends Component {
         this.setExpandAll()
     }
 
+    // handle del search della card senza la creazione di una nuova
+    searchLemma() {
+        let array = this.state.card
+        let index = this.state.focusedCard.id
+        let lemma = this.state.focusedCard.lemma
+        let row = this.state.focusedCard.row
+        this.setImg(array, index, lemma, row, null)
+    }
+
+    // handle della creazione di una card successiva a quella corrente senza la ricerca
+    addCardAfter() {
+        let localCards = this.state.card
+        let index = this.state.focusedCard.id
+        localCards.splice(index + 1, 0, {id: 0,
+            lemma: '',
+            lemmaPrevious: '',
+            img: 'placeholder.png',
+            sinonimi: 0,
+            imgAlt: [],
+            lock: 'unlock',
+            codClass: 'Altro',
+            complex: '0',
+            row: this.state.focusedCard.row
+        })
+        this.reorderIds(localCards)
+        this.setExpandAll()
+        this.setState({card: localCards})
+    }
+
+    // handle della creazione di una card precedente a quella corrente senza la ricerca
+    addCardBefore() {
+        let localCards = this.state.card
+        let index = this.state.focusedCard.id
+        localCards.splice(index, 0, {id: 0,
+            lemma: '',
+            lemmaPrevious: '',
+            img: 'placeholder.png',
+            sinonimi: 0,
+            imgAlt: [],
+            lock: 'unlock',
+            codClass: 'Altro',
+            complex: '0',
+            row: this.state.focusedCard.row
+        })
+        this.reorderIds(localCards)
+        this.setExpandAll()
+        this.setState({card: localCards})
+    }
+
     // handle del delete della card
     deleteCard(input) {
         let currentCard = this.state.focusedCard
@@ -632,7 +691,7 @@ class CardUI extends Component {
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             if (this.status === 200) {
-                self.props.saveComplete()
+                self.props.saveComplete(self.props.saveToDb)
             }
           }
         })
@@ -664,7 +723,7 @@ class CardUI extends Component {
     }
 
     render() {
-        if (this.props.saveToDb) {
+        if (this.props.saveToDb !== 'false') {
             this.handleSaveProject()
         }
 

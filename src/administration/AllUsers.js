@@ -109,10 +109,13 @@ class AllUsers extends Component{
           </Table.Row>
         )
       })
+      const tableStyle={
+        marginTop: '15px'
+      }
       return(
         <div>
-        <Container>
-          <Table celled padded textAlign='center'>
+        <Segment style={tableStyle}>
+          <Table celled padded textAlign='center' >
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>ID</Table.HeaderCell>
@@ -127,7 +130,7 @@ class AllUsers extends Component{
               {tableLayout}
             </Table.Body>
           </Table>
-        </Container>
+        </Segment>
         <Confirm
             open={this.state.openConfirmDelete}
             header='This action cannot be reversed'

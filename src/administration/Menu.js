@@ -20,7 +20,7 @@ class AdminMenu extends Component{
    return(
         <Menu id='navbar'>
             <Menu.Item name='header'>
-                Pannello di Amministrazione
+                <h4><b>Pannello di Amministrazione</b></h4>
             </Menu.Item>
             <Menu.Item name='users' onClick={()=>this.triggerLoading(1)}>
                 Utenti
@@ -28,8 +28,11 @@ class AdminMenu extends Component{
             <Menu.Item name='groups' onClick={()=>this.triggerLoading(2)}>
                 Gruppi
             </Menu.Item>
-            <Menu.Item name='logout' onClick={()=>this.Logout()}>
-                Logout
+            <Menu.Item name='goback' onClick={()=>this.props.history.push('/')}>
+                Torna alla Home
+            </Menu.Item>
+            <Menu.Item name='logout' position='right' onClick={()=>this.Logout()}>
+                <b>Logout</b>
             </Menu.Item>
 
         </Menu>

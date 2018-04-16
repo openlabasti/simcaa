@@ -50,8 +50,8 @@ class Admin extends Component{
       case 1:
         return(
            <div>
-             <AdminMenu action={this.handleSelection}/>
-             <AllUsers action={this.handleSelection}/>
+            <AdminMenu action={this.handleSelection}/>
+              <AllUsers action={this.handleSelection}/>
            </div>
          )
          break
@@ -66,7 +66,9 @@ class Admin extends Component{
       return(
          <div>
            <AdminMenu action={this.handleSelection}/>
-           <AllGroups/>
+           <Segment>
+            <AllGroups/>
+          </Segment>
          </div>
        )
        break

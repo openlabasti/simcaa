@@ -146,7 +146,7 @@ class Project extends Component {
 
     render() {
         const { t, i18n } = this.props
-
+console.log(this.props.user);
         let localChapters = this.state.chapters
         localChapters = localChapters.map((item, index) => {
             let ifBlocked = item.chapt_user_block === 0 ? false : true

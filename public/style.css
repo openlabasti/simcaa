@@ -101,21 +101,6 @@
     pointer-events:none;
 }
 
-.cardUI {
-    margin: 15px 0px 5px 20px !important;
-    min-width: 50% !important;
-    text-align: center;
-}
-
-.cardUI input {
-    text-align: center !important;
-    width: 100%;
-}
-
-.imgFullWidth {
-    min-width: 100%;
-}
-
 /* Hide the NaBar in view mode */
 .viewMode {
     display: none !important;
@@ -129,6 +114,17 @@ body {
     width: auto;
 }
 
+.cardUI {
+    margin: 15px 0px 5px 20px !important;
+    min-width: 50% !important;
+    text-align: center;
+}
+
+.cardUI input {
+    text-align: center !important;
+    width: 100%;
+}
+
 /* Typo rules */
 .uicardlayout {
     min-height: 100% !important;
@@ -139,12 +135,17 @@ body {
     width: 100% !important;
 }
 
+/* Img auto-scaling */
+.imgFullWidth {
+    min-width: 100%;
+}
+
 .uicardlayout input {
     text-align: center !important;
 }
 
-@media print
-{
+/* Print mode rules */
+@media print {
     .no-print
     {
         display: none !important;
@@ -154,6 +155,7 @@ body {
         visibility: hidden !important;
     }
 
+    /* TODO: Da vedere se attivare, facendolo printa pagina bianca in tutte le div senza il corretto css */
     /* body * {
         visibility: hidden;
     } */
@@ -186,7 +188,7 @@ body {
 }
 
 /* Multiple Drag select */
-.multipleDrag{
+.multipleDrag {
     -webkit-box-shadow:inset 0px 0px 0px 5px #f00 !important;
     -moz-box-shadow:inset 0px 0px 0px 5px #f00 !important;
     box-shadow:inset 0px 0px 0px 5px #f00 !important;

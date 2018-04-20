@@ -168,6 +168,9 @@ class BasicProject extends Component {
             if (toPage === 'preview') {
                 this.openPreviewA4()
             } else if (toPage === 'typo') {
+                let size = this.getSizeCard()
+                sessionStorage.setItem('cardWidth', size.width)
+                sessionStorage.setItem('cardHeight', size.height)
                 this.props.history.push('/layout/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
             }
         });
@@ -176,6 +179,17 @@ class BasicProject extends Component {
     // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    // Get dimension of cards
+    getSizeCard() {
+        let numCard = document.getElementsByClassName('cardUI');
+        let cardHeight = document.getElementById('card-0').offsetHeight
+        let cardWidth = []
+        for (let i = 0; i < numCard.length; i++) {
+            cardWidth[i] = document.getElementById('card-' + i).offsetWidth
+        }
+        return {width: cardWidth, height: cardHeight}
     }
 
     setNavbarCard(card) {
@@ -241,12 +255,8 @@ class BasicProject extends Component {
 
         if (this.state.previewPage) {
             // Prendo e calcolo width e height delle card per passarle alla Preview
-            let numCard = document.getElementsByClassName('cardUI');
-            let cardHeight = document.getElementById('card-0').offsetHeight
-            let cardWidth = []
-            for (let i = 0; i < numCard.length; i++) {
-                cardWidth[i] = document.getElementById('card-' + i).offsetWidth
-            }
+            let size = this.getSizeCard()
+
             return (
                 <div>
                     <Menu className='no-print'>
@@ -257,7 +267,7 @@ class BasicProject extends Component {
                             <Button negative onClick={this.openPreviewA4.bind(this)}>Return to Chapter</Button>
                         </Menu.Item>
                     </Menu>
-                    <PreviewA4Portrait cardWidth={cardWidth} cardHeight={cardHeight} />
+                    <PreviewA4Portrait cardWidth={size.width} cardHeight={size.height} />
                 </div>
             )
         }

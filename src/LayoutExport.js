@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Button, Dropdown, Image, Message } from 'semantic-ui-react'
+import { Segment, Button, Dropdown, Image, Message, Loader } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
@@ -33,6 +33,7 @@ class LayoutExport extends Component {
             multipleDrag: false,
             listMultipleDragIds: [],
             saveMessage: true,
+            finishLoad: false,
         }
     }
 
@@ -58,37 +59,65 @@ class LayoutExport extends Component {
 
         this.props.apolloFetch({ query })
             .then((data) => {
-                let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
+                // Parse del capitolo e del profilo
                 let profile = JSON.parse(data.data.projects.data[0].proj_profile)
+                let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
+                let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
+
+                this.cleanCard(stateCard)
 
                 if (savedTypo === null || savedTypo.length === 0) {
-                    let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
-                    let numCardRow = Math.floor(794 / 200)
-                    let xCard = 200
-                    let yCard = 0
-                    let k = 0
+                    // Salvo il width delle card
+                    let localCardWidth = JSON.parse('[' + sessionStorage.getItem('cardWidth') + ']')
+
+                    // Setto le righe correttamente in base al foglio
+                    let pageWidth = 794 - localCardWidth[0]
                     for (let i = 0; i < stateCard.length; i++) {
-                        if (!stateCard[i].lemma) {
-                            stateCard.splice(i, 1)
-                            i--
+                        if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
+                            pageWidth = pageWidth - localCardWidth[i]
+                        } else {
+                            if (i === 0) {
+                                pageWidth = 794 - localCardWidth[0]
+                            } else {
+                                pageWidth = 794 - localCardWidth[i]
+                            }
                         }
-                    }
-                    for (let i = 0; i < stateCard.length; i++) {
-                        stateCard[i].id = i
+                        if (pageWidth < 0) {
+                            for (let j = i; j < stateCard.length; j++) {
+                                stateCard[j].row++
+                            }
+                            pageWidth = 794 - localCardWidth[i]
+                        }
                     }
 
-                    for (let i = 0, j = 0; i < stateCard.length; i++, j++) {
-                        if (i % numCardRow === 0 && i > 0) {
-                            k++
-                            j = 0
-                            yCard = 240 * k
+                    // Calcolo la posizione in cui mettere le card
+                    let heightY = parseInt(sessionStorage.getItem('cardHeight'))
+                    let widthX = 0
+                    for (let i = 0; i < stateCard.length; i++) {
+                        if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
+                            widthX += localCardWidth[i-1] + 20
+                        } else {
+                            widthX = 0
                         }
-                        stateCard[i].x = xCard * j
-                        stateCard[i].y = yCard
-                        stateCard[i].rndWidth = 178
-                        stateCard[i].rndHeight = 226
+                        stateCard[i].x = widthX
+                        stateCard[i].y = heightY * stateCard[i].row
+                        stateCard[i].rndWidth = localCardWidth[i]
+                        stateCard[i].rndHeight = heightY
                         stateCard[i].lastX = stateCard[i].x
                         stateCard[i].lastY = stateCard[i].y
+                    }
+
+                    // Setto la pagina
+                    let numCardPage = Math.floor(1123/heightY)
+                    for (let i = 0; i < stateCard.length; i++) {
+                        if (stateCard[i].row % numCardPage === 0 &&
+                            stateCard[i].row !== 0 &&
+                            stateCard[i].row !== stateCard[i-1].row) {
+                            for (let j = i; j < stateCard.length; j++) {
+                                stateCard[j].y -= heightY * numCardPage * (stateCard[i-1].page + 1)
+                                stateCard[j].page++
+                            }
+                        }
                     }
                     this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile})
                 } else {
@@ -102,6 +131,21 @@ class LayoutExport extends Component {
             })
     }
 
+    // Elimino le card vuote, allineo gli id e aggiungo la pagina
+    cleanCard(stateCard) {
+        for (let i = 0; i < stateCard.length; i++) {
+            if (!stateCard[i].lemma) {
+                stateCard.splice(i, 1)
+                i--
+            }
+        }
+        for (let i = 0; i < stateCard.length; i++) {
+            stateCard[i].id = i
+            stateCard[i].page = 0
+        }
+    }
+
+    // Change all cards size
     onChangeDropdown(event, data) {
         let localCard = this.state.cards
         for (var i = 0; i < localCard.length; i++) {
@@ -111,12 +155,13 @@ class LayoutExport extends Component {
         this.setState({cards: localCard})
     }
 
+    // DnD of cards
     drag(item, e, d) {
         let localCard = this.state.cards
         let localListIds = this.state.listMultipleDragIds
+        let deltaX = d.x - item.lastX
+        let deltaY = d.y - item.lastY
         if (localListIds.indexOf(item.id) > -1) {
-            let deltaX = d.x - item.lastX
-            let deltaY = d.y - item.lastY
             for (let i = 0; i < localListIds.length; i++) {
                 let tmpX = localCard[localListIds[i]].lastX + deltaX
                 let tmpY = localCard[localListIds[i]].lastY + deltaY
@@ -127,13 +172,11 @@ class LayoutExport extends Component {
                 } else {
                     localCard[localListIds[i]].x = tmpX
                 }
-                localCard[localListIds[i]].y = tmpY < 0 ? 0 : tmpY
+                localCard[localListIds[i]].y = tmpY < (-1123 * localCard[item.id].page) ? -1123 * localCard[item.id].page : tmpY
                 localCard[localListIds[i]].lastX = localCard[localListIds[i]].x
                 localCard[localListIds[i]].lastY = localCard[localListIds[i]].y
             }
         } else {
-            let deltaX = d.x - item.lastX
-            let deltaY = d.y - item.lastY
             let tmpX = localCard[item.id].lastX + deltaX
             let tmpY = localCard[item.id].lastY + deltaY
             if (tmpX < 0) {
@@ -143,14 +186,30 @@ class LayoutExport extends Component {
             } else {
                 localCard[item.id].x = tmpX
             }
-            localCard[item.id].y = tmpY < 0 ? 0 : tmpY
+            localCard[item.id].y = tmpY < (-1123 * localCard[item.id].page) ? -1123 * localCard[item.id].page : tmpY
             localCard[item.id].lastX = localCard[item.id].x
             localCard[item.id].lastY = localCard[item.id].y
         }
         this.setState({cards: localCard})
     }
+
+    // Resize of cards
+    resize(item, e, direction, ref, delta, position, event) {
+        let img = document.getElementById('layout-' + item.id).getElementsByClassName('image')
+        img[0].classList.add('imgFullWidth')
+        let localCard = this.state.cards
+        localCard[item.id].rndWidth = ref.offsetWidth
+        localCard[item.id].rndHeight = ref.offsetHeight
+        this.setState({cards: localCard})
+    }
+
+    // DnD of custom imgs
     dragImg(item, index, e, d){
         let localImgs = this.state.customImgs
+        if (localImgs[index].height === 'auto' || localImgs[index].width === 'auto') {
+            localImgs[index].height = document.getElementById('dndImg-' + index).height
+            localImgs[index].width = document.getElementById('dndImg-' + index).width
+        }
         if (d.x < 0) {
             localImgs[index].x = 0
         } else if (d.x + localImgs[index].width > 794) {
@@ -161,18 +220,16 @@ class LayoutExport extends Component {
         localImgs[index].y = d.y < 0 ? 0 : d.y
         this.setState({customImgs: localImgs})
     }
-    resize(item, e, direction, ref, delta, position, event) {
-        let localCard = this.state.cards
-        localCard[item.id].rndWidth = ref.offsetWidth
-        localCard[item.id].rndHeight = ref.offsetHeight
-        this.setState({cards: localCard})
-    }
+
+    // Resize of the custom imgs
     resizeImg(item, index, e, direction, ref, dimensions, position){
         let localImgs = this.state.customImgs
         localImgs[index].height = document.getElementById('dndImg-' + index).height
         localImgs[index].width = document.getElementById('dndImg-' + index).width
         this.setState({customImgs: localImgs})
     }
+
+    // Handle custom imgs upload
     handler(imgs){
         //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
         let localImgs = this.state.customImgs
@@ -270,6 +327,10 @@ class LayoutExport extends Component {
         this.props.apolloFetch({ query })
             .then((data) => {
                 self.componentWillMount()
+                let imgDivs = document.getElementsByClassName('imgFullWidth')
+                for (let i = 0; i < imgDivs.length; i++) {
+                    imgDivs[i].classList.remove("imgFullWidth")
+                }
             })
             .catch((error) => {
                 console.log(error);
@@ -278,14 +339,32 @@ class LayoutExport extends Component {
 
     // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
-        return new Promise((resolve) => setTimeout(resolve, time));
+        return new Promise((resolve) => setTimeout(resolve, time))
+    }
+
+    componentDidUpdate() {
+        if (this.state.finishLoad === false) {
+            let self = this
+            setTimeout(() => {
+                let imgDivs = document.getElementsByClassName('image')
+                for (let i = 0; i < imgDivs.length; i++) {
+                    imgDivs[i].style.setProperty("display", "block", "important")
+                    imgDivs[i].style.setProperty("margin", "auto", "important")
+                }
+                self.setState({finishLoad: true})
+            }, 0)
+        }
     }
 
     render() {
         const { t, i18n } = this.props
 
         if (this.state.savedProject.length === 0) {
-            return (<p>Loading...</p>)
+            return (
+                <Segment className={this.state.classSheet}>
+                    <Loader active inline='centered' size='massive'/>
+                </Segment>
+            )
         } else {
             let customImgsLayout = this.state.customImgs
             customImgsLayout = customImgsLayout.map((img,index) => {
@@ -300,7 +379,7 @@ class LayoutExport extends Component {
                 <Rnd
                     key={index}
                     style={{background: '#ddd'}}
-                    bounds='parent'
+                    z={99}
                     position={{ x: img.x, y: img.y}}
                     size={{ height: img.height, width: img.width}}
                     onDragStop={this.dragImg.bind(this, img, index)}
@@ -315,11 +394,9 @@ class LayoutExport extends Component {
                 return (
                     <Rnd
                         key={index}
-                        style={{ background: '#ddd'}}
                         z = {99}
-                        size={{ width: item.rndWidth,
-                                height: item.rndHeight }}
                         position={{ x: item.x, y: item.y }}
+                        size={{width: item.rndWidth, height: item.rndHeight}}
                         onDragStop={this.drag.bind(this, item)}
                         onResize={this.resize.bind(this, item)}
                         minHeight= '150'
@@ -329,7 +406,7 @@ class LayoutExport extends Component {
                             <CardLayout
                                 Card={item}
                                 isTypo={true}
-                                imgFullWidth={true}
+                                imgFullWidth={false}
                                 mode={true}
                                 posInput= {this.state.profile.posInput}
                                 sizeInput= {this.state.profile.sizeInput}
@@ -352,6 +429,41 @@ class LayoutExport extends Component {
                 )
             })
 
+            // render the divs page
+            let segmentPage = []
+            for (let i = 0; i <= this.state.cards[this.state.cards.length-1].page; i++) {
+                segmentPage.push(this.state.cards[this.state.cards.length-1].page)
+            }
+            segmentPage = segmentPage.map((item, index) => {
+                let cardPerPage = []
+                for (let i = 0; i < this.state.cards.length; i++) {
+                    if (this.state.cards[i].page === index) {
+                        cardPerPage.push(cardsLayout[i])
+                    }
+                }
+                if (index === 0) {
+                    return(
+                        <div key={index}>
+                            <Segment className={this.state.classSheet + ' section-to-print'}>
+                                {customImgsLayout}
+                                {cardPerPage}
+                            </Segment>
+                            <br className='no-print' />
+                        </div>
+                    )
+                } else {
+                    return(
+                        <div key={index}>
+                            <Segment className={this.state.classSheet + ' section-to-print'}>
+                                {cardPerPage}
+                            </Segment>
+                            <br className='no-print' />
+                        </div>
+                    )
+                }
+            })
+
+            // Main render return
             return (
                 <div onKeyDown={this.setMultipleDrag.bind(this)} onKeyUp={this.setMultipleDrag.bind(this)} tabIndex="0">
                     <Segment.Group className='no-print'>
@@ -381,14 +493,14 @@ class LayoutExport extends Component {
                         icon={'save'}
                         header='Projet Saved'
                     />
+                    {/*
                     <Segment className={this.state.classSheet} id='printable-div'>
                         {customImgsLayout}
                         {cardsLayout}
                     </Segment>
                     <br className='no-print' />
-                    <Segment className={this.state.classSheet} id='printable-div'>
-
-                    </Segment>
+                    */}
+                    {segmentPage}
                 </div>
             )
         }

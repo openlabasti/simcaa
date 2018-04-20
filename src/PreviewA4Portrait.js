@@ -57,7 +57,6 @@ class PreviewA4Portrait extends Component {
                 let localCardWidth = this.props.cardWidth
 
                 // Setto le righe correttamente in base al foglio
-                let numCardRow = 0
                 let pageWidth = 794 - localCardWidth[0]
                 for (let i = 0; i < stateCard.length; i++) {
                     if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
@@ -79,14 +78,14 @@ class PreviewA4Portrait extends Component {
 
                 // Calcolo la posizione in cui mettere le card
                 let heightY = this.props.cardHeight
-                let widthX = -1
+                let widthX = 0
                 for (let i = 0; i < stateCard.length; i++) {
                     if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
-                        widthX++
+                        widthX += localCardWidth[i-1] + 20
                     } else {
                         widthX = 0
                     }
-                    stateCard[i].x = localCardWidth[i] * widthX
+                    stateCard[i].x = widthX
                     stateCard[i].y = heightY * stateCard[i].row
                 }
 
@@ -123,14 +122,15 @@ class PreviewA4Portrait extends Component {
         }
     }
 
-    // componentDidUpdate() {
-    //     for (let i = 0; i < this.state.cards.length; i++) {
-    //         setTimeout(() => {
-    //             let card = document.getElementById('layout-' + i)
-    //             card.style.width = this.state.cardWidth[i] + 'px'
-    //         }, 0)
-    //     }
-    // }
+    componentDidUpdate() {
+        setTimeout(() => {
+            let div = document.getElementsByClassName('cardUI')
+            for (let i = 0; i < div.length; i++) {
+                div[i].style.setProperty("margin", "15px 0px 5px 10px", "important")
+            }
+        }, 0)
+    }
+
 
     render() {
         const { t, i18n } = this.props
@@ -150,7 +150,7 @@ class PreviewA4Portrait extends Component {
                         disableDragging
                         enableResizing
                         position={{ x: item.x, y: item.y}}
-                        size={{width: this.state.cardWidth[index] - 10, height: this.props.cardHeight}}
+                        size={{width: this.state.cardWidth[index], height: this.props.cardHeight}}
                     >
                         <CardLayout
                             Card={item}
@@ -193,7 +193,7 @@ class PreviewA4Portrait extends Component {
                         <Segment className={this.state.classSheet + ' section-to-print'}>
                             {cardPerPage}
                         </Segment>
-                        <br className={'no-print'} />
+                        <br className='no-print' />
                     </div>
                 )
             })

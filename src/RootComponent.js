@@ -417,6 +417,8 @@ class RootComponent extends Component {
                         <Grid.Column>
                             <Segment>
                                 <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
+                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
+                                <Button color='blue' as={Link} to="/administration">Admin</Button>
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>

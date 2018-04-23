@@ -96,8 +96,8 @@ class CardLayout extends Component {
         let cardImage = <Card.Content className={this.props.imgPadding}>
                             <Image
                                 src={this.props.urlImg + this.state.card.img}
-                                size={this.props.imgSize}
                                 className={imgFullWidth}
+                                size={this.props.imgSize}
                             />
                         </Card.Content>
         if (this.props.posInput === 'bottom' && this.props.isTypo === true) {

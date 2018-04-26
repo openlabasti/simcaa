@@ -23,8 +23,7 @@ class PreviewA4Portrait extends Component {
                         {type: 'imgsize', value: 600, text: 'big'},
                         {type: 'imgsize', value: 800, text: 'huge'},
                         {type: 'imgsize', value: 960, text: 'massive'}],
-            x: 0,
-            y: 0,
+            pageWidth: 794,
         }
     }
 
@@ -57,22 +56,22 @@ class PreviewA4Portrait extends Component {
                 let localCardWidth = this.props.cardWidth
 
                 // Setto le righe correttamente in base al foglio
-                let pageWidth = 794 - localCardWidth[0]
+                let pageWidth = this.state.pageWidth - localCardWidth[0]
                 for (let i = 0; i < stateCard.length; i++) {
                     if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
-                        pageWidth = pageWidth - localCardWidth[i]
+                        pageWidth = pageWidth - localCardWidth[i] - 10
                     } else {
                         if (i === 0) {
-                            pageWidth = 794 - localCardWidth[0]
+                            pageWidth = this.state.pageWidth - localCardWidth[0] - 10
                         } else {
-                            pageWidth = 794 - localCardWidth[i]
+                            pageWidth = this.state.pageWidth - localCardWidth[i] - 10
                         }
                     }
                     if (pageWidth < 0) {
                         for (let j = i; j < stateCard.length; j++) {
                             stateCard[j].row++
                         }
-                        pageWidth = 794 - localCardWidth[i]
+                        pageWidth = this.state.pageWidth - localCardWidth[i]
                     }
                 }
 
@@ -190,7 +189,7 @@ class PreviewA4Portrait extends Component {
                 }
                 return(
                     <div key={index}>
-                        <Segment className={this.state.classSheet + ' section-to-print'}>
+                        <Segment className={this.state.classSheet}>
                             {cardPerPage}
                         </Segment>
                         <br className='no-print' />

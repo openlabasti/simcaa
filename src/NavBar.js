@@ -46,11 +46,29 @@ class NavBar extends Component {
         } else {
             return (
                 <Segment basic>
-                    <Button color='green' onClick={this.triggerSaveProject.bind(this)}>{t("HEAD_BTN_SAVE")}</Button>
+                    <Button color='green'
+                        loading={this.props.loadingButton}
+                        disabled={this.props.loadingButton}
+                        onClick={this.triggerSaveProject.bind(this)}
+                    >
+                            {t("HEAD_BTN_SAVE")}
+                    </Button>
                     <Button color='red' onClick={this.closeChapter.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                     <Button color='blue' onClick={this.props.checkMode}>{mode}</Button>
-                    <Button color='blue' onClick={this.triggerSaveProject.bind(this, 'preview')}>A4 Preview</Button>
-                    <Button color='violet' onClick={this.triggerSaveProject.bind(this, 'typo')}>{t("HEAD_BTN_TYPO")}</Button>
+                    <Button color='blue'
+                        loading={this.props.loadingButton}
+                        disabled={this.props.loadingButton}
+                        onClick={this.triggerSaveProject.bind(this, 'preview')}
+                    >
+                            A4 Preview
+                    </Button>
+                    <Button color='violet'
+                        loading={this.props.loadingButton}
+                        disabled={this.props.loadingButton}
+                        onClick={this.triggerSaveProject.bind(this, 'typo')}
+                    >
+                        {t("HEAD_BTN_TYPO")}
+                    </Button>
                 </Segment>
             )
         }

@@ -146,8 +146,7 @@ body {
 
 /* Print mode rules */
 @media print {
-    .no-print
-    {
+    .no-print {
         display: none !important;
     }
 
@@ -156,7 +155,7 @@ body {
     }
 
     /* TODO: Da vedere se attivare, facendolo printa pagina bianca in tutte le div senza il corretto css */
-    /* body * {
+    /* body {
         visibility: hidden;
     } */
 
@@ -172,7 +171,7 @@ body {
 }
 
 @page {
-    margin: 100mm;
+    margin: 0mm;
 }
 
 .A4-portrait {

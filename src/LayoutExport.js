@@ -34,6 +34,7 @@ class LayoutExport extends Component {
             listMultipleDragIds: [],
             saveMessage: true,
             finishLoad: false,
+            loadingButton: false,
         }
     }
 
@@ -74,12 +75,12 @@ class LayoutExport extends Component {
                     let pageWidth = 794 - localCardWidth[0]
                     for (let i = 0; i < stateCard.length; i++) {
                         if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
-                            pageWidth = pageWidth - localCardWidth[i]
+                            pageWidth = pageWidth - localCardWidth[i] - 10
                         } else {
                             if (i === 0) {
-                                pageWidth = 794 - localCardWidth[0]
+                                pageWidth = 794 - localCardWidth[0] - 10
                             } else {
-                                pageWidth = 794 - localCardWidth[i]
+                                pageWidth = 794 - localCardWidth[i] - 10
                             }
                         }
                         if (pageWidth < 0) {
@@ -99,8 +100,9 @@ class LayoutExport extends Component {
                         } else {
                             widthX = 0
                         }
+                        let distance = stateCard[i].row * 10
                         stateCard[i].x = widthX
-                        stateCard[i].y = heightY * stateCard[i].row
+                        stateCard[i].y = heightY * stateCard[i].row + distance
                         stateCard[i].rndWidth = localCardWidth[i]
                         stateCard[i].rndHeight = heightY
                         stateCard[i].lastX = stateCard[i].x
@@ -298,10 +300,11 @@ class LayoutExport extends Component {
         let self = this
         let data = JSON.stringify(localProject)
         let xhr = new XMLHttpRequest()
+        this.setState({loadingButton: true})
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             if (this.status === 200) {
-                self.setState({saveMessage: false})
+                self.setState({saveMessage: false, loadingButton: false})
                 self.sleep(1000).then(() => {
                     self.setState({saveMessage: true})
                 });
@@ -315,7 +318,7 @@ class LayoutExport extends Component {
     }
 
     // Reset the layout to null
-    resetTypo() {
+    resetTypo(mode = null, e) {
         let self = this
         let query = `
         mutation resetTypo {
@@ -330,6 +333,9 @@ class LayoutExport extends Component {
                 let imgDivs = document.getElementsByClassName('imgFullWidth')
                 for (let i = 0; i < imgDivs.length; i++) {
                     imgDivs[i].classList.remove("imgFullWidth")
+                }
+                if (mode === 'full') {
+                    this.setState({customImgs: []})
                 }
             })
             .catch((error) => {
@@ -469,7 +475,14 @@ class LayoutExport extends Component {
                     <Segment.Group className='no-print'>
                         <Segment>
                             <Button color='blue' onClick={this.resetTypo.bind(this)}>{t("HEAD_BTN_RESET")}</Button>
-                            <Button color='green' onClick={this.saveTypo.bind(this)}>{t("HEAD_BTN_SAVE")}</Button>
+                            <Button color='blue' onClick={this.resetTypo.bind(this, 'full')}>Full Reset</Button>
+                            <Button color='green'
+                                disabled={this.state.loadingButton}
+                                loading={this.state.loadingButton}
+                                onClick={this.saveTypo.bind(this)}
+                            >
+                                {t("HEAD_BTN_SAVE")}
+                            </Button>
                             <Button color='blue' disabled onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link}
@@ -493,13 +506,6 @@ class LayoutExport extends Component {
                         icon={'save'}
                         header='Projet Saved'
                     />
-                    {/*
-                    <Segment className={this.state.classSheet} id='printable-div'>
-                        {customImgsLayout}
-                        {cardsLayout}
-                    </Segment>
-                    <br className='no-print' />
-                    */}
                     {segmentPage}
                 </div>
             )

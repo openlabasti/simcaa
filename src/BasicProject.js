@@ -19,6 +19,7 @@ class BasicProject extends Component {
             saveProject: 'false',
             currentProject: {},
             saveMessage: true,
+            loadingButton: false,
             navbarCard: {id:0 ,
                     lemma: 'React',
                     lemmaPrevious: 'React',
@@ -154,9 +155,9 @@ class BasicProject extends Component {
     // TRIGGER SAVE
     triggerSave(value = null) {
         if (value !== null) {
-            this.setState({saveProject: value})
+            this.setState({saveProject: value, loadingButton: true})
         } else {
-            this.setState({saveProject: 'true'})
+            this.setState({saveProject: 'true', loadingButton: true})
         }
     }
 
@@ -164,7 +165,7 @@ class BasicProject extends Component {
     savedSuccessfully(toPage = null) {
         this.setState({saveMessage: !this.state.saveMessage, saveProject: 'false'})
         this.sleep(1000).then(() => {
-            this.setState({saveMessage: !this.state.saveMessage})
+            this.setState({saveMessage: !this.state.saveMessage, loadingButton: false})
             if (toPage === 'preview') {
                 this.openPreviewA4()
             } else if (toPage === 'typo') {
@@ -285,6 +286,7 @@ class BasicProject extends Component {
                                 checked={this.state.mode}
                                 save={this.triggerSave}
                                 openPreviewA4={this.openPreviewA4}
+                                loadingButton={this.state.loadingButton}
                             />
                         </Menu.Item>
                         <Menu.Item className='navbar-icon' id='navbar-icon'>

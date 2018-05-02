@@ -7,12 +7,12 @@ window.env = {
 
     // Online Simcaa.it
     "PathImages": "http://www.simcaa.it/demo/media/symbols/",
-    // "ApiImageUpload": "http://www.simcaa.it/demo/laravel-imageupload/public/imageupload",
-    // "MediaImage": "http://www.simcaa.it/demo/media/images/",
+    "ApiImageUpload": "http://www.simcaa.it/demo/laravel-imageupload/public/imageupload",
+    "MediaImage": "http://www.simcaa.it/demo/media/images/",
 
     // Local
-    "ApiImageUpload": "http://10.0.0.132:8086/imageupload",
-    "MediaImage": "http://10.0.0.132/media/images/",
+    // "ApiImageUpload": "http://10.0.0.132:8086/imageupload",
+    // "MediaImage": "http://10.0.0.132/media/images/",
 
     //  URL
     // Online Radis-Svil

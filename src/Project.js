@@ -62,7 +62,6 @@ class Project extends Component {
             createCaaChapter(caa_project_id: ${currentProjectId},
                             chapt_title: "${escapedTitle}",
                             chapt_content: "",
-                            chapt_layout: "layout"
                             chapt_user_block: 0) {
                 id
             }

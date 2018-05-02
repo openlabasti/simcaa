@@ -12,18 +12,10 @@ class PreviewA4Portrait extends Component {
         this.state = {
             savedProject: [],
             profile: {},
+            layout: {},
             cards: [],
             cardWidth: [],
-            classSheet: 'A4-portrait',
-            imageSize: [{type: 'imgsize', value: 35, text: 'mini'},
-                        {type: 'imgsize', value: 80, text: 'tiny'},
-                        {type: 'imgsize', value: 150, text: 'small'},
-                        {type: 'imgsize', value: 300, text: 'medium'},
-                        {type: 'imgsize', value: 450, text: 'large'},
-                        {type: 'imgsize', value: 600, text: 'big'},
-                        {type: 'imgsize', value: 800, text: 'huge'},
-                        {type: 'imgsize', value: 960, text: 'massive'}],
-            pageWidth: 794,
+            classSheet: 'PreviewTypoDocument',
         }
     }
 
@@ -34,6 +26,7 @@ class PreviewA4Portrait extends Component {
                 data {
                     id
                     proj_profile
+                    proj_layout
                 }
             }
             chapters (id: ${this.props.match.params.chapterid}) {
@@ -46,9 +39,10 @@ class PreviewA4Portrait extends Component {
         `
         this.props.apolloFetch({ query })
             .then((data) => {
-                // Parse del capitolo e del profilo
+                // Parse dei dati
                 let profile = JSON.parse(data.data.projects.data[0].proj_profile)
                 let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
+                let layout = JSON.parse(data.data.projects.data[0].proj_layout)
 
                 this.cleanCard(stateCard)
 
@@ -56,22 +50,22 @@ class PreviewA4Portrait extends Component {
                 let localCardWidth = this.props.cardWidth
 
                 // Setto le righe correttamente in base al foglio
-                let pageWidth = this.state.pageWidth - localCardWidth[0]
+                let pageWidth = layout.width - localCardWidth[0]
                 for (let i = 0; i < stateCard.length; i++) {
                     if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
                         pageWidth = pageWidth - localCardWidth[i] - 10
                     } else {
                         if (i === 0) {
-                            pageWidth = this.state.pageWidth - localCardWidth[0] - 10
+                            pageWidth = layout.width - localCardWidth[0] - 10
                         } else {
-                            pageWidth = this.state.pageWidth - localCardWidth[i] - 10
+                            pageWidth = layout.width - localCardWidth[i] - 10
                         }
                     }
                     if (pageWidth < 0) {
                         for (let j = i; j < stateCard.length; j++) {
                             stateCard[j].row++
                         }
-                        pageWidth = this.state.pageWidth - localCardWidth[i]
+                        pageWidth = layout.width - localCardWidth[i]
                     }
                 }
 
@@ -89,18 +83,18 @@ class PreviewA4Portrait extends Component {
                 }
 
                 // Setto la pagina
-                let numCardPage = Math.floor(1123/heightY)
+                let numCardPage = Math.floor(layout.height/heightY)
                 for (let i = 0; i < stateCard.length; i++) {
                     if (stateCard[i].row % numCardPage === 0 &&
                         stateCard[i].row !== 0 &&
                         stateCard[i].row !== stateCard[i-1].row) {
                         for (let j = i; j < stateCard.length; j++) {
-                            stateCard[j].y -= heightY * numCardPage * (stateCard[i-1].page + 1)
+                            stateCard[j].y = heightY * (stateCard[j].row - stateCard[i].row)
                             stateCard[j].page++
                         }
                     }
                 }
-                this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile, cardWidth: localCardWidth})
+                this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile, layout, cardWidth: localCardWidth})
             })
             .catch((error) => {
                 console.log(error)
@@ -187,9 +181,13 @@ class PreviewA4Portrait extends Component {
                         cardPerPage.push(cardsLayout[i])
                     }
                 }
+
                 return(
                     <div key={index}>
-                        <Segment className={this.state.classSheet}>
+                        <Segment
+                            className={this.state.classSheet}
+                            style={{'width': this.state.layout.width, 'height': this.state.layout.height}}
+                        >
                             {cardPerPage}
                         </Segment>
                         <br className='no-print' />

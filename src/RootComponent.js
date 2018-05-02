@@ -14,11 +14,13 @@ class RootComponent extends Component {
         this.state= {
             projects: [{}],
             profiles: [{}],
+            layouts: [{}],
             openConfirmProject: false,
             openConfirmProfile: false,
             deleteProjectId: 0,
             deleteProfileId: 0,
             optionsProfiles: [{}],
+            optionsLayouts: [{}],
             fetchFinished: false,
         }
     }
@@ -34,6 +36,7 @@ class RootComponent extends Component {
                     proj_share
                     proj_note
                     proj_owner
+                    proj_layout
                 }
             }
             profiles(profile_user_id: ${this.props.user.id}) {
@@ -45,18 +48,39 @@ class RootComponent extends Component {
                     profile_user_id
                 }
             }
+            layouts {
+                data {
+                    id
+                    layout_name
+                    layout_mode
+                    layout_margins
+                    width
+                    height
+                }
+            }
         }
         `
         this.props.apolloFetch({ query })
             .then((data) => {
+                // Set Profile for Modal
                 let localOptionsProfile = this.state.optionsProfiles
                 for (var i = 0; i < data.data.profiles.data.length; i++) {
                     localOptionsProfile[i] = {value: data.data.profiles.data[i].profile_conf,
                                                 text: data.data.profiles.data[i].profile_name}
                 }
+
+                // Set Layout for Modal
+                let localOptionsLayout = this.state.optionsLayouts
+                for (var i = 0; i < data.data.layouts.data.length; i++) {
+                    localOptionsLayout[i] = {value: JSON.stringify(data.data.layouts.data[i]),
+                                                text: data.data.layouts.data[i].layout_name}
+                }
+
                 this.setState({projects: data.data.projects.data,
                                 profiles: data.data.profiles.data,
+                                layouts: data.data.layouts.data,
                                 optionsProfiles: localOptionsProfile,
+                                optionsLayouts: localOptionsLayout,
                                 fetchFinished: true})
             })
             .catch((error) => {
@@ -98,18 +122,23 @@ class RootComponent extends Component {
     }
 
     // Crea un nuovo progetto
-    createProject(title, notes, share, profile) {
+    createProject(title, notes, share, profile, layout) {
         let proj_name = this.escapeQuotes(title)
         let proj_note = this.escapeQuotes(notes)
         let proj_owner = this.props.user.id
         let proj_share = share === false ? 0 : 1
         let proj_profile = this.escapeQuotes(profile)
+        let proj_layout = this.escapeQuotes(layout)
         let proj_blocked = 0
         let query = `
         mutation createProject {
-            createCaaProject(proj_name: "${proj_name}", proj_owner: ${proj_owner},
-                                proj_share: ${proj_share}, proj_profile: "${proj_profile}",
-                                proj_blocked: ${proj_blocked}, proj_note: "${proj_note}"){
+            createCaaProject(proj_name: "${proj_name}",
+                            proj_owner: ${proj_owner},
+                            proj_share: ${proj_share},
+                            proj_profile: "${proj_profile}",
+                            proj_layout: "${proj_layout}",
+                            proj_blocked: ${proj_blocked},
+                            proj_note: "${proj_note}"){
                 id
             }
         }
@@ -124,13 +153,18 @@ class RootComponent extends Component {
     }
 
     // Aggiorna un progetto preesistente
-    updateProject(id, title, notes, share) {
+    updateProject(id, title, notes, share, layout) {
         let escapedNotes = this.escapeQuotes(notes)
         let escapedTitle = this.escapeQuotes(title)
         let proj_share = share === false ? 0 : 1
+        let proj_layout = this.escapeQuotes(layout)
         let query = `
         mutation updateProject {
-            updateCaaProject(id: ${id}, proj_name: "${escapedTitle}", proj_share: ${proj_share}, proj_note: "${escapedNotes}"){
+            updateCaaProject(id: ${id},
+                            proj_name: "${escapedTitle}",
+                            proj_share: ${proj_share},
+                            proj_note: "${escapedNotes}",
+                            proj_layout: "${proj_layout}"){
                 id
             }
         }
@@ -299,6 +333,7 @@ class RootComponent extends Component {
                             data={item}
                             updateProject={this.updateProject.bind(this)}
                             optionsProfiles={this.state.optionsProfiles}
+                            optionsLayouts={this.state.optionsLayouts}
                         />
                         <Icon name='trash' color='red' size='big'
                             className='icon-pointer'
@@ -356,6 +391,7 @@ class RootComponent extends Component {
                                         size='big'
                                         createProject={this.createProject.bind(this)}
                                         optionsProfiles={this.state.optionsProfiles}
+                                        optionsLayouts={this.state.optionsLayouts}
                                     />
                                 </Header>
                                 <Table celled striped>

@@ -17,8 +17,9 @@ class LayoutExport extends Component {
         this.state = {
             savedProject: [],
             profile: {},
+            layout: {},
             cards: [],
-            classSheet: 'A4-portrait',
+            classSheet: 'PreviewTypoDocument',
             imageSize: [{type: 'imgsize', value: 35, text: 'mini'},
                         {type: 'imgsize', value: 80, text: 'tiny'},
                         {type: 'imgsize', value: 150, text: 'small'},
@@ -27,8 +28,6 @@ class LayoutExport extends Component {
                         {type: 'imgsize', value: 600, text: 'big'},
                         {type: 'imgsize', value: 800, text: 'huge'},
                         {type: 'imgsize', value: 960, text: 'massive'}],
-            x: 0,
-            y: 0,
             customImgs: [],
             multipleDrag: false,
             listMultipleDragIds: [],
@@ -45,6 +44,7 @@ class LayoutExport extends Component {
                 data {
                     id
                     proj_profile
+                    proj_layout
                 }
             }
             chapters (id: ${this.props.match.params.chapterid}) {
@@ -52,7 +52,6 @@ class LayoutExport extends Component {
                     id
                     chapt_content
                     chapt_typo
-                    chapt_layout
                 }
             }
         }
@@ -64,6 +63,7 @@ class LayoutExport extends Component {
                 let profile = JSON.parse(data.data.projects.data[0].proj_profile)
                 let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
                 let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
+                let layout = JSON.parse(data.data.projects.data[0].proj_layout)
 
                 this.cleanCard(stateCard)
 
@@ -72,22 +72,22 @@ class LayoutExport extends Component {
                     let localCardWidth = JSON.parse('[' + sessionStorage.getItem('cardWidth') + ']')
 
                     // Setto le righe correttamente in base al foglio
-                    let pageWidth = 794 - localCardWidth[0]
+                    let pageWidth = layout.width - localCardWidth[0]
                     for (let i = 0; i < stateCard.length; i++) {
                         if (stateCard[i-1] && stateCard[i].row === stateCard[i-1].row) {
                             pageWidth = pageWidth - localCardWidth[i] - 10
                         } else {
                             if (i === 0) {
-                                pageWidth = 794 - localCardWidth[0] - 10
+                                pageWidth = layout.width - localCardWidth[0] - 10
                             } else {
-                                pageWidth = 794 - localCardWidth[i] - 10
+                                pageWidth = layout.width - localCardWidth[i] - 10
                             }
                         }
                         if (pageWidth < 0) {
                             for (let j = i; j < stateCard.length; j++) {
                                 stateCard[j].row++
                             }
-                            pageWidth = 794 - localCardWidth[i]
+                            pageWidth = layout.width - localCardWidth[i]
                         }
                     }
 
@@ -110,22 +110,22 @@ class LayoutExport extends Component {
                     }
 
                     // Setto la pagina
-                    let numCardPage = Math.floor(1123/heightY)
+                    let numCardPage = Math.floor(layout.height/heightY)
                     for (let i = 0; i < stateCard.length; i++) {
                         if (stateCard[i].row % numCardPage === 0 &&
                             stateCard[i].row !== 0 &&
                             stateCard[i].row !== stateCard[i-1].row) {
                             for (let j = i; j < stateCard.length; j++) {
-                                stateCard[j].y -= heightY * numCardPage * (stateCard[i-1].page + 1)
+                                stateCard[j].y = heightY * (stateCard[j].row - stateCard[i].row)
                                 stateCard[j].page++
                             }
                         }
                     }
-                    this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile})
+                    this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile, layout})
                 } else {
                     let typoCard = savedTypo.card
                     let typoImg = savedTypo.img
-                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, customImgs: typoImg, profile})
+                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, customImgs: typoImg, profile, layout})
                 }
             })
             .catch((error) => {
@@ -169,12 +169,12 @@ class LayoutExport extends Component {
                 let tmpY = localCard[localListIds[i]].lastY + deltaY
                 if (tmpX < 0) {
                     localCard[localListIds[i]].x = 0
-                } else if (tmpX + localCard[localListIds[i]].rndWidth > 794) {
-                    localCard[localListIds[i]].x = 794 - localCard[localListIds[i]].rndWidth
+                } else if (tmpX + localCard[localListIds[i]].rndWidth > this.state.layout.width) {
+                    localCard[localListIds[i]].x = this.state.layout.width - localCard[localListIds[i]].rndWidth
                 } else {
                     localCard[localListIds[i]].x = tmpX
                 }
-                localCard[localListIds[i]].y = tmpY < (-1123 * localCard[item.id].page) ? -1123 * localCard[item.id].page : tmpY
+                localCard[localListIds[i]].y = tmpY < (-this.state.layout.height * localCard[item.id].page) ? -this.state.layout.height * localCard[item.id].page : tmpY
                 localCard[localListIds[i]].lastX = localCard[localListIds[i]].x
                 localCard[localListIds[i]].lastY = localCard[localListIds[i]].y
             }
@@ -183,12 +183,12 @@ class LayoutExport extends Component {
             let tmpY = localCard[item.id].lastY + deltaY
             if (tmpX < 0) {
                 localCard[item.id].x = 0
-            } else if (tmpX + localCard[item.id].rndWidth > 794) {
-                localCard[item.id].x = 794 - localCard[item.id].rndWidth
+            } else if (tmpX + localCard[item.id].rndWidth > this.state.layout.width) {
+                localCard[item.id].x = this.state.layout.width - localCard[item.id].rndWidth
             } else {
                 localCard[item.id].x = tmpX
             }
-            localCard[item.id].y = tmpY < (-1123 * localCard[item.id].page) ? -1123 * localCard[item.id].page : tmpY
+            localCard[item.id].y = tmpY < (-this.state.layout.height * localCard[item.id].page) ? -this.state.layout.height * localCard[item.id].page : tmpY
             localCard[item.id].lastX = localCard[item.id].x
             localCard[item.id].lastY = localCard[item.id].y
         }
@@ -214,8 +214,8 @@ class LayoutExport extends Component {
         }
         if (d.x < 0) {
             localImgs[index].x = 0
-        } else if (d.x + localImgs[index].width > 794) {
-            localImgs[index].x = 794 - localImgs[index].width
+        } else if (d.x + localImgs[index].width > this.state.layout.width) {
+            localImgs[index].x = this.state.layout.width - localImgs[index].width
         } else {
             localImgs[index].x = d.x
         }
@@ -450,7 +450,9 @@ class LayoutExport extends Component {
                 if (index === 0) {
                     return(
                         <div key={index}>
-                            <Segment className={this.state.classSheet + ' section-to-print'}>
+                            <Segment className={this.state.classSheet + ' section-to-print'}
+                                style={{'width': this.state.layout.width, 'height': this.state.layout.height}}
+                            >
                                 {customImgsLayout}
                                 {cardPerPage}
                             </Segment>
@@ -460,7 +462,9 @@ class LayoutExport extends Component {
                 } else {
                     return(
                         <div key={index}>
-                            <Segment className={this.state.classSheet + ' section-to-print'}>
+                            <Segment className={this.state.classSheet + ' section-to-print'}
+                                style={{'width': this.state.layout.width, 'height': this.state.layout.height}}
+                            >
                                 {cardPerPage}
                             </Segment>
                             <br className='no-print' />

@@ -174,9 +174,7 @@ body {
     margin: 0mm;
 }
 
-.A4-portrait {
-    width: 210mm;
-    height: 297mm;
+.PreviewTypoDocument {
     margin: auto!important;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

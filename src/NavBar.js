@@ -51,9 +51,15 @@ class NavBar extends Component {
                         disabled={this.props.loadingButton}
                         onClick={this.triggerSaveProject.bind(this)}
                     >
-                            {t("HEAD_BTN_SAVE")}
+                        {t("HEAD_BTN_SAVE")}
                     </Button>
-                    <Button color='red' onClick={this.closeChapter.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
+                    <Button color='red'
+                        loading={this.props.loadingButton}
+                        disabled={this.props.loadingButton}
+                        onClick={this.closeChapter.bind(this)}
+                    >
+                        {t("HEAD_BTN_CLOSE")}
+                    </Button>
                     <Button color='blue' onClick={this.props.checkMode}>{mode}</Button>
                     <Button color='blue'
                         loading={this.props.loadingButton}

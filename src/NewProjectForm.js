@@ -11,6 +11,7 @@ class NewProjectForm extends Component {
             errorMessage: true,
             share: false,
             profile: this.props.edit ? '' : this.props.optionsProfiles[0].value,
+            layout: this.props.edit ? '' : this.props.optionsLayouts[0].value,
             newProjectTitle: '',
             newProjectNote: '',
             iconColor: 'black',
@@ -54,8 +55,12 @@ class NewProjectForm extends Component {
         this.setState({newProjectTitle: e.target.value})
     }
 
-    handleDropdownChange(e, data) {
-        this.setState({profile: data.value})
+    handleDropdownChange(dropdownType, e, data) {
+        if(dropdownType === 'profile') {
+            this.setState({profile: data.value})
+        } else {
+            this.setState({layout: data.value})
+        }
     }
 
     handleCheckboxChange(e) {
@@ -73,7 +78,7 @@ class NewProjectForm extends Component {
         }
         else {
             this.props.createProject(this.state.newProjectTitle, this.state.newProjectNote,
-                                        this.state.share, this.state.profile)
+                                        this.state.share, this.state.profile, this.state.layout)
             this.setState({errorMessage: true, modalVisible: !this.state.modalVisible})
         }
     }
@@ -85,7 +90,7 @@ class NewProjectForm extends Component {
         }
         else {
             this.props.updateProject(this.props.data.id, this.state.newProjectTitle, this.state.newProjectNote,
-                                        this.state.share)
+                                        this.state.share, this.state.layout)
             this.setState({errorMessage: true, modalVisible: !this.state.modalVisible})
         }
     }
@@ -125,7 +130,7 @@ class NewProjectForm extends Component {
         return (
             <div>
                 <Modal trigger={iconModal} closeOnDimmerClick={false} open={this.state.modalVisible}>
-                    <Modal.Header>{t("MAIN_LBL_CREATE")}</Modal.Header>
+                    <Modal.Header>{this.props.edit ? t("MAIN_BTN_UPDATE") : t("MAIN_LBL_CREATE")}</Modal.Header>
                     <Modal.Content>
                         <Form>
                             <Form.Field required>
@@ -137,11 +142,20 @@ class NewProjectForm extends Component {
                             </Form.Field>
                             <Form.Field>
                                 <label>{t("MAIN_FRM_PROFILE")}</label>
-                                <Dropdown placeholder='Layout' selection options={this.props.optionsProfiles}
+                                <Dropdown placeholder='Profile' selection options={this.props.optionsProfiles}
                                     placeholder='Cannot change profile now'
                                     disabled={this.props.edit ? true : false}
                                     defaultValue={this.props.edit ? '' : this.props.optionsProfiles[0].value}
-                                    onChange={this.handleDropdownChange.bind(this)} />
+                                    onChange={this.handleDropdownChange.bind(this, 'profile')}
+                                />
+                            </Form.Field>
+                            <Form.Field>
+                                <label>{t("MAIN_FRM_LAYOUT")}</label>
+                                <Dropdown placeholder='Layout' selection options={this.props.optionsLayouts}
+                                    placeholder='Cannot change layout now'
+                                    defaultValue={this.props.edit ? this.props.data.proj_layout : this.props.optionsLayouts[0].value}
+                                    onChange={this.handleDropdownChange.bind(this, 'layout')}
+                                />
                             </Form.Field>
                             <Form.Field>
                                 <label>{t("MAIN_FRM_SHARE")}</label>
@@ -170,7 +184,7 @@ class NewProjectForm extends Component {
                             <Button color='green'
                                 onClick={this.props.edit ? this.updateProject.bind(this) : this.createNewProject.bind(this)}
                             >
-                                {t("MAIN_BTN_CREATE")}
+                                {this.props.edit ? t("MAIN_BTN_UPDATE") : t("MAIN_BTN_CREATE")}
                             </Button>
                             <Button.Or />
                             <Button color='red' onClick={this.handleOpenCloseModal.bind(this, 'close')}>

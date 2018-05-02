@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Card, Input, Image, Label, Transition, Segment } from 'semantic-ui-react'
+import { Card, Input, Image, Label, Transition, Segment, Loader, Dimmer } from 'semantic-ui-react'
 import { withApolloFetch } from './withApolloFetch'
 import { withApolloFetchNoAuth } from './withApolloFetchNoAuth'
 import { withRefreshToken } from './withRefreshToken'
@@ -36,6 +36,7 @@ class CardUI extends Component {
             imgDiv: [],
             imgDivId: 0,
             visibleImg: false,
+            finishLoad: false,
         }
     }
 
@@ -76,7 +77,6 @@ class CardUI extends Component {
                             caa_project_id
                             chapt_title
                             chapt_content
-                            chapt_layout
                             chapt_user_block
                         }
                     }
@@ -88,11 +88,11 @@ class CardUI extends Component {
                     let content = chapter.chapt_content
                     content = content.length === 0 ? '' : JSON.parse(content)
                     if(Object.keys(content).length !== 0 && typeof(content) === 'object') {
-                        this.setState({chapter: chapter, card: content})
+                        this.setState({chapter: chapter, card: content, finishLoad: true})
                         this.setExpandAll()
                     }
                     else {
-                        this.setState({chapter: chapter})
+                        this.setState({chapter: chapter, finishLoad: true})
                     }
                 })
                 .catch((error) => {
@@ -286,9 +286,11 @@ class CardUI extends Component {
     handleExpandInput(currentCard) {
         let textId = 'text-' + currentCard.id
         let inputResize = document.getElementById(textId)
-        inputResize.style.width = '0px'
-        if (inputResize.scrollWidth > inputResize.clientWidth) {
-            inputResize.style.width = inputResize.scrollWidth + 20 + 'px'
+        if (inputResize) {
+            inputResize.style.width = '0px'
+            if (inputResize.scrollWidth > inputResize.clientWidth) {
+                inputResize.style.width = inputResize.scrollWidth + 20 + 'px'
+            }
         }
     }
 
@@ -828,7 +830,16 @@ class CardUI extends Component {
                     />
             )
         })
-
+        if (this.state.finishLoad === false) {
+            return (
+                <Dimmer
+                    active={!this.state.finishLoad}
+                    page
+                >
+                    <Loader active inline='centered' size='massive' />
+                </Dimmer>
+            )
+        }
         return(
             <div>
                 {cardGroup}

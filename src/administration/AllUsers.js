@@ -4,6 +4,7 @@ import { translate, Trans } from 'react-i18next'
 import {withApolloFetch} from '../withApolloFetch'
 import { withRouter } from 'react-router-dom'
 import UsrConfig from './UsrConfig'
+import NewUserForm from './NewUserForm'
 
 class AllUsers extends Component{
   constructor(props){
@@ -56,6 +57,7 @@ class AllUsers extends Component{
     `
     this.props.apolloFetch({ query })
         .then((data) => {
+            this.setState({openConfirmDelete: false});
             this.componentWillMount()
         })
         .catch((error) => {
@@ -133,6 +135,9 @@ class AllUsers extends Component{
               {tableLayout}
             </Table.Body>
           </Table>
+
+          <NewUserForm
+            update = {()=>{this.update()}}/>
         </Segment>
         <Confirm
             open={this.state.openConfirmDelete}
@@ -152,4 +157,4 @@ class AllUsers extends Component{
     }
   }
 }
-  export default translate('translations') (withRouter(withApolloFetch(AllUsers)))
+  export default withApolloFetch(translate('translations')(AllUsers))

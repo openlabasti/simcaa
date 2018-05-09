@@ -128,7 +128,6 @@ class NewProjectForm extends Component {
         }
 
         return (
-            <div>
                 <Modal trigger={iconModal} closeOnDimmerClick={false} open={this.state.modalVisible}>
                     <Modal.Header>{this.props.edit ? t("MAIN_BTN_UPDATE") : t("MAIN_LBL_CREATE")}</Modal.Header>
                     <Modal.Content>
@@ -193,7 +192,6 @@ class NewProjectForm extends Component {
                         </Button.Group>
                     </Modal.Actions>
                 </Modal>
-            </div>
         )
     }
 }

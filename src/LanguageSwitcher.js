@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Segment } from 'semantic-ui-react'
+import { Button, Segment, Dropdown } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 
 class LanguageSwitcher extends Component {
@@ -14,6 +14,16 @@ class LanguageSwitcher extends Component {
         const { t, i18n } = this.props
         const changeLanguage = (lng) => {
             i18n.changeLanguage(lng);
+        }
+        if (this.props.type === 'dropdown') {
+            return (
+                <Dropdown item text={t("HOME_NAVBAR_LANGUAGE")}>
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => changeLanguage('it')}>Italiano</Dropdown.Item>
+                        <Dropdown.Item onClick={() => changeLanguage('en')}>English</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+            )
         }
         return (
             <Segment basic>

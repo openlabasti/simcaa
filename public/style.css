@@ -110,6 +110,11 @@ body {
     background-color: #f6f6f6;
 }
 
+/* Fix for table header in HOMEPAGE */
+#header-table-icon-project > div:first-child, #header-table-icon-profile > div:first-child {
+    display: inline-block !important;
+}
+
 .ui.card {
     width: auto;
 }

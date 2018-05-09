@@ -1,5 +1,5 @@
 import React, { Component, Link } from 'react'
-import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon, Confirm} from 'semantic-ui-react'
+import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon, Confirm, Modal, Form} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import {withApolloFetch} from '../withApolloFetch'
 import { withRouter } from 'react-router-dom'
@@ -46,10 +46,12 @@ class AllUsers extends Component{
   }
 
   handleDelete(){
+    console.log(this.state.idToDelete);
     let query = `
     mutation delUser {
-        deleteCaaUser(id: ${this.state.idTodelete}){
+        deleteCaaUser(id: ${this.state.idToDelete}){
           id
+        }
     }
     `
     this.props.apolloFetch({ query })
@@ -86,7 +88,7 @@ class AllUsers extends Component{
             <Table.Cell>
               {item.link_web}
             </Table.Cell>
-            <Table.Cell>
+            <Table.Cell style={{display: "flex"}}>
               <Popup
                 trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
                 content= 'Elimina utente'
@@ -107,6 +109,7 @@ class AllUsers extends Component{
 
             </Table.Cell>
           </Table.Row>
+
         )
       })
       const tableStyle={

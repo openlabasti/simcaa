@@ -34,9 +34,9 @@ class App extends Component {
                         <Redirect to="/home" />
                     )}/>
                     <Route path="/home" render={this.isLogged.bind(this, RootComponent)}/>
-                    <Route path="/basic/:view?/:projectid?/:chapterid?" render={this.isLogged.bind(this, BasicProject)} />
+                    <Route path="/basic/:mode?/:projectid?/:chapterid?" render={this.isLogged.bind(this, BasicProject)} />
                     <Route path="/project/:projectid?" render={this.isLogged.bind(this, Project)} />
-                    <Route path="/layout/:chapterid?" render={this.isLogged.bind(this, LayoutExport)} />
+                    <Route path="/layout/:projectid?/:chapterid?" render={this.isLogged.bind(this, LayoutExport)} />
                     <Route path="/login" render={() => (
                         <Login checkLogin={this.login} />
                     )}/>

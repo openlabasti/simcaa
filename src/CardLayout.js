@@ -75,7 +75,8 @@ class CardLayout extends Component {
             styles = Object.assign({}, this.props.Style, this.state.borderCard[this.state.card.codClass]);
         }
         else if (this.props.Style) {
-            let {top, ...styles} = this.props.Style
+            let {top, ...other} = this.props.Style
+            styles = other
         }
         else if (this.props.borderCard) {
             styles = this.state.borderCard[this.state.card.codClass]
@@ -87,27 +88,22 @@ class CardLayout extends Component {
                                 disabled={this.props.mode}
                                 transparent={inputBorder}
                                 className={this.props.formatInput + ' ' + this.props.weightInput + ' ' + this.props.decorationInput + ' ' + this.props.fontStyleInput + ' colorTextInput colorBackgroundInput'}
-                                id = {'text-' + this.state.card.id}
+                                id = {'textLayout-' + this.state.card.id}
                                 value = {this.state.card.lemma}
                             />
                         </Card.Content>
 
         let cardImage = <Card.Content className={this.props.imgPadding}>
-                            <img
-                              crossOrigin="anonymous"
-                              src={this.props.urlImg + this.state.card.img}
-                              className={imgFullWidth}
-                              width="200px"
-                              height="200px"
-                              />
-
-                          
+                            <Image
+                                src={this.props.urlImg + this.state.card.img}
+                                className={imgFullWidth}
+                                size={this.props.imgSize}
+                            />
                         </Card.Content>
-
         if (this.props.posInput === 'bottom' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'card-' + this.state.card.id}
+                    id={'layout-' + this.state.card.id}
                     style={{...styles}}
                     className='uicardlayout'
                 >
@@ -119,7 +115,7 @@ class CardLayout extends Component {
         else if (this.props.posInput === 'top' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'card-' + this.state.card.id}
+                    id={'layout-' + this.state.card.id}
                     style={{...styles}}
                     className="uicardlayout"
                 >
@@ -133,7 +129,7 @@ class CardLayout extends Component {
                 <Card.Group>
                     <div className={this.props.disabledCard}>
                         <Card
-                            id={'card-' + this.state.card.id}
+                            id={'layout-' + this.state.card.id}
                             style={{...styles}}
                             className='cardUI'
                         >
@@ -149,7 +145,7 @@ class CardLayout extends Component {
                 <Card.Group>
                     <div className={this.props.disabledCard}>
                         <Card
-                            id={'card-' + this.state.card.id}
+                            id={'layout-' + this.state.card.id}
                             style={{...styles}}
                             className="cardUI"
                         >

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Message, Menu, Icon, Popup } from 'semantic-ui-react'
+import { Message, Menu, Icon, Popup, Button } from 'semantic-ui-react'
 import NavBar from './NavBar'
 import CardUI from './CardUI'
+import PreviewA4Portrait from './PreviewA4Portrait'
 import { translate, Trans } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import { withCurrentProject } from './withCurrentProject'
@@ -12,12 +13,13 @@ class BasicProject extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cardRow: [{row: 0}],
             visibleOption: false,
             mode: false,
-            saveProject: false,
+            previewPage: false,
+            saveProject: 'false',
             currentProject: {},
             saveMessage: true,
+            loadingButton: false,
             navbarCard: {id:0 ,
                     lemma: 'React',
                     lemmaPrevious: 'React',
@@ -65,6 +67,9 @@ class BasicProject extends Component {
             linkCard: false,
             lockCard: false,
             copyCard: false,
+            searchLemma: false,
+            addCardAfter: false,
+            addCardBefore: false,
             deleteCard: false,
         }
         this.handleMode = this.handleMode.bind(this)
@@ -83,7 +88,13 @@ class BasicProject extends Component {
         this.linkCard = this.linkCard.bind(this)
         this.lockCard = this.lockCard.bind(this)
         this.copyCard = this.copyCard.bind(this)
+        this.searchLemma = this.searchLemma.bind(this)
+        this.addCardAfter = this.addCardAfter.bind(this)
+        this.addCardBefore = this.addCardBefore.bind(this)
         this.deleteCard = this.deleteCard.bind(this)
+
+        // Preview Modal
+        this.openPreviewA4 = this.openPreviewA4.bind(this)
     }
 
     componentWillMount() {
@@ -94,24 +105,28 @@ class BasicProject extends Component {
     }
 
     componentDidMount() {
-        // Blocca il capitolo, TODO: rivedere per eliminare il timeout
-        let query = `
-        mutation BlockChapter {
-            updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
-                id
-            }
-        }
-        `
         let self = this
-        setTimeout(function() {
-            self.props.apolloFetch({ query })
+        // Setta la mode to view se l'url è quello della view
+        if (this.props.match.params.mode === 'view') {
+            this.handleMode()
+        } else {
+            // Blocca il capitolo, TODO: rivedere per eliminare il timeout
+            let query = `
+            mutation BlockChapter {
+                updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
+                    id
+                }
+            }
+            `
+            this.props.apolloFetch({ query })
             .then((data) => {
 
             })
             .catch((error) => {
                 console.log(error);
             })
-        }, 2000)
+        }
+
 
         // TODO: Rivedere questa parte per eliminare il timeout
         setTimeout(function() {
@@ -122,12 +137,12 @@ class BasicProject extends Component {
         }, 50)
     }
 
+    // HANDLE EDIT-VIEW MODE
     handleMode() {
         let navbar = document.getElementById("navbar-icon")
         if (this.state.mode === false) {
             navbar.classList.add("viewMode")
-        }
-        else {
+        } else {
             navbar.classList.remove("viewMode")
         }
         let elem = document.getElementById('navbar')
@@ -138,21 +153,44 @@ class BasicProject extends Component {
     }
 
     // TRIGGER SAVE
-    triggerSave(value) {
-        this.setState({saveProject: value})
+    triggerSave(value = null) {
+        if (value !== null) {
+            this.setState({saveProject: value, loadingButton: true})
+        } else {
+            this.setState({saveProject: 'true', loadingButton: true})
+        }
     }
 
     // SHOW THE SAVED MESSAGE
-    savedSuccessfully() {
-        this.setState({saveMessage: false, saveProject: false})
+    savedSuccessfully(toPage = null) {
+        this.setState({saveMessage: !this.state.saveMessage, saveProject: 'false'})
         this.sleep(1000).then(() => {
-            this.setState({saveMessage: true})
+            this.setState({saveMessage: !this.state.saveMessage, loadingButton: false})
+            if (toPage === 'preview') {
+                this.openPreviewA4()
+            } else if (toPage === 'typo') {
+                let size = this.getSizeCard()
+                sessionStorage.setItem('cardWidth', size.width)
+                sessionStorage.setItem('cardHeight', size.height)
+                this.props.history.push('/layout/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
+            }
         });
     }
 
-    // SLEEP
+    // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    // Get dimension of cards
+    getSizeCard() {
+        let numCard = document.getElementsByClassName('cardUI');
+        let cardHeight = document.getElementById('card-0').offsetHeight
+        let cardWidth = []
+        for (let i = 0; i < numCard.length; i++) {
+            cardWidth[i] = document.getElementById('card-' + i).offsetWidth
+        }
+        return {width: cardWidth, height: cardHeight}
     }
 
     setNavbarCard(card) {
@@ -183,10 +221,26 @@ class BasicProject extends Component {
         this.setState({copyCard: !this.state.copyCard})
     }
 
+    searchLemma() {
+        this.setState({searchLemma: !this.state.searchLemma})
+    }
+
+    addCardAfter() {
+        this.setState({addCardAfter: !this.state.addCardAfter})
+    }
+
+    addCardBefore() {
+        this.setState({addCardBefore: !this.state.addCardBefore})
+    }
+
     deleteCard() {
         this.setState({deleteCard: !this.state.deleteCard})
     }
 
+    // PREVIEW MODAL
+    openPreviewA4() {
+        this.setState({previewPage: !this.state.previewPage})
+    }
 
     render() {
         const { t, i18n } = this.props
@@ -196,49 +250,27 @@ class BasicProject extends Component {
         //     event.returnValue = "Confirm to exit";
         // })
 
-        let cardRow = this.state.cardRow
-        cardRow = cardRow.map((item, index) => {
-            return (
-                <CardUI
-                    Style={this.state.cardStyle}
-                    setNavbarCard={this.setNavbarCard}
-                    key={index}
-                    saveComplete={this.savedSuccessfully}
-                    project={this.state.currentProject}
-                    saveToDb={this.state.saveProject}
-                    newLine={this.state.newLine}
-                    mode={this.state.mode}
-                    row={item.row}
-                    transparent={this.state.styleInput}
-                    sizeInput={this.state.sizeInput}
-                    posInput={this.state.posInput}
-                    formatInput={this.state.formatInput}
-                    weightInput={this.state.weightInput}
-                    decorationInput={this.state.decorationInput}
-                    fontStyleInput={this.state.fontStyleInput}
-                    colorTextInput={this.state.colorTextInput}
-                    colorBackgroundInput={this.state.colorBackgroundInput}
-                    imgSize={this.state.imgSize}
-                    imgPadding={this.state.imgPadding}
-                    imgType={this.state.imgType}
-                    imgStyle={this.state.imgStyle}
-                    borderCard={this.state.borderCard}
-                    urlRest={this.state.urlRest}
-                    urlImg={this.state.urlImg}
-                    priorityOrder={this.state.priorityOrder}
-
-                    triggerImg={this.state.triggerImg}
-                    shiftLeft={this.state.shiftLeft}
-                    shiftRight={this.state.shiftRight}
-                    linkCard={this.state.linkCard}
-                    lockCard={this.state.lockCard}
-                    copyCard={this.state.copyCard}
-                    deleteCard={this.state.deleteCard}
-                />
-            )
-        })
         if (this.state.currentProject.length === 0 ) {
             return (<p>Loading...</p>)
+        }
+
+        if (this.state.previewPage) {
+            // Prendo e calcolo width e height delle card per passarle alla Preview
+            let size = this.getSizeCard()
+
+            return (
+                <div>
+                    <Menu className='no-print'>
+                        <Menu.Item>
+                            <Button primary onClick={() => {window.print()}}>Print</Button>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Button negative onClick={this.openPreviewA4.bind(this)}>Return to Chapter</Button>
+                        </Menu.Item>
+                    </Menu>
+                    <PreviewA4Portrait cardWidth={size.width} cardHeight={size.height} />
+                </div>
+            )
         }
 
         return (
@@ -253,6 +285,8 @@ class BasicProject extends Component {
                                 checkMode={this.handleMode}
                                 checked={this.state.mode}
                                 save={this.triggerSave}
+                                openPreviewA4={this.openPreviewA4}
+                                loadingButton={this.state.loadingButton}
                             />
                         </Menu.Item>
                         <Menu.Item className='navbar-icon' id='navbar-icon'>
@@ -289,11 +323,39 @@ class BasicProject extends Component {
                                 onClick={() => {this.lockCard()}}/>
                             <Popup
                                 trigger={
-                                    <Icon name='copy' bordered inverted color="teal"
+                                    <Icon name='clone' bordered inverted color="teal"
                                         size='large'
                                         onClick={() => {this.copyCard()}}/>
                                 }
                                 content='Copy current Card'
+                            />
+                            <Icon
+                                name='search'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.searchLemma()}}
+                                style={{cursor: 'pointer'}}
+                            />
+                            <Icon
+                                name='external share'
+                                flipped='horizontally'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.addCardBefore()}}
+                                style={{cursor: 'pointer'}}
+                            />
+                            <Icon
+                                name='external share'
+                                bordered
+                                inverted
+                                color='teal'
+                                size='large'
+                                onClick={() => {this.addCardAfter()}}
+                                style={{cursor: 'pointer'}}
                             />
                             <Icon
                                 name='delete'
@@ -321,8 +383,43 @@ class BasicProject extends Component {
                     icon={'save'}
                     header='Projet Saved'
                 />
-                {cardRow}
+                <CardUI
+                    Style={this.state.cardStyle}
+                    setNavbarCard={this.setNavbarCard}
+                    saveComplete={this.savedSuccessfully}
+                    project={this.state.currentProject}
+                    saveToDb={this.state.saveProject}
+                    newLine={this.state.newLine}
+                    mode={this.state.mode}
+                    transparent={this.state.styleInput}
+                    sizeInput={this.state.sizeInput}
+                    posInput={this.state.posInput}
+                    formatInput={this.state.formatInput}
+                    weightInput={this.state.weightInput}
+                    decorationInput={this.state.decorationInput}
+                    fontStyleInput={this.state.fontStyleInput}
+                    colorTextInput={this.state.colorTextInput}
+                    colorBackgroundInput={this.state.colorBackgroundInput}
+                    imgSize={this.state.imgSize}
+                    imgPadding={this.state.imgPadding}
+                    imgType={this.state.imgType}
+                    imgStyle={this.state.imgStyle}
+                    borderCard={this.state.borderCard}
+                    urlRest={this.state.urlRest}
+                    urlImg={this.state.urlImg}
+                    priorityOrder={this.state.priorityOrder}
 
+                    triggerImg={this.state.triggerImg}
+                    shiftLeft={this.state.shiftLeft}
+                    shiftRight={this.state.shiftRight}
+                    linkCard={this.state.linkCard}
+                    lockCard={this.state.lockCard}
+                    copyCard={this.state.copyCard}
+                    searchLemma={this.state.searchLemma}
+                    addCardAfter={this.state.addCardAfter}
+                    addCardBefore={this.state.addCardBefore}
+                    deleteCard={this.state.deleteCard}
+                />
             </div>
         );
     }

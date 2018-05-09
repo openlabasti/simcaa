@@ -6,6 +6,7 @@
     overflow: auto;
 }
 
+/* NEVER MOVE THIS TWO RULES */
 .colorTextInput > input , .colorTextInput > input:active, .colorTextInput > input:focus {
     color: #000000 !important;
 }
@@ -100,21 +101,7 @@
     pointer-events:none;
 }
 
-.cardUI {
-    margin: 15px 0px 5px 20px !important;
-    min-width: 50% !important;
-    text-align: center;
-}
-
-.cardUI input {
-    text-align: center !important;
-    width: 100%;
-}
-
-.imgFullWidth {
-    min-width: 100%;
-}
-
+/* Hide the NaBar in view mode */
 .viewMode {
     display: none !important;
 }
@@ -127,15 +114,59 @@ body {
     width: auto;
 }
 
+.cardUI {
+    margin: 15px 0px 5px 20px !important;
+    min-width: 50% !important;
+    text-align: center;
+}
+
+.cardUI input {
+    text-align: center !important;
+    width: 100%;
+}
+
+/* Typo rules */
 .uicardlayout {
     min-height: 100% !important;
 }
 
-@media print
-{
-    .no-print
-    {
+/* width 100% for the container DIV of the input */
+.uicardlayout div > div {
+    width: 100% !important;
+}
+
+/* Img auto-scaling */
+.imgFullWidth {
+    min-width: 100%;
+}
+
+.uicardlayout input {
+    text-align: center !important;
+}
+
+/* Print mode rules */
+@media print {
+    .no-print {
         display: none !important;
+    }
+
+    .no-print-modal {
+        visibility: hidden !important;
+    }
+
+    /* TODO: Da vedere se attivare, facendolo printa pagina bianca in tutte le div senza il corretto css */
+    /* body {
+        visibility: hidden;
+    } */
+
+    .section-to-print, .section-to-print * {
+        visibility: visible !important;
+    }
+
+    .section-to-print {
+        position: absolute;
+        left: 0;
+        top: 0;
     }
 }
 
@@ -143,10 +174,21 @@ body {
     margin: 0mm;
 }
 
-.A4-portrait {
-    width: 210mm;
-    height: 297mm;
+.PreviewTypoDocument {
     margin: auto!important;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+/* Multiple Drag select */
+.multipleDrag {
+    -webkit-box-shadow:inset 0px 0px 0px 5px #f00 !important;
+    -moz-box-shadow:inset 0px 0px 0px 5px #f00 !important;
+    box-shadow:inset 0px 0px 0px 5px #f00 !important;
 }
 
 /* Fix Navbar CSS problem */
@@ -161,6 +203,15 @@ body {
 /*  Cursor Pointer per le icone */
 .icon-pointer {
     cursor: pointer;
+}
+
+/* Custom Dropzone CSS to make it nicer */
+.dropzone-beautify {
+    width: 200px;
+    height: 200px;
+    border: 2px rgb(102, 102, 102) dashed;
+    border-radius: 5px;
+    padding: 10px;
 }
 
 /* Da testare su MS, Opera e Safari*/
@@ -185,7 +236,7 @@ body > div > div div > div.login-form { */
     /* height: 100%;
 } */
 
-/* fix per but modale causato dalla regola sopra */
+/* fix per bug modale causato dalla regola sopra */
 .ui.modal {
     height: auto;
 }

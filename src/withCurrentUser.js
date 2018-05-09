@@ -27,7 +27,11 @@ export const withCurrentUser = (WrappedComponent) => {
                 fetch(window.env.GraphQLCurrentUser, myInit).then(function(response) {
                     return response.json();
                 }).then(function(data) {
-                    self.setState({currentUser: data})
+                    if (data[0] === 'token_expired') {
+                        self.props.history.push('/login')
+                    } else {
+                        self.setState({currentUser: data})
+                    }
                 })
 
                 return (

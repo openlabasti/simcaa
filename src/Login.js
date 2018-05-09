@@ -8,7 +8,8 @@ class Login extends Component {
         this.state = {
             user: '',
             password: '',
-            error: { code: 0, text: 'Fill the form to Login into the App', view: false, header: 'Welcome to SimCAA'}
+            error: { code: 0, text: 'Fill the form to Login into the App', view: false, header: 'Welcome to SimCAA'},
+            disabledButton: false,
         }
     }
 
@@ -21,6 +22,7 @@ class Login extends Component {
     }
 
     login() {
+        this.setState({disabledButton: true})
         let data = JSON.stringify({user: this.state.user, password: this.state.password})
         let url = window.env.GraphQLLogin
         let xhr = new XMLHttpRequest();
@@ -40,13 +42,21 @@ class Login extends Component {
                     let textError = JSON.parse(this.responseText)
                     let stringError = textError.error;
                     let newError = {code: this.status, text: stringError, view: true, header: 'Error Detected'}
-                    self.setState({error: newError})
+                    self.setState({error: newError, disabledButton: false})
                 }
             }
         })
         xhr.open("POST", url)
         xhr.setRequestHeader("content-type", "application/json")
         xhr.send(data)
+    }
+
+    // TODO: DELETE WHEN MESSAGE BECOME USELESS
+    componentDidMount() {
+        let blueContent = document.getElementById('blue_content')
+        let violetContent = document.getElementById('violet_content')
+        blueContent.innerHTML = window.env.blue_text_content
+        violetContent.innerHTML = window.env.violet_text_content
     }
 
     render() {
@@ -69,7 +79,7 @@ class Login extends Component {
                                     fluid
                                     icon='user'
                                     iconPosition='left'
-                                    placeholder='E-mail address'
+                                    placeholder='Username'
                                     value={this.state.user}
                                     onChange={this.changeFormEmail.bind(this)}
                                 />
@@ -82,37 +92,33 @@ class Login extends Component {
                                     value={this.state.password}
                                     onChange={this.changeFormPassword.bind(this)}
                                 />
-                                <Button type='submit' fluid color='blue' onClick={this.login.bind(this)}>Login</Button>
+                                <Button type='submit' fluid color='blue'
+                                    disabled={this.state.disabledButton}
+                                    loading={this.state.disabledButton}
+                                    onClick={this.login.bind(this)}>Login</Button>
                             </Segment>
                         </Form>
                     </Grid.Column>
                 </Grid>
 
                 <Segment style={{'maxWidth': '50%', 'left': '50%', 'transform': 'translateX(-50%)'}}>
-                <Message
-                    color='blue'
-                    size='massive'
-                >
-                <Message.Header>To test this Demo</Message.Header>
-                    <p>Email: user@demo.com</p>
-                    Password: user
-                </Message>
+                    <Message
+                        color='blue'
+                        size='massive'
+                    >
+                    <Message.Header>
+                        {window.env.blue_text_header}
+                    </Message.Header>
+                    <Message.Content id='blue_content'>
+                    </Message.Content>
+                    </Message>
                     <Message
                         color='purple'
                         size='massive'
                     >
-                    <Message.Header>OpenLab Asti</Message.Header>
-                        Stiamo sviluppando l'applicazione (nome provvisorio SIMCAA) <br />
-                        "Scrittura Inclusiva Multimodale Comunicazione Aumentativa Aperta" <br /><br />
-                        Questo sito è un ambiente di demo/sviluppo di
-                        <a href='http://openlabasti.it'> OpenLab Asti </a>, serve principalmente
-                        per testare l'applicazione in ambiente web puro. <br />
-                        SIMCAA è in corso di sviluppo, quindi soggetta ad aggiornamenti e modifiche
-                        continue, le funzionalità sono incomplete e non sono garantite. <br />
-                        I simboli usati da SIMCAA sono proprietà di
-                        <a href='http://www.arasaac.org/'> CATEDU </a> sotto licenza
-                        <a href='https://it.wikipedia.org/wiki/Creative_Commons'> Creative Common</a> e sono
-                        stati creati da Sergio Palao.
+                    <Message.Header>{window.env.violet_text_header}</Message.Header>
+                    <Message.Content id='violet_content'>
+                    </Message.Content>
                     </Message>
                 </Segment>
 

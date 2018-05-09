@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 import { withCurrentUser } from './withCurrentUser'
+import LanguageSwitcher from './LanguageSwitcher'
 import NewProjectForm from './NewProjectForm'
 import NewProfileForm from './NewProfileForm'
 
@@ -13,25 +14,29 @@ class RootComponent extends Component {
         this.state= {
             projects: [{}],
             profiles: [{}],
+            layouts: [{}],
             openConfirmProject: false,
             openConfirmProfile: false,
             deleteProjectId: 0,
             deleteProfileId: 0,
             optionsProfiles: [{}],
+            optionsLayouts: [{}],
             fetchFinished: false,
         }
     }
 
+    // Richiama i profili e i progetti pubblici o dell'utente
     componentWillMount() {
         let query = `
         query allProjects {
-            projects(proj_owner: ${this.props.user.id}) {
+            projects(proj_owner: ${this.props.user.id}, is_public: ${true}) {
                 data {
                     id
                     proj_name
                     proj_share
                     proj_note
                     proj_owner
+                    proj_layout
                 }
             }
             profiles(profile_user_id: ${this.props.user.id}) {
@@ -43,18 +48,39 @@ class RootComponent extends Component {
                     profile_user_id
                 }
             }
+            layouts {
+                data {
+                    id
+                    layout_name
+                    layout_mode
+                    layout_margins
+                    width
+                    height
+                }
+            }
         }
         `
         this.props.apolloFetch({ query })
             .then((data) => {
+                // Set Profile for Modal
                 let localOptionsProfile = this.state.optionsProfiles
                 for (var i = 0; i < data.data.profiles.data.length; i++) {
                     localOptionsProfile[i] = {value: data.data.profiles.data[i].profile_conf,
                                                 text: data.data.profiles.data[i].profile_name}
                 }
+
+                // Set Layout for Modal
+                let localOptionsLayout = this.state.optionsLayouts
+                for (var i = 0; i < data.data.layouts.data.length; i++) {
+                    localOptionsLayout[i] = {value: JSON.stringify(data.data.layouts.data[i]),
+                                                text: data.data.layouts.data[i].layout_name}
+                }
+
                 this.setState({projects: data.data.projects.data,
                                 profiles: data.data.profiles.data,
+                                layouts: data.data.layouts.data,
                                 optionsProfiles: localOptionsProfile,
+                                optionsLayouts: localOptionsLayout,
                                 fetchFinished: true})
             })
             .catch((error) => {
@@ -96,16 +122,49 @@ class RootComponent extends Component {
     }
 
     // Crea un nuovo progetto
-    createProject(title, notes, share, profile) {
+    createProject(title, notes, share, profile, layout) {
+        let proj_name = this.escapeQuotes(title)
+        let proj_note = this.escapeQuotes(notes)
         let proj_owner = this.props.user.id
         let proj_share = share === false ? 0 : 1
-        let proj_profile = JSON.stringify(profile.replace(/"/g, "\""))
+        let proj_profile = this.escapeQuotes(profile)
+        let proj_layout = this.escapeQuotes(layout)
         let proj_blocked = 0
         let query = `
         mutation createProject {
-            createCaaProject(proj_name: "${title}", proj_owner: ${proj_owner},
-                                proj_share: ${proj_share}, proj_profile: ${proj_profile},
-                                proj_blocked: ${proj_blocked}, proj_note: "${notes}"){
+            createCaaProject(proj_name: "${proj_name}",
+                            proj_owner: ${proj_owner},
+                            proj_share: ${proj_share},
+                            proj_profile: "${proj_profile}",
+                            proj_layout: "${proj_layout}",
+                            proj_blocked: ${proj_blocked},
+                            proj_note: "${proj_note}"){
+                id
+            }
+        }
+        `
+        this.props.apolloFetch({ query })
+            .then((data) => {
+                this.componentWillMount()
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    // Aggiorna un progetto preesistente
+    updateProject(id, title, notes, share, layout) {
+        let escapedNotes = this.escapeQuotes(notes)
+        let escapedTitle = this.escapeQuotes(title)
+        let proj_share = share === false ? 0 : 1
+        let proj_layout = this.escapeQuotes(layout)
+        let query = `
+        mutation updateProject {
+            updateCaaProject(id: ${id},
+                            proj_name: "${escapedTitle}",
+                            proj_share: ${proj_share},
+                            proj_note: "${escapedNotes}",
+                            proj_layout: "${proj_layout}"){
                 id
             }
         }
@@ -170,11 +229,13 @@ class RootComponent extends Component {
 
     // Crea un nuovo profilo
     createProfile(data) {
-        let profile_name = JSON.stringify(data.newProfileName)
-        let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let newData = data
+        newData.newProfileName = data.newProfileName.replace(/"/g, '')
+        let profile_name = data.newProfileName
+        let profile_conf = this.escapeQuotes(newData)
         let query = `
         mutation createNewProfile {
-            createCaaProfile(profile_name: ${profile_name},
+            createCaaProfile(profile_name: "${profile_name}",
                             profile_system: 0,
                             profile_conf: "${profile_conf}",
                             profile_user_id: ${this.props.user.id}) {
@@ -193,12 +254,14 @@ class RootComponent extends Component {
 
     // Aggiorna un profilo preesistente
     updateProfile(id, data) {
-        let profile_name = JSON.stringify(data.newProfileName)
-        let profile_conf = JSON.stringify(data).replace(/\"/g, "\\\"")
+        let newData = data
+        newData.newProfileName = data.newProfileName.replace(/"/g, '')
+        let profile_name = data.newProfileName
+        let profile_conf = this.escapeQuotes(newData)
         let query = `
         mutation updateProfile {
             updateCaaProfile(id: ${id},
-                            profile_name: ${profile_name},
+                            profile_name: "${profile_name}",
                             profile_system: 0,
                             profile_conf: "${profile_conf}",
                             profile_user_id: ${this.props.user.id}) {
@@ -233,7 +296,16 @@ class RootComponent extends Component {
             })
     }
 
-    //  Logout....cancella il jwt dal session storage e redirige sulla login
+    // Escape quotes if needed
+    escapeQuotes(item) {
+        if (typeof item === 'string' || item instanceof String) {
+            return item.replace(/\\([\s\S])|(")/g,"\\$1$2")
+        } else {
+            return JSON.stringify(item).replace(/\\([\s\S])|(")/g,"\\$1$2")
+        }
+    }
+
+    //  Logout...cancella il jwt dal session storage e redirige sulla login
     Logout() {
         sessionStorage.removeItem('jwt')
         this.props.history.push('/')
@@ -252,8 +324,17 @@ class RootComponent extends Component {
                         </Link>
                     </Table.Cell>
                     <Table.Cell>{item.proj_note}</Table.Cell>
-                    <Table.Cell collapsing>{item.proj_share === 0 ? 'Private' : 'Public'}</Table.Cell>
+                    <Table.Cell collapsing>{item.proj_share === 0 ? t("MAIN_TBL_PRIVATE") : t("MAIN_TBL_PUBLIC")}</Table.Cell>
                     <Table.Cell collapsing textAlign='right'>
+                        <NewProjectForm
+                            className='icon-pointer'
+                            size='big'
+                            edit='icon'
+                            data={item}
+                            updateProject={this.updateProject.bind(this)}
+                            optionsProfiles={this.state.optionsProfiles}
+                            optionsLayouts={this.state.optionsLayouts}
+                        />
                         <Icon name='trash' color='red' size='big'
                             className='icon-pointer'
                             disabled={this.props.user.id !== item.proj_owner ? true : false}
@@ -310,6 +391,7 @@ class RootComponent extends Component {
                                         size='big'
                                         createProject={this.createProject.bind(this)}
                                         optionsProfiles={this.state.optionsProfiles}
+                                        optionsLayouts={this.state.optionsLayouts}
                                     />
                                 </Header>
                                 <Table celled striped>
@@ -317,7 +399,7 @@ class RootComponent extends Component {
                                         <Table.Row>
                                             <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_NOTES")}</Table.HeaderCell>
-                                            <Table.HeaderCell>Share</Table.HeaderCell>
+                                            <Table.HeaderCell>{t("MAIN_TBL_SHARE")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -359,13 +441,18 @@ class RootComponent extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
+                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
+                            </Segment>
+                            <Segment>
+                                <Header>Cambia lingua / Change language</Header>
+                                <LanguageSwitcher />
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
+                                <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
                                 <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
                                 <Button color='blue' as={Link} to="/administration">Admin</Button>
                             </Segment>

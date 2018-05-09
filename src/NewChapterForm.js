@@ -39,9 +39,7 @@ class NewChapterForm extends Component {
 
     render() {
         const { t, i18n } = this.props
-
-        let options = [{value: 'default', text: 'Default'}]
-
+        
         let iconModal = <Icon name='add square'
             className={this.props.className}
             size={this.props.size}
@@ -63,11 +61,6 @@ class NewChapterForm extends Component {
                                     value={this.state.newChaptherTitle}
                                     onChange={this.handleFormChange.bind(this)}
                                 />
-                            </Form.Field>
-                            <Form.Field>
-                                <label>{t("PRJ_FRM_LAYOUT")}</label>
-                                <Dropdown placeholder='Layout' selection options={options}
-                                    defaultValue='default' />
                             </Form.Field>
                         </Form>
                         <Message

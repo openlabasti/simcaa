@@ -38,6 +38,14 @@ i18n
                     "MAIN_BTN_CREATEPROFILE": "Crea Profilo",
                     "MAIN_BTN_UPDATEPROFILE": "Aggiorna Profilo",
 
+                    // HOMEPAGE NAVBAR
+                    "HOME_NAVBAR_LANGUAGE": "Lingua",
+                    "HOME_NAVBAR_MANAGE": "Gestione",
+                    "HOME_NAVBAR_MANAGE_SYMBOL": "Carica Simbolo",
+                    "HOME_NAVBAR_USER": "User",
+                    "HOME_NAVBAR_USER_PROFILE": "Profilo",
+                    "HOME_NAVBAR_USER_LOGOUT": "Esci",
+
                     // NAVBAR
                     "HEAD_BTN_OPTIONS": "Opzioni",
                     "HEAD_BTN_EXPORT": "Esporta",
@@ -155,6 +163,14 @@ i18n
                     "MAIN_BTN_BACK": "Back",
                     "MAIN_BTN_CREATEPROFILE": "Create Profile",
                     "MAIN_BTN_UPDATEPROFILE": "Update Profile",
+
+                    // HOMEPAGE NAVBAR
+                    "HOME_NAVBAR_LANGUAGE": "Language",
+                    "HOME_NAVBAR_MANAGE": "Manage",
+                    "HOME_NAVBAR_MANAGE_SYMBOL": "Upload Symbol",
+                    "HOME_NAVBAR_USER": "User",
+                    "HOME_NAVBAR_USER_PROFILE": "Profile",
+                    "HOME_NAVBAR_USER_LOGOUT": "Logout",
 
                     // NAVBAR
                     "HEAD_BTN_OPTIONS": "Options",

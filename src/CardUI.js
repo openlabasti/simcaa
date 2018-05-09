@@ -14,7 +14,7 @@ class CardUI extends Component {
                     lemmaPrevious: 'React',
                     img: 'react.png',
                     sinonimi: 0,
-                    imgAlt: [{voice_human: 'react',voice_start: 'react', voice_last: 'react', img: 'react.png'}],
+                    imgAlt: [{voice_human: 'react',voice_start: 'react', img: 'react.png'}],
                     lock: 'unlock',
                     codClass: 'Altro',
                     complex: '0',
@@ -25,7 +25,7 @@ class CardUI extends Component {
                     lemmaPrevious: 'React',
                     img: 'react.png',
                     sinonimi: 0,
-                    imgAlt: [{voice_human: 'react',voice_start: 'react', voice_last: 'react', img: 'react.png'}],
+                    imgAlt: [{voice_human: 'react',voice_start: 'react', img: 'react.png'}],
                     lock: 'unlock',
                     codClass: 'Altro',
                     complex: '0',
@@ -303,10 +303,20 @@ class CardUI extends Component {
                 data {
                     voice_master
                     voice_human
-                    voice_last
                     symbol_sign
                     idclass
                     lexical_expr
+                    imgcolor
+                    idstyle
+                }
+            }
+            preload_headword(headword: "${lemma}") {
+                data {
+                    id
+                    headword
+                    lexical_expr
+                    idclass
+                    symbol_sign
                     imgcolor
                     idstyle
                 }
@@ -370,11 +380,24 @@ class CardUI extends Component {
             for (let i=0; i<completeOrderedArray.length; i++) {
                 array[index].imgAlt.splice(i, 0, {voice_human: completeOrderedArray[i].voice_human,
                                                 voice_start: completeOrderedArray[i].voice_master,
-                                                voice_last: completeOrderedArray[i].voice_last,
                                                 img: completeOrderedArray[i].symbol_sign,
                                                 complex: completeOrderedArray[i].lexical_expr
                                                 })
             }
+
+            // accodo le img della seconda query
+            // TODO: vedere meglio con ordinamento
+            let imgAltQuery2 = data.data.preload_headword.data
+            for (let i = 0; i < imgAltQuery2.length; i++) {
+                array[index].imgAlt.splice(i + array[index].imgAlt.length, 0,
+                                                {voice_human: imgAltQuery2[i].headword,
+                                                voice_start: imgAltQuery2[i].headword,
+                                                img: imgAltQuery2[i].symbol_sign,
+                                                complex: imgAltQuery2[i].lexical_expr,
+                                                custom: true,
+                                                })
+            }
+
             this.setState({card: array})
             this.setComplexVerbs(array[index])
             this.props.setNavbarCard(array[index])
@@ -733,6 +756,8 @@ class CardUI extends Component {
         var cards = this.state.card
         var inputBorder = this.props.transparent === 'normal' ? false : true
         cards = cards.map((item, index) => {
+            let testCustom = item.imgAlt.find(x => x.img === item.img)
+            let srcImg = testCustom && testCustom.custom ? window.env.CustomImage + item.img : this.props.urlImg + item.img
 
             let styles = {}
             if (this.props.Style && this.props.borderCard) {
@@ -768,7 +793,7 @@ class CardUI extends Component {
                             color={item.id === this.state.focusedCard.id ? 'blue' : null}
                         >
                             <Card.Content className={this.props.imgPadding}>
-                                <Image src={this.props.urlImg + item.img} size={this.props.imgSize} />
+                                <Image src={srcImg} size={this.props.imgSize} />
                             </Card.Content>
                             {cardInput}
                         </Card>
@@ -787,7 +812,7 @@ class CardUI extends Component {
                         >
                             {cardInput}
                             <Card.Content className={this.props.imgPadding}>
-                            <Image src={this.props.urlImg + item.img} size={this.props.imgSize} />
+                            <Image src={srcImg} size={this.props.imgSize} />
                             </Card.Content>
                         </Card>
                     </div>
@@ -817,9 +842,10 @@ class CardUI extends Component {
         // render the div for the alternative imgs
         var imagesDiv = this.state.imgDiv
         imagesDiv = imagesDiv.map((item, index) => {
+            let srcImg = item.custom ? window.env.CustomImage + item.img : this.props.urlImg + item.img
             return(
                     <Image
-                        src={this.props.urlImg + item.img}
+                        src={srcImg}
                         style={{margin: "10px"}}
                         width={'100'}
                         height={'100'}

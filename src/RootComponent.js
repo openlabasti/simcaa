@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader } from 'semantic-ui-react'
+import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader, Menu, Dropdown, Dimmer } from 'semantic-ui-react'
 import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
@@ -7,6 +7,7 @@ import { withCurrentUser } from './withCurrentUser'
 import LanguageSwitcher from './LanguageSwitcher'
 import NewProjectForm from './NewProjectForm'
 import NewProfileForm from './NewProfileForm'
+import UploadSymbol from './UploadSymbol'
 
 class RootComponent extends Component {
     constructor(props) {
@@ -318,6 +319,7 @@ class RootComponent extends Component {
         allProjects = allProjects.map((item, index) => {
             return (
                 <Table.Row key={index}>
+                    <Table.Cell collapsing>{item.id}</Table.Cell>
                     <Table.Cell collapsing>
                         <Link to={'/project/' + item.id}>
                             {item.proj_name}
@@ -325,6 +327,7 @@ class RootComponent extends Component {
                     </Table.Cell>
                     <Table.Cell>{item.proj_note}</Table.Cell>
                     <Table.Cell collapsing>{item.proj_share === 0 ? t("MAIN_TBL_PRIVATE") : t("MAIN_TBL_PUBLIC")}</Table.Cell>
+                    <Table.Cell collapsing textAlign='center'>{item.proj_owner}</Table.Cell>
                     <Table.Cell collapsing textAlign='right'>
                         <NewProjectForm
                             className='icon-pointer'
@@ -348,9 +351,11 @@ class RootComponent extends Component {
         allProfiles = allProfiles.map((item, index) => {
             return (
                 <Table.Row key={index}>
+                    <Table.Cell collapsing>{item.id}</Table.Cell>
                     <Table.Cell collapsing>
                         {item.profile_name}
                     </Table.Cell>
+                    <Table.Cell>{item.profile_user_id}</Table.Cell>
                     <Table.Cell>{item.profile_system}</Table.Cell>
                     <Table.Cell collapsing textAlign='right' disabled={item.id === 1 ? true : false}>
                         <NewProfileForm
@@ -370,22 +375,46 @@ class RootComponent extends Component {
             )
         })
 
+        let dropdownOptions = ''
+        if (this.props.user.group_id === 1) {
+            dropdownOptions = <Dropdown.Item as={Link} to="/administration">Admin</Dropdown.Item>
+        }
+
         // Renderizza il Loader se non ha ancora finito le chiamate al db
         if (!this.state.fetchFinished) {
             return (
-                <div>
-                    <Loader active inline='centered' size='massive'/>
-                </div>
+                <Dimmer
+                    active={!this.state.fetchFinished}
+                    page
+                >
+                    <Loader active inline='centered' size='massive' />
+                </Dimmer>
             )
         }
         return (
             <Container>
+                <Menu>
+                    <Menu.Menu position='right'>
+                        <LanguageSwitcher type='dropdown' />
+                        <Dropdown item text={t("HOME_NAVBAR_MANAGE")}>
+                            <Dropdown.Menu>
+                                <UploadSymbol type='dropdown' user={this.props.user} />
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <Dropdown item text={t("HOME_NAVBAR_USER")}>
+                            <Dropdown.Menu>
+                                <Dropdown.Item>{t("HOME_NAVBAR_USER_PROFILE")}</Dropdown.Item>
+                                {dropdownOptions}
+                                <Dropdown.Item onClick={this.Logout.bind(this)}>{t("HOME_NAVBAR_USER_LOGOUT")}</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Menu.Menu>
+                </Menu>
                 <Grid columns='equal' style={{padding: '10px'}}>
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large'>
-                                    {t("MAIN_LBL_ALL")}
+                                <Header size='large' id='header-table-icon-project'>
                                     <NewProjectForm
                                         className='icon-pointer'
                                         size='big'
@@ -393,13 +422,21 @@ class RootComponent extends Component {
                                         optionsProfiles={this.state.optionsProfiles}
                                         optionsLayouts={this.state.optionsLayouts}
                                     />
+                                    <Header.Content>
+                                        {t("MAIN_LBL_ALL")}
+                                        <Header.Subheader>
+                                            Manage your project
+                                        </Header.Subheader>
+                                    </Header.Content>
                                 </Header>
-                                <Table celled striped>
+                                <Table celled striped color='blue'>
                                     <Table.Header>
                                         <Table.Row>
+                                            <Table.HeaderCell>ID</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
-                                            <Table.HeaderCell>{t("MAIN_TBL_NOTES")}</Table.HeaderCell>
+                                            <Table.HeaderCell>Date Update</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_SHARE")}</Table.HeaderCell>
+                                            <Table.HeaderCell>User Owner</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -414,19 +451,26 @@ class RootComponent extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large'>
-                                    {t("MAIN_LBL_ALLPROFILE")}
+                                <Header size='large' id='header-table-icon-profile'>
                                     <NewProfileForm
                                         className='icon-pointer'
                                         size='big'
                                         createProfile={this.createProfile.bind(this)}
                                     />
+                                    <Header.Content>
+                                        {t("MAIN_LBL_ALLPROFILE")}
+                                        <Header.Subheader>
+                                            Manage your profile
+                                        </Header.Subheader>
+                                    </Header.Content>
                                 </Header>
-                                <Table celled striped>
+                                <Table celled striped color='blue'>
                                     <Table.Header>
                                         <Table.Row>
+                                            <Table.HeaderCell>ID</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
-                                            <Table.HeaderCell>{t("MAIN_TBL_NOTES")}</Table.HeaderCell>
+                                            <Table.HeaderCell>Profile Owner</Table.HeaderCell>
+                                            <Table.HeaderCell>Profile System</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -435,26 +479,6 @@ class RootComponent extends Component {
                                         {allProfiles}
                                     </Table.Body>
                                 </Table>
-                            </Segment>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row>
-                        <Grid.Column>
-                            <Segment>
-                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
-                            </Segment>
-                            <Segment>
-                                <Header>Cambia lingua / Change language</Header>
-                                <LanguageSwitcher />
-                            </Segment>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row>
-                        <Grid.Column>
-                            <Segment>
-                                <Header size='large'>{t("MAIN_LBL_NEWS")}</Header>
-                                <Button color='red' onClick={this.Logout.bind(this)}>Logout</Button>
-                                <Button color='blue' as={Link} to="/administration">Admin</Button>
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>

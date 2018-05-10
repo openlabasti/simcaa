@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button, Form, Select, Message, Dimmer, Loader } from 'semantic-ui-react'
+import { Modal, Button, Icon, Form, Select, Message, Dimmer, Loader, Popup } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from '../withApolloFetch'
 import { withRouter} from 'react-router-dom'
@@ -89,9 +89,17 @@ class NewUserForm extends Component{
     this.setState({team_id: data.value})
   }
   handleSubmit(){
-    if(this.state.newName == "" || this.state.newEmail == "" || this.state.newPassword == "" || this.state.newUsername == ""){
+    if(this.state.newName === "" || this.state.newEmail === "" || this.state.newPassword === "" || this.state.newUsername === ""){
       this.setState({missingData: true})
     }else{
+      let org="n.d."
+      let link_web="n.d."
+      if(this.state.newOrg !== ""){
+        org = this.state.newOrg
+      }
+      if(this.state.newLinkWeb !== ""){
+        link_web = this.state.newLinkWeb
+      }
       this.setState({missingData: false, loading: true})
       let query = `
       mutation updateUser {
@@ -100,8 +108,8 @@ class NewUserForm extends Component{
                           email: "${this.state.newEmail}",
                           password: "${this.state.newPassword}",
                           user: "${this.state.newUsername}",
-                          organization: "${this.state.newOrg}",
-                          link_web: "${this.state.newLinkWeb}",
+                          organization: "${org}",
+                          link_web: "${link_web}",
                           group_id: ${this.state.group_id},
                           team_id: ${this.state.team_id}
                         ){
@@ -121,7 +129,7 @@ class NewUserForm extends Component{
   render(){
     if(this.state.loading){
       return(
-        <Modal trigger={<Button primary onClick={()=>this.setState({open:true})}>Nuovo Utente</Button>}>
+        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>}>
           <Modal.Content>
           <Dimmer active>
             <Loader />
@@ -133,7 +141,7 @@ class NewUserForm extends Component{
       if(this.state.interror){
         //messaggio di errore interno
         return(
-          <Modal trigger={<Button primary onClick={()=>this.setState({open:true})}>Nuovo Utente</Button>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
             <Modal.Content>
               <Message negative>
                 <Message.Header>Si è verificato un errore!</Message.Header>
@@ -146,7 +154,7 @@ class NewUserForm extends Component{
       }else if(this.state.missingData){
         //errore dato mancante in form
         return(
-          <Modal trigger={<Button primary onClick={()=>this.setState({open:true})}>Nuovo Utente</Button>} open={this.state.open}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open}>
             <Modal.Header>Nuovo utente</Modal.Header>
             <Modal.Content>
               <Form>
@@ -224,7 +232,7 @@ class NewUserForm extends Component{
         );
       }else if(this.state.added){
         return(
-          <Modal trigger={<Button primary onClick={()=>this.setState({open:true})}>Nuovo Utente</Button>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
             <Modal.Content>
               <Message positive>
                 <Message.Header>Tutto ok!</Message.Header>
@@ -237,7 +245,7 @@ class NewUserForm extends Component{
       }else{
         //form inserimento
         return(
-          <Modal trigger={<Button primary onClick={()=>this.setState({open:true})}>Nuovo Utente</Button>} open={this.state.open}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open}>
             <Modal.Header>Nuovo utente</Modal.Header>
             <Modal.Content>
               <Form>

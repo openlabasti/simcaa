@@ -8,11 +8,14 @@ import NewUserForm from './NewUserForm'
 
 class AllUsers extends Component{
   constructor(props){
+    console.log('asd');
     super(props)
     this.update = this.update.bind(this)
     this.state={
       lock: 0,
       users: [],
+      groups: [],
+      teams: [],
       openConfirmDelete: false
     }
   }
@@ -23,17 +26,36 @@ class AllUsers extends Component{
           data{
             id
             name
+            user
             email
             organization
             link_web
+            group_id
+            team_id
+          }
+        }
+        groups{
+          data {
+            id
+            desc_group
+          }
+        }
+        team{
+          data {
+            id
+            name
           }
         }
       }
     `
-    console.log('sto facendo query')
     this.props.apolloFetch({query})
     .then((data)=>{
-      this.setState({lock:1, users: data.data.caa_users.data})
+      this.setState({
+        lock:1,
+        users: data.data.caa_users.data,
+        groups: data.data.groups.data,
+        teams: data.data.team.data
+      })
     })
     .catch((error)=>{
       console.log(error);
@@ -47,7 +69,6 @@ class AllUsers extends Component{
   }
 
   handleDelete(){
-    console.log(this.state.idToDelete);
     let query = `
     mutation delUser {
         deleteCaaUser(id: ${this.state.idToDelete}){
@@ -64,56 +85,82 @@ class AllUsers extends Component{
             console.log(error);
         })
   }
+
   handleCancel(){
     this.setState({openConfirmDelete: false})
   }
+
   update(){
     this.componentWillMount();
   }
+
   render(){
+    const { t, i18n } = this.props
+
     if(this.state.lock===1){
       let tableLayout = this.state.users.map((item)=>{
-        return(
-          <Table.Row key={item.id}>
-            <Table.Cell>
-              {item.id}
-            </Table.Cell>
-            <Table.Cell>
-              {item.name}
-            </Table.Cell>
-            <Table.Cell>
-              {item.email}
-            </Table.Cell>
-            <Table.Cell>
-              {item.organization}
-            </Table.Cell>
-            <Table.Cell>
-              {item.link_web}
-            </Table.Cell>
-            <Table.Cell style={{display: "flex"}}>
-              <Popup
-                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
-                content= 'Elimina utente'
+      let team=""
+      let group=""
+      for(let i=0; i<this.state.teams.length; i++){
+        if(this.state.teams[i].id === item.team_id){
+          team=this.state.teams[i].name
+        }
+      }
+      for(let i=0; i<this.state.groups.length; i++){
+        if(this.state.groups[i].id === item.group_id){
+          group=this.state.groups[i].desc_group
+        }
+      }
+      return(
+        <Table.Row key={item.id}>
+          <Table.Cell>
+            {item.id}
+          </Table.Cell>
+          <Table.Cell>
+            {item.name}
+          </Table.Cell>
+          <Table.Cell>
+            {item.user}
+          </Table.Cell>
+          <Table.Cell>
+            {item.email}
+          </Table.Cell>
+          <Table.Cell>
+            {item.organization}
+          </Table.Cell>
+          <Table.Cell>
+            {item.link_web}
+          </Table.Cell>
+          <Table.Cell>
+            {group}
+          </Table.Cell>
+          <Table.Cell>
+            {team}
+          </Table.Cell>
+          <Table.Cell style={{display: "flex"}}>
+            <Popup
+              trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
+              content= {t("POPUP_DEL")}
+              />
+            <Popup
+              trigger={
+                <UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
+                  id={item.id}
+                  name={item.name}
+                  email={item.email}
+                  organization = {item.organization}
+                  link_web = {item.link_web}
+                  update = {()=>{this.update()}}
                 />
-              <Popup
-                trigger={
-                  <UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
-                    id={item.id}
-                    name={item.name}
-                    email={item.email}
-                    organization = {item.organization}
-                    link_web = {item.link_web}
-                    update = {()=>{this.update()}}
-                  />
-                }
-                content= 'Configura utente'
-                />
+              }
+              content= {t("POPUP_MOD")}
+              />
 
-            </Table.Cell>
-          </Table.Row>
+          </Table.Cell>
+        </Table.Row>
 
         )
-      })
+      });
       const tableStyle={
         marginTop: '15px'
       }
@@ -124,11 +171,14 @@ class AllUsers extends Component{
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>ID</Table.HeaderCell>
-                <Table.HeaderCell>Nome</Table.HeaderCell>
-                <Table.HeaderCell>Email</Table.HeaderCell>
-                <Table.HeaderCell>Organizzazione</Table.HeaderCell>
-                <Table.HeaderCell>Sito web</Table.HeaderCell>
-                <Table.HeaderCell>Azione</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_NAME")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_USR")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_EMAIL")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_ORG")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_LWEB")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_GROUP")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_TEAM")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("TBL_ACTION")}</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -141,8 +191,8 @@ class AllUsers extends Component{
         </Segment>
         <Confirm
             open={this.state.openConfirmDelete}
-            header='This action cannot be reversed'
-            content="Sei sicuro di  voler eliminare l'utente?"
+            header={t("DELETE_CNF_H")}
+            content={t("DELETE_CNF_C")}
             onCancel={this.handleCancel.bind(this)}
             onConfirm={this.handleDelete.bind(this)}
         />
@@ -151,10 +201,10 @@ class AllUsers extends Component{
     }else{
       return(
           <Dimmer active>
-            <Loader size='massive'>Sto caricando....</Loader>
+            <Loader size='massive'>{t("LOADING")}</Loader>
           </Dimmer>
       )
     }
   }
 }
-  export default withApolloFetch(translate('translations')(AllUsers))
+  export default withApolloFetch(withRouter(translate('translations')(AllUsers)))

@@ -27,21 +27,21 @@ window.env = {
 
     //  URL
     // Online Simcaa.it
-    // "GraphQLServer": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query",
-    // "GraphQLServerNoAuth": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query/noauth",
-    // "GraphQLLogin": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/login",
-    // "GraphQLCurrentUser": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/me",
-    // "GraphQLRefreshToken": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/jwtrefresh",
-    // "RestApiCard": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/card",
+     "GraphQLServer": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query",
+     "GraphQLServerNoAuth": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query/noauth",
+     "GraphQLLogin": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/login",
+     "GraphQLCurrentUser": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/me",
+     "GraphQLRefreshToken": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/jwtrefresh",
+     "RestApiCard": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/card",
 
     // Local
-    "GraphQLServer": "http://10.0.0.132:8085/graphql/query",
+    /*"GraphQLServer": "http://10.0.0.132:8085/graphql/query",
     "GraphQLServerNoAuth": "http://10.0.0.132:8085/graphql/query/noauth",
     "GraphQLLogin": "http://10.0.0.132:8085/graphql/login",
     "GraphQLCurrentUser": "http://10.0.0.132:8085/graphql/me",
     "GraphQLRefreshToken": "http://10.0.0.132:8085/graphql/jwtrefresh",
     "RestApiCard": "http://10.0.0.132:8085/graphql/card",
-
+      */
     // HOMEPAGE MESSAGE
     "blue_text_header": "To test this Demo",
     "blue_text_content": "<p>Username: user</p>Password: user",

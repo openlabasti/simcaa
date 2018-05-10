@@ -130,6 +130,31 @@ i18n
                     "PRJ_FRM_LAYOUT": "Layout del capitolo",
                     "PRJ_BTN_CREATE": "Crea Capitolo",
                     "PRJ_BTN_CLOSE": "Chiudi",
+
+                    //ADMINISTRATION
+
+                    //ADMIN-MENU
+                    "ADM_MNU_USRS": "Utenti",
+                    "ADM_MNU_GROUPS": "Gruppi",
+                    "ADM_MNU_BACK": "Torna ai progetti",
+
+                    //ADMIN-ALLUSERS
+                    "TBL_NAME" : "Nome",
+                    "TBL_USR" : "Username",
+                    "TBL_EMAIL" : "Email",
+                    "TBL_ORG" : "Organizzazione",
+                    "TBL_LWEB" : "Sito Web",
+                    "TBL_GROUP" : "Ruolo",
+                    "TBL_TEAM" : "Team",
+                    "TBL_ACTION" : "Azione",
+                    "DELETE_CNF_H": "Questa azione è irreversibile!",
+                    "DELETE_CNF_C": "Sei sicuro di voler eliminare l'utente?",
+                    "LOADING": "Sto caricando....",
+                    "POPUP_DEL": "Elimina",
+                    "POPUP_MOD": "Configura",
+
+
+
                 }
             },
             en: {
@@ -255,7 +280,30 @@ i18n
                     "PRJ_FRM_TITLE": "Chapter Title",
                     "PRJ_FRM_LAYOUT": "Chapter Layout",
                     "PRJ_BTN_CREATE": "Create Chapter",
-                    "PRJ_BTN_CLOSE": "Close"
+                    "PRJ_BTN_CLOSE": "Close",
+
+                    //ADMINISTRATION
+
+                    //ADMIN-MENU
+                    "ADM_MNU_USRS": "Users",
+                    "ADM_MNU_GROUPS": "Groups",
+                    "ADM_MNU_BACK": "Go back to projects",
+
+                    //ADMIN-ALLUSERS
+                    "TBL_NAME" : "Name",
+                    "TBL_USR" : "Username",
+                    "TBL_EMAIL" : "Email",
+                    "TBL_ORG" : "Organization",
+                    "TBL_LWEB" : "Website",
+                    "TBL_GROUP" : "Role",
+                    "TBL_TEAM" : "Team",
+                    "TBL_ACTION" : "Action",
+                    "DELETE_CNF_H": "This action cannot be reversed!",
+                    "DELETE_CNF_C": "Do you really want to delete the user?",
+                    "LOADING": "I'm loading....",
+                    "POPUP_DEL": "Delete",
+                    "POPUP_MOD": "Manage"
+
                 }
             }
         },

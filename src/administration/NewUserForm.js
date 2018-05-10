@@ -127,9 +127,11 @@ class NewUserForm extends Component{
     }
   }
   render(){
+    const { t, i18n } = this.props
+
     if(this.state.loading){
       return(
-        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>}>
+        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>}>
           <Modal.Content>
           <Dimmer active>
             <Loader />
@@ -141,33 +143,33 @@ class NewUserForm extends Component{
       if(this.state.interror){
         //messaggio di errore interno
         return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
             <Modal.Content>
               <Message negative>
-                <Message.Header>Si è verificato un errore!</Message.Header>
-                <p>Si è verificato un errore interno, riprovare più tardi</p>
+                <Message.Header>{t("INTERROR_HEADER")}</Message.Header>
+                <p>{t("INTERROR_BODY")}</p>
               </Message>
-              <Button primary onClick={()=>this.setState({interror:false, open:false})}>Continua</Button>
+              <Button primary onClick={()=>this.setState({interror:false, open:false})}>{t("BTN_CONTINUE")}</Button>
             </Modal.Content>
           </Modal>
         )
       }else if(this.state.missingData){
         //errore dato mancante in form
         return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open}>
-            <Modal.Header>Nuovo utente</Modal.Header>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open}>
+            <Modal.Header>{t("MODAL_HEADER")}</Modal.Header>
             <Modal.Content>
               <Form>
                 <Form.Field required>
-                  <label>Nome</label>
-                  <input placeholder='Nome e Cognome'
+                  <label>{t("TBL_NAME")}</label>
+                  <input placeholder={t("TBL_NAME")}
                          value={this.state.newName}
                          onChange={this.newNameChange.bind(this)}
                          />
                 </Form.Field>
                 <Form.Field required>
-                  <label>Email</label>
-                  <input placeholder='Email'
+                  <label>{t("TBL_EMAIL")}</label>
+                  <input placeholder={t("TBL_EMAIL")}
                          value={this.state.newEmail}
                          onChange={this.newEmailChange.bind(this)}
                          />
@@ -181,23 +183,23 @@ class NewUserForm extends Component{
                          />
                 </Form.Field>
                 <Form.Field required>
-                  <label>Username</label>
-                  <input placeholder='Username'
+                  <label>{t("TBL_USR")}</label>
+                  <input placeholder={t("TBL_USR")}
                          value={this.state.newUsername}
                          onChange={this.newUsernameChange.bind(this)}
                          />
                 </Form.Field>
                 <Form.Group widths='equal'>
                   <Form.Field>
-                    <label>Sito Web</label>
-                    <input placeholder='Sito web'
+                    <label>{t("TBL_LWEB")}</label>
+                    <input placeholder={t("TBL_LWEB")}
                            value={this.state.newLinkWeb}
                            onChange={this.newLinkWebChange.bind(this)}
                            />
                   </Form.Field>
                   <Form.Field>
-                    <label>Organizzazione</label>
-                    <input placeholder='Organizzazione'
+                    <label>{t("TBL_ORG")}</label>
+                    <input placeholder={t("TBL_ORG")}
                            value={this.state.newOrg}
                            onChange={this.newOrgChange.bind(this)}
                            />
@@ -205,26 +207,26 @@ class NewUserForm extends Component{
                 </Form.Group>
                 <Form.Group widths='equal'>
                   <Form.Field>
-                    <label>Ruolo</label>
+                    <label>{t("TBL_GROUP")}</label>
                     <Select options={this.state.groups}
                             onChange={this.selectGroup.bind(this)}
                             />
                   </Form.Field>
                   <Form.Field>
-                    <label>Team</label>
+                    <label>{t("TBL_TEAM")}</label>
                     <Select options={this.state.teams}
                             onChange={this.selectTeam.bind(this)}
                             />
                   </Form.Field>
                 </Form.Group>
                 <Message negative>
-                  <Message.Header>Dati mancanti!</Message.Header>
-                  <p>I campi segnati con * sono obbligatori</p>
+                  <Message.Header>{t("MISSING_DATA_H")}</Message.Header>
+                  <p>{t("MISSING_DATA_C")}</p>
                 </Message>
 
                 <div>
-                  <Button primary onClick={this.handleSubmit.bind(this)}> Procedi </Button>
-                  <Button negative onClick={()=>this.setState({open:false, missingData:false})}> Annulla </Button>
+                  <Button primary onClick={this.handleSubmit.bind(this)}> {t("BTN_CONFIRM")} </Button>
+                  <Button negative onClick={()=>this.setState({open:false, missingData:false})}> {t("BTN_DENY")} </Button>
                 </div>
               </Form>
             </Modal.Content>
@@ -232,33 +234,33 @@ class NewUserForm extends Component{
         );
       }else if(this.state.added){
         return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
             <Modal.Content>
               <Message positive>
-                <Message.Header>Tutto ok!</Message.Header>
-                <p>Utente creato correttamente</p>
+                <Message.Header>{t("CREATED_USR_H")}</Message.Header>
+                <p>{t("CREATED_USR_C")}</p>
               </Message>
-              <Button primary onClick={()=>this.setState({open:false, added:false})}>Continua</Button>
+              <Button primary onClick={()=>this.setState({open:false, added:false})}>{t("BTN_CONTINUE")}</Button>
             </Modal.Content>
           </Modal>
         )
       }else{
         //form inserimento
         return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content="Aggiungi utente"/>} open={this.state.open}>
-            <Modal.Header>Nuovo utente</Modal.Header>
+          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open}>
+            <Modal.Header>{t("MODAL_HEADER")}</Modal.Header>
             <Modal.Content>
               <Form>
                 <Form.Field required>
-                  <label>Nome</label>
-                  <input placeholder='Nome e Cognome'
+                  <label>{t("TBL_NAME")}</label>
+                  <input placeholder={t("TBL_NAME")}
                          value={this.state.newName}
                          onChange={this.newNameChange.bind(this)}
                          />
                 </Form.Field>
                 <Form.Field required>
-                  <label>Email</label>
-                  <input placeholder='Email'
+                  <label>{t("TBL_EMAIL")}</label>
+                  <input placeholder={t("TBL_EMAIL")}
                          value={this.state.newEmail}
                          onChange={this.newEmailChange.bind(this)}
                          />
@@ -272,23 +274,23 @@ class NewUserForm extends Component{
                          />
                 </Form.Field>
                 <Form.Field required>
-                  <label>Username</label>
-                  <input placeholder='Username'
+                  <label>{t("TBL_USR")}</label>
+                  <input placeholder={t("TBL_USR")}
                          value={this.state.newUsername}
                          onChange={this.newUsernameChange.bind(this)}
                          />
                 </Form.Field>
                 <Form.Group widths='equal'>
                   <Form.Field>
-                    <label>Sito Web</label>
-                    <input placeholder='Sito web'
+                    <label>{t("TBL_LWEB")}</label>
+                    <input placeholder={t("TBL_LWEB")}
                            value={this.state.newLinkWeb}
                            onChange={this.newLinkWebChange.bind(this)}
                            />
                   </Form.Field>
                   <Form.Field>
-                    <label>Organizzazione</label>
-                    <input placeholder='Organizzazione'
+                    <label>{t("TBL_ORG")}</label>
+                    <input placeholder={t("TBL_ORG")}
                            value={this.state.newOrg}
                            onChange={this.newOrgChange.bind(this)}
                            />
@@ -296,21 +298,21 @@ class NewUserForm extends Component{
                 </Form.Group>
                 <Form.Group widths='equal'>
                   <Form.Field>
-                    <label>Ruolo</label>
+                    <label>{t("TBL_GROUP")}</label>
                     <Select options={this.state.groups}
                             onChange={this.selectGroup.bind(this)}
                             />
                   </Form.Field>
                   <Form.Field>
-                    <label>Team</label>
+                    <label>{t("TBL_TEAM")}</label>
                     <Select options={this.state.teams}
                             onChange={this.selectTeam.bind(this)}
                             />
                   </Form.Field>
                 </Form.Group>
                 <div>
-                  <Button primary onClick={this.handleSubmit.bind(this)}> Procedi </Button>
-                  <Button negative onClick={()=>this.setState({open:false})}>Annulla</Button>
+                  <Button primary onClick={this.handleSubmit.bind(this)}> {t("BTN_CONFIRM")} </Button>
+                  <Button negative onClick={()=>this.setState({open:false})}> {t("BTN_DENY")} </Button>
                 </div>
               </Form>
             </Modal.Content>

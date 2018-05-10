@@ -131,6 +131,13 @@ i18n
                     "PRJ_BTN_CREATE": "Crea Capitolo",
                     "PRJ_BTN_CLOSE": "Chiudi",
 
+                    //MISC
+                    "INTERROR_HEADER": "Si è verificato un errore!",
+                    "INTERROR_BODY": "C'è un problema di sistema, riprovare più tardi",
+                    "BTN_CONTINUE": "Continua",
+                    "BTN_DENY": "Annulla",
+                    "BTN_CONFIRM": "Conferma",
+
                     //ADMINISTRATION
 
                     //ADMIN-MENU
@@ -138,7 +145,7 @@ i18n
                     "ADM_MNU_GROUPS": "Gruppi",
                     "ADM_MNU_BACK": "Torna ai progetti",
 
-                    //ADMIN-ALLUSERS
+                    //ADMIN-AllUsers
                     "TBL_NAME" : "Nome",
                     "TBL_USR" : "Username",
                     "TBL_EMAIL" : "Email",
@@ -152,6 +159,15 @@ i18n
                     "LOADING": "Sto caricando....",
                     "POPUP_DEL": "Elimina",
                     "POPUP_MOD": "Configura",
+
+                    //ADMIN-NewUserForm
+                    "POPUP_ADD": "Aggiungi utente",
+                    "MODAL_HEADER": "Nuovo utente",
+                    "MISSING_DATA_H": "Dati mancanti!",
+                    "MISSING_DATA_C": "I campi segnati con * sono obbligatori",
+                    "CREATED_USR_H": "Tutto ok!",
+                    "CREATED_USR_C": "Utente creato correttamente",
+
 
 
 
@@ -282,6 +298,13 @@ i18n
                     "PRJ_BTN_CREATE": "Create Chapter",
                     "PRJ_BTN_CLOSE": "Close",
 
+                    //MISC
+                    "INTERROR_HEADER": "An error occured!",
+                    "INTERROR_BODY": "System erro, try again later",
+                    "BTN_CONTINUE": "Continue",
+                    "BTN_DENY": "Deny",
+                    "BTN_CONFIRM": "Confirm",
+
                     //ADMINISTRATION
 
                     //ADMIN-MENU
@@ -302,7 +325,17 @@ i18n
                     "DELETE_CNF_C": "Do you really want to delete the user?",
                     "LOADING": "I'm loading....",
                     "POPUP_DEL": "Delete",
-                    "POPUP_MOD": "Manage"
+                    "POPUP_MOD": "Manage",
+
+                    //ADMIN-NewUserForm
+                    "POPUP_ADD": "Add user",
+                    "MODAL_HEADER": "New user",
+                    "MISSING_DATA_H": "Missing data!",
+                    "MISSING_DATA_C": "Field checked with * are mandatory",
+                    "CREATED_USR_H": "Everything ok!",
+                    "CREATED_USR_C": "User succesfully created",
+
+
 
                 }
             }

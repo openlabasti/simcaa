@@ -6,7 +6,6 @@ import LayoutExport from './LayoutExport'
 import Project from './Project'
 import Login from './Login'
 import Admin from './administration/Administration'
-import UsrConfig from './administration/UsrConfig'
 // Import CSS files
 import './css/grid_styles.css'
 import './css/resizable_styles.css'

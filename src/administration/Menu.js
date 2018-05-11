@@ -18,7 +18,7 @@ class AdminMenu extends Component{
    return(
         <Menu id='navbar'>
             <Menu.Item name='header'>
-                <h4><b>Pannello di Amministrazione</b></h4>
+                <h3><b>Pannello di Amministrazione</b></h3>
             </Menu.Item>
             <Menu.Item as={Link} to="/administration/home">
                 Home

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon, Input, Modal, Message} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
-import {withApolloFetch} from '../withApolloFetch'
+import {withApolloFetch} from '../../withApolloFetch'
 import { withRouter } from 'react-router-dom'
 
 class UsrConfig extends Component{
@@ -118,6 +118,7 @@ class UsrConfig extends Component{
     })
   }
   render(){
+    const { t, i18n } = this.props
     if(this.state.loading){
       return(
         <Modal trigger={this.props.trigger}>
@@ -134,8 +135,8 @@ class UsrConfig extends Component{
           <Modal trigger={this.props.trigger} onClose={()=>this.setState({interror:false})}>
             <Modal.Content>
               <Message negative>
-                <Message.Header>Si è verificato un errore!</Message.Header>
-                <p>Si è verificato un errore interno, riprovare più tardi</p>
+                <Message.Header>{t("INTERROR_HEADER")}</Message.Header>
+                <p>{t("INTERROR_BODY")}</p>
               </Message>
             </Modal.Content>
           </Modal>
@@ -143,21 +144,21 @@ class UsrConfig extends Component{
       }else{
         return(
           <Modal trigger={this.props.trigger}>
-            <Modal.Header>Modifica Utente</Modal.Header>
+            <Modal.Header>{t("USR_CNFG_H")}</Modal.Header>
             <Modal.Content>
               <Table celled padded textAlign='center'>
                 <Table.Header>
                   <Table.Row>
                     <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Valore Attuale</Table.HeaderCell>
-                    <Table.HeaderCell>Nuovo Valore</Table.HeaderCell>
+                    <Table.HeaderCell>{t("USR_CNFG_CUR_VAL")}</Table.HeaderCell>
+                    <Table.HeaderCell>{t("USR_CNFG_NEW_VAL")}</Table.HeaderCell>
                     <Table.HeaderCell></Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
                   <Table.Row key='0'>
                     <Table.Cell>
-                      Nome
+                      {t("TBL_NAME")}
                     </Table.Cell>
                     <Table.Cell>
                       {this.state.name}
@@ -167,14 +168,14 @@ class UsrConfig extends Component{
                     </Table.Cell>
                     <Table.Cell>
                       <Button animated onClick={()=>this.modData(0)}>
-                        <Button.Content visible> Modifica </Button.Content>
+                        <Button.Content visible> {t("BTN_MOD")} </Button.Content>
                         <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                       </Button>
                     </Table.Cell>
                   </Table.Row>
                   <Table.Row key='1'>
                     <Table.Cell>
-                      Email
+                      {t("TBL_EMAIL")}
                     </Table.Cell>
                     <Table.Cell>
                       {this.state.email}
@@ -184,14 +185,14 @@ class UsrConfig extends Component{
                     </Table.Cell>
                     <Table.Cell>
                       <Button animated onClick={()=>this.modData(1)}>
-                        <Button.Content visible> Modifica </Button.Content>
+                        <Button.Content visible> {t("BTN_MOD")} </Button.Content>
                         <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                       </Button>
                     </Table.Cell>
                   </Table.Row>
                   <Table.Row key='2'>
                     <Table.Cell>
-                      Organizzazione
+                      {t("TBL_ORG")}
                     </Table.Cell>
                     <Table.Cell>
                       {this.state.organization}
@@ -201,14 +202,14 @@ class UsrConfig extends Component{
                     </Table.Cell>
                     <Table.Cell>
                       <Button animated onClick={()=>this.modData(2)}>
-                        <Button.Content visible> Modifica </Button.Content>
+                        <Button.Content visible> {t("BTN_MOD")} </Button.Content>
                         <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                       </Button>
                     </Table.Cell>
                   </Table.Row>
                   <Table.Row key='3'>
                     <Table.Cell>
-                      Sito Web
+                      {t("TBL_LWEB")}
                     </Table.Cell>
                     <Table.Cell>
                       {this.state.web}
@@ -218,7 +219,7 @@ class UsrConfig extends Component{
                     </Table.Cell>
                     <Table.Cell>
                       <Button animated onClick={()=>this.modData(3)}>
-                        <Button.Content visible> Modifica </Button.Content>
+                        <Button.Content visible> {t("BTN_MOD")} </Button.Content>
                         <Button.Content hidden> <Icon name='checkmark'/> </Button.Content>
                       </Button>
                     </Table.Cell>

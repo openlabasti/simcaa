@@ -1,14 +1,13 @@
 import React, { Component, Link } from 'react'
 import {Container, Header, Table, Dimmer, Segment, Loader, Button, Popup, Icon, Confirm, Modal, Form} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
-import {withApolloFetch} from '../withApolloFetch'
+import {withApolloFetch} from '../../withApolloFetch'
 import { withRouter } from 'react-router-dom'
 import UsrConfig from './UsrConfig'
 import NewUserForm from './NewUserForm'
 
 class AllUsers extends Component{
   constructor(props){
-    console.log('asd');
     super(props)
     this.update = this.update.bind(this)
     this.state={
@@ -99,65 +98,65 @@ class AllUsers extends Component{
 
     if(this.state.lock===1){
       let tableLayout = this.state.users.map((item)=>{
-      let team=""
-      let group=""
-      for(let i=0; i<this.state.teams.length; i++){
-        if(this.state.teams[i].id === item.team_id){
-          team=this.state.teams[i].name
+        let team=""
+        let group=""
+        for(let i=0; i<this.state.teams.length; i++){
+          if(this.state.teams[i].id === item.team_id){
+            team=this.state.teams[i].name
+          }
         }
-      }
-      for(let i=0; i<this.state.groups.length; i++){
-        if(this.state.groups[i].id === item.group_id){
-          group=this.state.groups[i].desc_group
+        for(let i=0; i<this.state.groups.length; i++){
+          if(this.state.groups[i].id === item.group_id){
+            group=this.state.groups[i].desc_group
+          }
         }
-      }
-      return(
-        <Table.Row key={item.id}>
-          <Table.Cell>
-            {item.id}
-          </Table.Cell>
-          <Table.Cell>
-            {item.name}
-          </Table.Cell>
-          <Table.Cell>
-            {item.user}
-          </Table.Cell>
-          <Table.Cell>
-            {item.email}
-          </Table.Cell>
-          <Table.Cell>
-            {item.organization}
-          </Table.Cell>
-          <Table.Cell>
-            {item.link_web}
-          </Table.Cell>
-          <Table.Cell>
-            {group}
-          </Table.Cell>
-          <Table.Cell>
-            {team}
-          </Table.Cell>
-          <Table.Cell style={{display: "flex"}}>
-            <Popup
-              trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
-              content= {t("POPUP_DEL")}
-              />
-            <Popup
-              trigger={
-                <UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
-                  id={item.id}
-                  name={item.name}
-                  email={item.email}
-                  organization = {item.organization}
-                  link_web = {item.link_web}
-                  update = {()=>{this.update()}}
+        return(
+          <Table.Row key={item.id}>
+            <Table.Cell>
+              {item.id}
+            </Table.Cell>
+            <Table.Cell>
+              {item.name}
+            </Table.Cell>
+            <Table.Cell>
+              {item.user}
+            </Table.Cell>
+            <Table.Cell>
+              {item.email}
+            </Table.Cell>
+            <Table.Cell>
+              {item.organization}
+            </Table.Cell>
+            <Table.Cell>
+              {item.link_web}
+            </Table.Cell>
+            <Table.Cell>
+              {group}
+            </Table.Cell>
+            <Table.Cell>
+              {team}
+            </Table.Cell>
+            <Table.Cell style={{display: "flex"}}>
+              <Popup
+                trigger={<Button circular icon={<Icon name='remove user' size='large'/>} onClick={()=>this.openConfirm(item.id)}/>}
+                content= {t("POPUP_DEL")}
                 />
-              }
-              content= {t("POPUP_MOD")}
-              />
+              <Popup
+                trigger={
+                  <UsrConfig trigger={<Button circular icon={<Icon name='configure' size='large'/>} />}
+                    id={item.id}
+                    name={item.name}
+                    email={item.email}
+                    organization = {item.organization}
+                    link_web = {item.link_web}
+                    update = {()=>{this.update()}}
+                  />
+                }
+                content= {t("POPUP_MOD")}
+                />
 
-          </Table.Cell>
-        </Table.Row>
+            </Table.Cell>
+          </Table.Row>
 
         )
       });

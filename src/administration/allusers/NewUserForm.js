@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Modal, Button, Icon, Form, Select, Message, Dimmer, Loader, Popup } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
-import { withApolloFetch } from '../withApolloFetch'
+import { withApolloFetch } from '../../withApolloFetch'
 import { withRouter} from 'react-router-dom'
 
 class NewUserForm extends Component{

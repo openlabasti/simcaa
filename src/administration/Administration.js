@@ -5,8 +5,8 @@ import { withCurrentUser} from '../withCurrentUser'
 import { translate, Trans } from 'react-i18next'
 import { Container, Menu, Segment } from 'semantic-ui-react'
 import AdminMenu from './Menu'
-import AllUsers from './AllUsers'
-import AllGroups from './AllGroups'
+import AllUsers from './allusers/AllUsers'
+import AllGroups from './allgroups/AllGroups'
 import Helper from './Helper'
 class Admin extends Component{
   isLogged(Component) {

@@ -137,12 +137,13 @@ i18n
                     "BTN_CONTINUE": "Continua",
                     "BTN_DENY": "Annulla",
                     "BTN_CONFIRM": "Conferma",
+                    "BTN_MOD": "Modifica",
 
                     //ADMINISTRATION
 
                     //ADMIN-MENU
                     "ADM_MNU_USRS": "Utenti",
-                    "ADM_MNU_GROUPS": "Gruppi",
+                    "ADM_MNU_GROUPS": "Gruppi di lavoro",
                     "ADM_MNU_BACK": "Torna ai progetti",
 
                     //ADMIN-AllUsers
@@ -167,6 +168,12 @@ i18n
                     "MISSING_DATA_C": "I campi segnati con * sono obbligatori",
                     "CREATED_USR_H": "Tutto ok!",
                     "CREATED_USR_C": "Utente creato correttamente",
+
+                    //ADMIN-UsrConfig
+                    "USR_CNFG_H": "Modifica Utente",
+                    "USR_CNFG_CUR_VAL": "Valore Attuale",
+                    "USR_CNFG_NEW_VAL": "Nuovo Valore",
+
 
 
 
@@ -304,12 +311,13 @@ i18n
                     "BTN_CONTINUE": "Continue",
                     "BTN_DENY": "Deny",
                     "BTN_CONFIRM": "Confirm",
+                    "BTN_MOD": "Modify",
 
                     //ADMINISTRATION
 
                     //ADMIN-MENU
                     "ADM_MNU_USRS": "Users",
-                    "ADM_MNU_GROUPS": "Groups",
+                    "ADM_MNU_GROUPS": "Teams",
                     "ADM_MNU_BACK": "Go back to projects",
 
                     //ADMIN-ALLUSERS
@@ -335,7 +343,10 @@ i18n
                     "CREATED_USR_H": "Everything ok!",
                     "CREATED_USR_C": "User succesfully created",
 
-
+                    //ADMIN-UsrConfig
+                    "USR_CNFG_H": "User Configuration",
+                    "USR_CNFG_CUR_VAL": "Current Value",
+                    "USR_CNFG_NEW_VAL": "New Value",
 
                 }
             }

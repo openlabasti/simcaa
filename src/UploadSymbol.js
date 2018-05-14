@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Segment, Dropdown, Modal, Header, Image, Form, Checkbox, Grid } from 'semantic-ui-react'
+import { Button, Segment, Dropdown, Modal, Header, Image, Form, Checkbox, Grid, Message, Confirm, Icon } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetchNoAuth } from './withApolloFetchNoAuth'
@@ -12,6 +12,7 @@ class UploadSymbol extends Component {
         super(props)
         this.state = {
             modalOpen: false,
+            confirmOpen: false,
             classOptions: [],
             styleOptions: [],
             colorOptions: [{value: 1, text: 'Black and White'}, {value: 2, text: 'Color'}],
@@ -23,6 +24,8 @@ class UploadSymbol extends Component {
             style: 0,
             color: 0,
             class: 0,
+            privatePhoto: false,
+            error: {hidden: true, text: ''}
         }
     }
 
@@ -71,6 +74,10 @@ class UploadSymbol extends Component {
         let imgName = testImg !== null ? testImg.src.split("/").pop() : ''
         if (testImg !== null && imgName !== prevState.card.img) {
             setTimeout(() => {
+                // Riprendo i dati dalla div perchè in caso di reupload
+                testImg = document.getElementById('imgTmp')
+
+                // Aggiorno in tempo reale le info sull'immagine
                 localStat.width = testImg.width
                 localStat.height = testImg.height
                 localStat.size = this.state.file[0].size
@@ -99,11 +106,33 @@ class UploadSymbol extends Component {
     }
 
     openCloseModal() {
-        this.setState({modalOpen: !this.state.modalOpen})
+        if (this.state.modalOpen === true) {
+            this.setState({modalOpen: !this.state.modalOpen,
+                        file: [{preview: '', size: 0}],
+                        imgStat: {width: 0, height: 0, size: 0},
+                        word: '',
+                        style: 0,
+                        color: 0,
+                        class: 0,
+                        privatePhoto: false,
+                        error: {hidden: true, text: ''}
+            })
+        } else {
+            this.setState({modalOpen: !this.state.modalOpen, confirmOpen: false})
+        }
+
+    }
+
+    openCloseConfirm() {
+        this.setState({confirmOpen: !this.state.confirmOpen})
     }
 
     wordChange(e) {
         this.setState({word: e.target.value})
+    }
+
+    checkboxPrivate() {
+        this.setState({privatePhoto: !this.state.privatePhoto})
     }
 
     dropdownChange(type, e, data) {
@@ -117,55 +146,60 @@ class UploadSymbol extends Component {
     }
 
     upload() {
-        //  IMAGE UPLOAD
-        let imgToSend = new FormData()
-        imgToSend.append('img',this.state.file[0])
-        imgToSend.append('custom', true)
+        if (this.state.file[0].name && this.state.word !== '') {
+            //  IMAGE UPLOAD
+            let imgToSend = new FormData()
+            imgToSend.append('img',this.state.file[0])
+            imgToSend.append('custom', true)
 
-        let request = new Request(window.env.ApiImageUpload,{
-            method : 'POST',
-            mode: 'cors',
-            mimeType: 'multipart/form-data',
-            body: imgToSend
-        })
+            let request = new Request(window.env.ApiImageUpload,{
+                method : 'POST',
+                mode: 'cors',
+                mimeType: 'multipart/form-data',
+                body: imgToSend
+            })
 
-        fetch(request)
-            .then((response) => {
-                // Variables GraphQL
-                //  TODO: Change idlang and idcateg in future
-                let idlang = 4
-                let headword = this.state.word.trim()
-                let lexical_expr = headword.indexOf(' ') >= 0 ? 1 : 0
-                let idclass = this.state.class
-                let idcateg = 0
-                let type_img = 0
-                let symbol_sign = this.state.file[0].name
-                let imgcolor = this.state.color
-                let idstyle = this.state.style
-                let created_by = this.props.user.id
+            fetch(request)
+                .then((response) => {
+                    // Variables GraphQL
+                    //  TODO: Change idlang and idcateg in future
+                    let idlang = 4
+                    let headword = this.state.word.trim().toLowerCase()
+                    let voice_master = headword.replace(/ .*/,'')
+                    let lexical_expr = headword.indexOf(' ') >= 0 ? 1 : 0
+                    let idclass = this.state.class
+                    let idcateg = 0
+                    let type_img = this.state.privatePhoto === true ? 1 : 0
+                    let symbol_sign = this.state.file[0].name
+                    let imgcolor = this.state.color
+                    let idstyle = this.state.style
+                    let created_by = this.props.user.id
 
-                let query = `
-                mutation InsertNewPreloadHeardword {
-                    createCaaPreloadHeadword(idlang: ${idlang}, headword: "${headword}", lexical_expr: ${lexical_expr},
-                                            idclass: ${idclass}, idcateg: ${idcateg}, type_img: ${type_img}, idstyle: ${idstyle},
-                                            symbol_sign: "${symbol_sign}", imgcolor: "${imgcolor}", created_by: ${created_by}) {
-                        id
+                    let query = `
+                    mutation InsertNewPreloadHeardword {
+                        createCaaPreloadHeadword(idlang: ${idlang}, voice_master: "${voice_master}",
+                                                headword: "${headword}", lexical_expr: ${lexical_expr},
+                                                idclass: ${idclass}, idcateg: ${idcateg}, type_img: ${type_img},
+                                                idstyle: ${idstyle}, symbol_sign: "${symbol_sign}",
+                                                imgcolor: "${imgcolor}", created_by: ${created_by}) {
+                            id
+                        }
                     }
-                }
-                `
-                this.props.apolloFetch({ query })
-                    .then((data) => {
-                        this.openCloseModal()
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-
-
+                    `
+                    this.props.apolloFetch({ query })
+                        .then((data) => {
+                            this.openCloseModal()
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            } else {
+                this.setState({error: {hidden: false, text: 'Error in image or word'}})
+            }
     }
 
     render() {
@@ -175,16 +209,26 @@ class UploadSymbol extends Component {
         let triggerModal
         if (this.props.type === 'dropdown') {
             triggerModal = <Dropdown.Item
-                            className='icon-pointer'
+                            style={this.props.style}
+                            className='icon-pointer dropdown-item-hover'
                             onClick={this.openCloseModal.bind(this)}>
                                 {t("HOME_NAVBAR_MANAGE_SYMBOL")}
                         </Dropdown.Item>
         } else if (this.props.type === 'button') {
             triggerModal = <Button
+                            style={this.props.style}
                             className='icon-pointer'
                             onClick={this.openCloseModal.bind(this)}>
                                 {t("HOME_NAVBAR_MANAGE_SYMBOL")}
                         </Button>
+        } else if (this.props.type === 'icon') {
+            triggerModal = <Icon
+                            name='upload'
+                            bordered inverted color="teal" size='large'
+                            className={'icon-pointer ' + this.props.className}
+                            style={this.props.style}
+                            onClick={this.openCloseModal.bind(this)}
+                        />
         }
 
         let defaultClass = this.state.classOptions.length === 0 ? '' : this.state.classOptions[this.state.classOptions.length - 1].value
@@ -196,12 +240,16 @@ class UploadSymbol extends Component {
             <Modal trigger={triggerModal} open={this.state.modalOpen}>
                 <Modal.Header>Select an Image</Modal.Header>
                 <Modal.Content>
+                    <Message negative hidden={this.state.error.hidden}>
+                        <Message.Header>Error detected</Message.Header>
+                        <p>{this.state.error.text}</p>
+                    </Message>
                     <Form>
                         <Form.Field>
                             <label>Word</label>
                             <input placeholder='Word' value={this.state.word} onChange={this.wordChange.bind(this)} />
                         </Form.Field>
-                        <Form.Field>
+                        <Form.Field width={6}>
                             <label>Class</label>
                             <Dropdown placeholder='Select Class' selection
                                 options={this.state.classOptions}
@@ -211,9 +259,12 @@ class UploadSymbol extends Component {
                         </Form.Field>
                         <Form.Field>
                             <label>Image Type</label>
-                            <Checkbox label='This image is a private photo' />
+                            <Checkbox label='This image is a private photo'
+                                checked={this.state.privatePhoto}
+                                onChange={this.checkboxPrivate.bind(this)}
+                            />
                         </Form.Field>
-                        <Form.Field>
+                        <Form.Field width={6}>
                             <label>Image Color</label>
                             <Dropdown placeholder='Image Color' selection
                                 options={this.state.colorOptions}
@@ -221,7 +272,7 @@ class UploadSymbol extends Component {
                                 onChange={this.dropdownChange.bind(this, 'color')}
                             />
                         </Form.Field>
-                        <Form.Field>
+                        <Form.Field width={6}>
                             <label>Image Style</label>
                             <Dropdown placeholder='Select Style' selection
                                 options={this.state.styleOptions}
@@ -230,6 +281,7 @@ class UploadSymbol extends Component {
                             />
                         </Form.Field>
                         <Dropzone ref={(node) => { dropzoneRef = node; }}
+                            accept="image/jpeg, image/png"
                             style={{'display': 'none'}}
                             onDrop={this.onDrop.bind(this)}
                         />
@@ -286,10 +338,17 @@ class UploadSymbol extends Component {
                             </Grid.Row>
                         </Grid>
                     </Form>
+                    <Confirm
+                        open={this.state.confirmOpen}
+                        header='This is a custom header'
+                        content='ERROR HANDLING, RECAP AND GUIDE UPLOAD'
+                        onConfirm={this.upload.bind(this)}
+                        onCancel={this.openCloseConfirm.bind(this)}
+                    />
                 </Modal.Content>
                 <Modal.Actions>
                     <Button.Group>
-                        <Button positive onClick={this.upload.bind(this)}>Upload</Button>
+                        <Button positive onClick={this.openCloseConfirm.bind(this)}>Upload</Button>
                         <Button.Or />
                         <Button negative onClick={this.openCloseModal.bind(this)}>Cancel</Button>
                     </Button.Group>

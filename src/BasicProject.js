@@ -3,6 +3,7 @@ import { Message, Menu, Icon, Popup, Button } from 'semantic-ui-react'
 import NavBar from './NavBar'
 import CardUI from './CardUI'
 import PreviewA4Portrait from './PreviewA4Portrait'
+import UploadSymbol from './UploadSymbol'
 import { translate, Trans } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import { withCurrentProject } from './withCurrentProject'
@@ -110,7 +111,7 @@ class BasicProject extends Component {
         if (this.props.match.params.mode === 'view') {
             this.handleMode()
         } else {
-            // Blocca il capitolo, TODO: rivedere per eliminare il timeout
+            // Blocca il capitolo
             let query = `
             mutation BlockChapter {
                 updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
@@ -273,6 +274,11 @@ class BasicProject extends Component {
             )
         }
 
+        let testCustom = this.state.navbarCard.imgAlt.find(x => x.img === this.state.navbarCard.img)
+        let srcImg = testCustom && testCustom.custom ?
+                    window.env.CustomImage + this.state.navbarCard.img :
+                    this.state.urlImg + this.state.navbarCard.img
+
         return (
             <div>
                 <div className="no-print">
@@ -289,7 +295,8 @@ class BasicProject extends Component {
                                 loadingButton={this.state.loadingButton}
                             />
                         </Menu.Item>
-                        <Menu.Item className='navbar-icon' id='navbar-icon'>
+                        <Menu.Item className='navbar-icon fix-display' id='navbar-icon'>
+                            <UploadSymbol type='icon' user={this.props.user} />
                             <Popup
                                 trigger={<Icon name='arrow left' bordered inverted color="teal"
                                     size='large'
@@ -366,7 +373,7 @@ class BasicProject extends Component {
                                 onClick={() => {this.deleteCard()}}
                                 style={{cursor: 'pointer'}}
                             />
-                            <img src={this.state.urlImg + this.state.navbarCard.img}
+                            <img src={srcImg}
                                 style={{'verticalAlign': 'middle',
                                         'marginRight': '10px',
                                         'marginLeft': '10px'}}

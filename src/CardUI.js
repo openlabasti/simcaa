@@ -310,7 +310,7 @@ class CardUI extends Component {
                     idstyle
                 }
             }
-            preload_headword(headword: "${lemma}") {
+            preload_headword(voice_master: "${lemma}") {
                 data {
                     id
                     headword
@@ -537,8 +537,7 @@ class CardUI extends Component {
             localCards.splice(this.state.imgDivId+1, cont)
         }
         this.reorderIds(localCards)
-        // TODO: da rivedere se rimettere
-        // this.setFocusedCard(localCards[index])
+        this.setFocusedCard(localCards[index])
         this.setState({card: localCards, visibleImg: !this.state.visibleImg})
         this.setExpandAll()
     }

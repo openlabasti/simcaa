@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Icon, Button, Form, Message } from 'semantic-ui-react'
+import { Modal, Icon, Button, Form, Message, Dropdown } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 import InputOptions from './InputOptions'
@@ -239,6 +239,14 @@ class NewProfileForm extends Component {
             iconModal = <Button onClick={this.handleOpenCloseModal.bind(this, 'open')}>
                             {t("PRJ_MNU_OPTIONS")}
                         </Button>
+        } else if (this.props.type && this.props.type === 'dropdown') {
+            iconModal = <Dropdown.Item
+                            style={this.props.style}
+                            className='icon-pointer dropdown-item-hover'
+                            onClick={this.handleOpenCloseModal.bind(this, 'open')}
+                        >
+                                Add Profile
+                        </Dropdown.Item>
         } else {
             iconModal = <Icon name='add square'
                 style={this.props.style}

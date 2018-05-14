@@ -28,8 +28,9 @@ class LayoutExport extends Component {
                         {type: 'imgsize', value: 600, text: 'big'},
                         {type: 'imgsize', value: 800, text: 'huge'},
                         {type: 'imgsize', value: 960, text: 'massive'}],
+            customSymbolSize: '',
             customImgs: [],
-            multipleDrag: false,
+            multipleDrag: {on: false, key: ''},
             listMultipleDragIds: [],
             saveMessage: true,
             finishLoad: false,
@@ -65,7 +66,11 @@ class LayoutExport extends Component {
                 let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
                 let layout = JSON.parse(data.data.projects.data[0].proj_layout)
 
+                // Pulisco dalle card vuote
                 this.cleanCard(stateCard)
+
+                // Definisco la nuova dimensione dei simboli
+                let newSymbolSize = this.state.customSymbolSize !== '' ? this.state.customSymbolSize : profile.imgSize
 
                 if (savedTypo === null || savedTypo.length === 0) {
                     // Salvo il width delle card
@@ -121,11 +126,13 @@ class LayoutExport extends Component {
                             }
                         }
                     }
-                    this.setState({savedProject: data.data.chapters.data[0], cards: stateCard, profile, layout})
+                    this.setState({savedProject: data.data.chapters.data[0], cards: stateCard,
+                                    profile, layout, customSymbolSize: newSymbolSize})
                 } else {
                     let typoCard = savedTypo.card
                     let typoImg = savedTypo.img
-                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, customImgs: typoImg, profile, layout})
+                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard,
+                                    customImgs: typoImg, profile, layout , customSymbolSize: newSymbolSize})
                 }
             })
             .catch((error) => {
@@ -149,12 +156,36 @@ class LayoutExport extends Component {
 
     // Change all cards size
     onChangeDropdown(event, data) {
+        let currentSelectedSize = this.state.imageSize.find(x => x.value === data.value)
         let localCard = this.state.cards
         for (var i = 0; i < localCard.length; i++) {
             localCard[i].rndWidth = data.value + 28
             localCard[i].rndHeight = data.value + 40 + 28
         }
-        this.setState({cards: localCard})
+        this.setState({cards: localCard, customSymbolSize: currentSelectedSize.text, finishLoad: false}, () => {
+            // Ricalcolo le dimensioni delle card
+            let numCard = document.getElementsByClassName('uicardlayout');
+            let cardHeight = document.getElementById('layout-0').offsetHeight
+            let cardWidth = []
+            let inWhile = false
+
+            for (let i = 0; i < numCard.length; i++) {
+                let inputResize = document.getElementById('textLayout-' + i)
+                if (inputResize) {
+                    // TODO: RIVEDERE PER IL CALCOLO DELLO SPAZIO
+                    if (inputResize.scrollWidth > inputResize.clientWidth) {
+                        document.getElementsByClassName('typoCard-' + i)[0].style.width = 'auto'
+                    }
+                    cardWidth[i] = document.getElementById('layout-' + i).offsetWidth
+                }
+            }
+
+            sessionStorage.setItem('cardWidth', cardWidth)
+            sessionStorage.setItem('cardHeight', cardHeight)
+            this.componentWillMount()
+
+
+        })
     }
 
     // DnD of cards
@@ -251,27 +282,39 @@ class LayoutExport extends Component {
         this.setState({customImgs: localImgs})
     }
 
+    // Multiple Drag Set
     setMultipleDrag(e) {
         if (e.shiftKey) {
-            this.setState({multipleDrag: true})
+            this.setState({multipleDrag: {on: true, key: 'shift'}})
+        } else if (e.ctrlKey) {
+            this.setState({multipleDrag: {on: true, key: 'ctrl'}})
         } else {
-            this.setState({multipleDrag: false})
+            this.setState({multipleDrag: {on: false, key: ''}})
         }
         if (e.shiftKey && e.ctrlKey) {
             for (let i = 0; i < this.state.listMultipleDragIds.length; i++) {
                 document.getElementById('layout-' + this.state.listMultipleDragIds[i]).classList.remove('multipleDrag')
             }
-            this.setState({multipleDrag: false, listMultipleDragIds: []})
+            this.setState({multipleDrag: {on: false, key: ''}, listMultipleDragIds: []})
         }
     }
 
+    // Controlla se una o più card sono selezionate per il multiple drag
     checkMultipleDrag(item, e) {
-        if (this.state.multipleDrag) {
+        if (this.state.multipleDrag.on === true) {
             let localListIds = this.state.listMultipleDragIds
             let ifInList = localListIds.indexOf(item.id)
             if (ifInList < 0) {
-                document.getElementById('layout-' + item.id).classList.add('multipleDrag')
-                localListIds.push(item.id)
+                if (this.state.multipleDrag.key === 'shift' && localListIds.length === 1) {
+                    let minMaxId = [localListIds[0], item.id]
+                    for (let i = Math.min(...minMaxId); i <= Math.max(...minMaxId); i++) {
+                        localListIds.push(i)
+                        document.getElementById('layout-' + i).classList.add('multipleDrag')
+                    }
+                } else {
+                    document.getElementById('layout-' + item.id).classList.add('multipleDrag')
+                    localListIds.push(item.id)
+                }
             } else {
                 document.getElementById('layout-' + item.id).classList.remove('multipleDrag')
                 localListIds.splice(ifInList, 1)
@@ -280,6 +323,7 @@ class LayoutExport extends Component {
         }
     }
 
+    // Save to PDF, NON FUNZIONANTE TODO: DA RIVEDERE
     printDocument() {
       const input = document.getElementById('printable-div');
       html2canvas(document.body, {allowTaint: true, useCORS: true, proxy:'127.0.0.1'})
@@ -348,6 +392,7 @@ class LayoutExport extends Component {
         return new Promise((resolve) => setTimeout(resolve, time))
     }
 
+    // Distanzia le card se serve
     componentDidUpdate() {
         if (this.state.finishLoad === false) {
             let self = this
@@ -407,6 +452,7 @@ class LayoutExport extends Component {
                         onResize={this.resize.bind(this, item)}
                         minHeight= '150'
                         minWidth= '100'
+                        className={'typoCard-' + index}
                     >
                         <div style={{"width": "100%", "height":"100%"}} onClick={this.checkMultipleDrag.bind(this, item)}>
                             <CardLayout
@@ -423,7 +469,7 @@ class LayoutExport extends Component {
                                 weightInput= {this.state.profile.weightInput}
                                 decorationInput= {this.state.profile.decorationInput}
                                 fontStyleInput= {this.state.profile.fontStyleInput}
-                                imgSize= {this.state.profile.imgSize}
+                                imgSize= {this.state.customSymbolSize}
                                 imgPadding= {this.state.profile.imgPadding}
                                 imgType= {this.state.profile.imgType}
                                 borderCard= {this.state.profile.borderCard}

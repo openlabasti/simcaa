@@ -110,9 +110,15 @@ body {
     background-color: #f6f6f6;
 }
 
-/* Fix for table header in HOMEPAGE */
-#header-table-icon-project > div:first-child, #header-table-icon-profile > div:first-child {
+/* Fix for display inline if in component, ONLY WORKS ON FIRST CHILD (Watch RootComponent for Example) */
+.fix-display > div:first-child {
     display: inline-block !important;
+}
+
+/* Fix for dropdown item upload symbol in homepage */
+.dropdown-item-hover:hover {
+    background: rgba(0,0,0,.05) !important;
+    color: rgba(0,0,0,.95) !important;
 }
 
 .ui.card {

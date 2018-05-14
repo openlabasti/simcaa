@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader, Menu, Dropdown, Dimmer } from 'semantic-ui-react'
+import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader, Menu, Dropdown, Dimmer, Pagination } from 'semantic-ui-react'
 import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
@@ -23,6 +23,17 @@ class RootComponent extends Component {
             optionsProfiles: [{}],
             optionsLayouts: [{}],
             fetchFinished: false,
+
+            // Pagination state variables
+            currentPage: 1,
+            totalPages: 5,
+            total: 0,
+            limit: 15,
+            page: 1,
+
+            // Sort Table variables
+            direction: 'ascending',
+            column: null,
         }
     }
 
@@ -30,7 +41,9 @@ class RootComponent extends Component {
     componentWillMount() {
         let query = `
         query allProjects {
-            projects(proj_owner: ${this.props.user.id}, is_public: ${true}) {
+            projects(proj_owner: ${this.props.user.id}, is_public: ${true},
+                    limit: ${this.state.limit}, page: ${this.state.page}) {
+                total
                 data {
                     id
                     proj_name
@@ -38,6 +51,7 @@ class RootComponent extends Component {
                     proj_note
                     proj_owner
                     proj_layout
+                    updated_at
                 }
             }
             profiles(profile_user_id: ${this.props.user.id}) {
@@ -82,6 +96,8 @@ class RootComponent extends Component {
                                 layouts: data.data.layouts.data,
                                 optionsProfiles: localOptionsProfile,
                                 optionsLayouts: localOptionsLayout,
+                                total: data.data.projects.total,
+                                totalPages: Math.ceil(data.data.projects.total / this.state.limit),
                                 fetchFinished: true})
             })
             .catch((error) => {
@@ -297,6 +313,29 @@ class RootComponent extends Component {
             })
     }
 
+    // Change page on Project Table
+    changePageProject(e, activePage) {
+        this.setState({page: activePage.activePage}, () => {
+            this.componentWillMount()
+        })
+    }
+
+    // Sort the Project Table
+    handleSort(column, e) {
+        if (this.state.column !== column) {
+            let localProject = this.state.projects.sort((a, b) => {
+                return a[column] - b[column]
+            })
+            this.setState({column, direction: 'ascending', projects: localProject})
+        } else {
+            this.setState({
+                projects: this.state.projects.reverse(),
+                direction: this.state.direction === 'ascending' ? 'descending' : 'ascending',
+            })
+        }
+
+    }
+
     // Escape quotes if needed
     escapeQuotes(item) {
         if (typeof item === 'string' || item instanceof String) {
@@ -325,10 +364,10 @@ class RootComponent extends Component {
                             {item.proj_name}
                         </Link>
                     </Table.Cell>
-                    <Table.Cell>{item.proj_note}</Table.Cell>
+                    <Table.Cell>{item.updated_at}</Table.Cell>
                     <Table.Cell collapsing>{item.proj_share === 0 ? t("MAIN_TBL_PRIVATE") : t("MAIN_TBL_PUBLIC")}</Table.Cell>
                     <Table.Cell collapsing textAlign='center'>{item.proj_owner}</Table.Cell>
-                    <Table.Cell collapsing textAlign='right'>
+                    <Table.Cell collapsing textAlign='right' className='fix-display'>
                         <NewProjectForm
                             className='icon-pointer'
                             size='big'
@@ -338,11 +377,13 @@ class RootComponent extends Component {
                             optionsProfiles={this.state.optionsProfiles}
                             optionsLayouts={this.state.optionsLayouts}
                         />
-                        <Icon name='trash' color='red' size='big'
-                            className='icon-pointer'
-                            disabled={this.props.user.id !== item.proj_owner ? true : false}
-                            onClick={this.handleOpenConfirmProject.bind(this, item.id)}
-                        />
+                        <div style={{display: 'inline-block'}}>
+                            <Icon name='trash' color='red' size='big'
+                                className='icon-pointer'
+                                disabled={this.props.user.id !== item.proj_owner ? true : false}
+                                onClick={this.handleOpenConfirmProject.bind(this, item.id)}
+                            />
+                        </div>
                     </Table.Cell>
                 </Table.Row>
             )
@@ -352,12 +393,12 @@ class RootComponent extends Component {
             return (
                 <Table.Row key={index}>
                     <Table.Cell collapsing>{item.id}</Table.Cell>
-                    <Table.Cell collapsing>
+                    <Table.Cell collapsing >
                         {item.profile_name}
                     </Table.Cell>
                     <Table.Cell>{item.profile_user_id}</Table.Cell>
                     <Table.Cell>{item.profile_system}</Table.Cell>
-                    <Table.Cell collapsing textAlign='right' disabled={item.id === 1 ? true : false}>
+                    <Table.Cell collapsing textAlign='right' disabled={item.id === 1 ? true : false} className='fix-display'>
                         <NewProfileForm
                             className='icon-pointer'
                             size='big'
@@ -365,11 +406,13 @@ class RootComponent extends Component {
                             data={item.profile_conf}
                             updateProfile={this.updateProfile.bind(this, item.id)}
                         />
-                        <Icon name='trash' color='red' size='big'
-                            className='icon-pointer'
-                            disabled={item.id === 1 ? true : false}
-                            onClick={this.handleOpenConfirmProfile.bind(this, item.id)}
-                        />
+                        <div style={{display: 'inline-block'}}>
+                            <Icon name='trash' color='red' size='big'
+                                className='icon-pointer'
+                                disabled={item.id === 1 ? true : false}
+                                onClick={this.handleOpenConfirmProfile.bind(this, item.id)}
+                            />
+                        </div>
                     </Table.Cell>
                 </Table.Row>
             )
@@ -399,6 +442,12 @@ class RootComponent extends Component {
                         <Dropdown item text={t("HOME_NAVBAR_MANAGE")}>
                             <Dropdown.Menu>
                                 <UploadSymbol type='dropdown' user={this.props.user} />
+                                <NewProfileForm
+                                    className='icon-pointer'
+                                    size='big'
+                                    type='dropdown'
+                                    createProfile={this.createProfile.bind(this)}
+                                />
                             </Dropdown.Menu>
                         </Dropdown>
                         <Dropdown item text={t("HOME_NAVBAR_USER")}>
@@ -414,7 +463,7 @@ class RootComponent extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large' id='header-table-icon-project'>
+                                <Header size='large' className='fix-display'>
                                     <NewProjectForm
                                         className='icon-pointer'
                                         size='big'
@@ -429,13 +478,33 @@ class RootComponent extends Component {
                                         </Header.Subheader>
                                     </Header.Content>
                                 </Header>
-                                <Table celled striped color='blue'>
+                                <Table celled striped color='blue' sortable>
                                     <Table.Header>
                                         <Table.Row>
-                                            <Table.HeaderCell>ID</Table.HeaderCell>
-                                            <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
-                                            <Table.HeaderCell>Date Update</Table.HeaderCell>
-                                            <Table.HeaderCell>{t("MAIN_TBL_SHARE")}</Table.HeaderCell>
+                                            <Table.HeaderCell
+                                                sorted={this.state.column === 'id' ? this.state.direction : null}
+                                                onClick={this.handleSort.bind(this, 'id')}
+                                            >
+                                                ID
+                                            </Table.HeaderCell>
+                                            <Table.HeaderCell
+                                                sorted={this.state.column === 'proj_name' ? this.state.direction : null}
+                                                onClick={this.handleSort.bind(this, 'proj_name')}
+                                            >
+                                                {t("MAIN_TBL_NAME")}
+                                            </Table.HeaderCell>
+                                            <Table.HeaderCell
+                                                sorted={this.state.column === 'updated_at' ? this.state.direction : null}
+                                                onClick={this.handleSort.bind(this, 'updated_at')}
+                                            >
+                                                Date Update
+                                            </Table.HeaderCell>
+                                            <Table.HeaderCell
+                                                sorted={this.state.column === 'proj_share' ? this.state.direction : null}
+                                                onClick={this.handleSort.bind(this, 'proj_share')}
+                                            >
+                                                {t("MAIN_TBL_SHARE")}
+                                            </Table.HeaderCell>
                                             <Table.HeaderCell>User Owner</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
@@ -444,6 +513,18 @@ class RootComponent extends Component {
                                     <Table.Body>
                                         {allProjects}
                                     </Table.Body>
+
+                                    <Table.Footer>
+                                        <Table.Row>
+                                            <Table.HeaderCell colSpan='6'>
+                                                <Pagination
+                                                    defaultActivePage={this.state.currentPage}
+                                                    totalPages={this.state.totalPages}
+                                                    onPageChange={this.changePageProject.bind(this)}
+                                                />
+                                            </Table.HeaderCell>
+                                        </Table.Row>
+                                    </Table.Footer>
                                 </Table>
                             </Segment>
                         </Grid.Column>
@@ -451,12 +532,7 @@ class RootComponent extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Segment>
-                                <Header size='large' id='header-table-icon-profile'>
-                                    <NewProfileForm
-                                        className='icon-pointer'
-                                        size='big'
-                                        createProfile={this.createProfile.bind(this)}
-                                    />
+                                <Header size='large'>
                                     <Header.Content>
                                         {t("MAIN_LBL_ALLPROFILE")}
                                         <Header.Subheader>

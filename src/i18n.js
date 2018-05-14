@@ -130,6 +130,54 @@ i18n
                     "PRJ_FRM_LAYOUT": "Layout del capitolo",
                     "PRJ_BTN_CREATE": "Crea Capitolo",
                     "PRJ_BTN_CLOSE": "Chiudi",
+
+                    //MISC
+                    "INTERROR_HEADER": "Si è verificato un errore!",
+                    "INTERROR_BODY": "C'è un problema di sistema, riprovare più tardi",
+                    "BTN_CONTINUE": "Continua",
+                    "BTN_DENY": "Annulla",
+                    "BTN_CONFIRM": "Conferma",
+                    "BTN_MOD": "Modifica",
+
+                    //ADMINISTRATION
+
+                    //ADMIN-MENU
+                    "ADM_MNU_USRS": "Utenti",
+                    "ADM_MNU_GROUPS": "Gruppi di lavoro",
+                    "ADM_MNU_BACK": "Torna ai progetti",
+
+                    //ADMIN-AllUsers
+                    "TBL_NAME" : "Nome",
+                    "TBL_USR" : "Username",
+                    "TBL_EMAIL" : "Email",
+                    "TBL_ORG" : "Organizzazione",
+                    "TBL_LWEB" : "Sito Web",
+                    "TBL_GROUP" : "Ruolo",
+                    "TBL_TEAM" : "Team",
+                    "TBL_ACTION" : "Azione",
+                    "DELETE_CNF_H": "Questa azione è irreversibile!",
+                    "DELETE_CNF_C": "Sei sicuro di voler eliminare l'utente?",
+                    "LOADING": "Sto caricando....",
+                    "POPUP_DEL": "Elimina",
+                    "POPUP_MOD": "Configura",
+
+                    //ADMIN-NewUserForm
+                    "POPUP_ADD": "Aggiungi utente",
+                    "MODAL_HEADER": "Nuovo utente",
+                    "MISSING_DATA_H": "Dati mancanti!",
+                    "MISSING_DATA_C": "I campi segnati con * sono obbligatori",
+                    "CREATED_USR_H": "Tutto ok!",
+                    "CREATED_USR_C": "Utente creato correttamente",
+
+                    //ADMIN-UsrConfig
+                    "USR_CNFG_H": "Modifica Utente",
+                    "USR_CNFG_CUR_VAL": "Valore Attuale",
+                    "USR_CNFG_NEW_VAL": "Nuovo Valore",
+
+
+
+
+
                 }
             },
             en: {
@@ -255,7 +303,51 @@ i18n
                     "PRJ_FRM_TITLE": "Chapter Title",
                     "PRJ_FRM_LAYOUT": "Chapter Layout",
                     "PRJ_BTN_CREATE": "Create Chapter",
-                    "PRJ_BTN_CLOSE": "Close"
+                    "PRJ_BTN_CLOSE": "Close",
+
+                    //MISC
+                    "INTERROR_HEADER": "An error occured!",
+                    "INTERROR_BODY": "System erro, try again later",
+                    "BTN_CONTINUE": "Continue",
+                    "BTN_DENY": "Deny",
+                    "BTN_CONFIRM": "Confirm",
+                    "BTN_MOD": "Modify",
+
+                    //ADMINISTRATION
+
+                    //ADMIN-MENU
+                    "ADM_MNU_USRS": "Users",
+                    "ADM_MNU_GROUPS": "Teams",
+                    "ADM_MNU_BACK": "Go back to projects",
+
+                    //ADMIN-ALLUSERS
+                    "TBL_NAME" : "Name",
+                    "TBL_USR" : "Username",
+                    "TBL_EMAIL" : "Email",
+                    "TBL_ORG" : "Organization",
+                    "TBL_LWEB" : "Website",
+                    "TBL_GROUP" : "Role",
+                    "TBL_TEAM" : "Team",
+                    "TBL_ACTION" : "Action",
+                    "DELETE_CNF_H": "This action cannot be reversed!",
+                    "DELETE_CNF_C": "Do you really want to delete the user?",
+                    "LOADING": "I'm loading....",
+                    "POPUP_DEL": "Delete",
+                    "POPUP_MOD": "Manage",
+
+                    //ADMIN-NewUserForm
+                    "POPUP_ADD": "Add user",
+                    "MODAL_HEADER": "New user",
+                    "MISSING_DATA_H": "Missing data!",
+                    "MISSING_DATA_C": "Field checked with * are mandatory",
+                    "CREATED_USR_H": "Everything ok!",
+                    "CREATED_USR_C": "User succesfully created",
+
+                    //ADMIN-UsrConfig
+                    "USR_CNFG_H": "User Configuration",
+                    "USR_CNFG_CUR_VAL": "Current Value",
+                    "USR_CNFG_NEW_VAL": "New Value",
+
                 }
             }
         },

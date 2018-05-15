@@ -333,7 +333,16 @@ class CardUI extends Component {
 
         let thenVar = (data) => {
             let newDataSorting = data.data.query_view.data
-            let completeOrderedArray = this.prioritySort(newDataSorting, lemma)
+            let imgAltQuery2 = data.data.preload_headword.data
+            let completeOrderedArray
+            let noDataView
+            if (newDataSorting.length > 0) {
+                completeOrderedArray = this.prioritySort(newDataSorting, lemma)
+                noDataView = false
+            } else {
+                completeOrderedArray = this.prioritySort(imgAltQuery2, lemma)
+                noDataView = true
+            }
 
             // TODO: Cambiare una volta aggiunto il multilingua
             // Identifica la classe del lemma
@@ -377,25 +386,28 @@ class CardUI extends Component {
             array[index].imgAlt = []
             array[index].complex = completeOrderedArray[0].lexical_expr
             array[index].row = row
+
             for (let i=0; i<completeOrderedArray.length; i++) {
                 array[index].imgAlt.splice(i, 0, {voice_human: completeOrderedArray[i].voice_human,
                                                 voice_start: completeOrderedArray[i].voice_master,
                                                 img: completeOrderedArray[i].symbol_sign,
-                                                complex: completeOrderedArray[i].lexical_expr
+                                                complex: completeOrderedArray[i].lexical_expr,
+                                                custom: noDataView
                                                 })
             }
 
             // accodo le img della seconda query
             // TODO: vedere meglio con ordinamento
-            let imgAltQuery2 = data.data.preload_headword.data
-            for (let i = 0; i < imgAltQuery2.length; i++) {
-                array[index].imgAlt.splice(i + array[index].imgAlt.length, 0,
-                                                {voice_human: imgAltQuery2[i].headword,
-                                                voice_start: imgAltQuery2[i].headword,
-                                                img: imgAltQuery2[i].symbol_sign,
-                                                complex: imgAltQuery2[i].lexical_expr,
-                                                custom: true,
-                                                })
+            if (newDataSorting.length > 0 && imgAltQuery2.length > 0) {
+                for (let i = 0; i < imgAltQuery2.length; i++) {
+                    array[index].imgAlt.splice(i + array[index].imgAlt.length, 0,
+                        {voice_human: imgAltQuery2[i].headword,
+                            voice_start: imgAltQuery2[i].headword,
+                            img: imgAltQuery2[i].symbol_sign,
+                            complex: imgAltQuery2[i].lexical_expr,
+                            custom: true,
+                        })
+                    }
             }
 
             this.setState({card: array})
@@ -451,7 +463,7 @@ class CardUI extends Component {
     prioritySort(newDataSorting, lemma) {
         let count = 0
         for (let item of newDataSorting) {
-            if (item.voice_human === lemma) {
+            if (item.voice_human === lemma || item.headword === lemma) {
                 count++
             }
         }

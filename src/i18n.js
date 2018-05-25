@@ -143,7 +143,7 @@ i18n
 
                     //ADMIN-MENU
                     "ADM_MNU_USRS": "Utenti",
-                    "ADM_MNU_GROUPS": "Gruppi di lavoro",
+                    "ADM_MNU_GROUPS": "Teams",
                     "ADM_MNU_BACK": "Torna ai progetti",
 
                     //ADMIN-AllUsers
@@ -173,6 +173,19 @@ i18n
                     "USR_CNFG_H": "Modifica Utente",
                     "USR_CNFG_CUR_VAL": "Valore Attuale",
                     "USR_CNFG_NEW_VAL": "Nuovo Valore",
+                    "USR_CNFG_MISSING_DATA_H": "Dato Mancante!",
+                    "USR_CNFG_MISSING_DATA_B": "Devi specificare un valore per il dato da modificare",
+
+                    //ADMIN-AllGroups
+                    "ALLGROUPS_REMOVE": "Sei sicuro di voler rimuovere l'utente dal gruppo?",
+                    "ADDUSR_HELPER": "Cerca l'utente da inserire nel team:",
+                    "ALLGROUPS_ADDUSR_H": "Aggiunta Utente",
+                    "ADDUSR_SEARCH_NAME": "Per nome e cognome",
+                    "ADDUSR_SEARCH_EMAIL": "Per email",
+                    "ADDUSR_SEARCH_USER": "Per username",
+                    "ADDUSR_SEARCH_BTN": "Cerca",
+                    "ADDUSR_MISSING_DATA": "Devi inserire almeno un valore nei campi di ricerca!",
+
 
 
 
@@ -347,6 +360,18 @@ i18n
                     "USR_CNFG_H": "User Configuration",
                     "USR_CNFG_CUR_VAL": "Current Value",
                     "USR_CNFG_NEW_VAL": "New Value",
+                    "USR_CNFG_MISSING_DATA_H": "Missing Data!",
+                    "USR_CNFG_MISSING_DATA_B": "You must specify a proper value in order to modify the attribute",
+
+                    //ADMIN-AllGroups
+                    "ALLGROUPS_REMOVE": "Do you really want to remove the user from the team?",
+                    "ADDUSR_HELPER": "Search for the user to insert in the team:",
+                    "ALLGROUPS_ADDUSR_H": "Adding User",
+                    "ADDUSR_SEARCH_NAME": "By name & surname",
+                    "ADDUSR_SEARCH_EMAIL": "By email",
+                    "ADDUSR_SEARCH_USER": "By username",
+                    "ADDUSR_SEARCH_BTN": "Search",
+                    "ADDUSR_MISSING_DATA": "You must specify at least one of the search parameters",
 
                 }
             }

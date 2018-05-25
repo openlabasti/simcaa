@@ -12,10 +12,10 @@ window.env = {
     "MediaImage": "http://www.simcaa.it/demo/media/images/",
 
     // Local
-    // "CustomImage": "http://10.0.0.132/media/custom/",
-    // "ApiImageUpload": "http://10.0.0.132:8086/imageupload",
-    // "MediaImage": "http://10.0.0.132/media/images/",
-
+    /* "CustomImage": "http://10.0.0.132/media/custom/",
+     "ApiImageUpload": "http://10.0.0.132:8086/imageupload",
+     "MediaImage": "http://10.0.0.132/media/images/",
+     */
     //  URL
     // Online Radis-Svil
     // "GraphQLServer": "http://www.radis-svil.it/simcaa/apisimcaa-graphql/public/graphql/query",
@@ -27,6 +27,7 @@ window.env = {
 
     //  URL
     // Online Simcaa.it
+
     "GraphQLServer": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query",
     "GraphQLServerNoAuth": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/query/noauth",
     "GraphQLLogin": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/login",
@@ -35,13 +36,14 @@ window.env = {
     "RestApiCard": "http://www.simcaa.it/demo/apisimcaa-graphql/public/graphql/card",
 
     // Local
-    // "GraphQLServer": "http://10.0.0.132:8085/graphql/query",
-    // "GraphQLServerNoAuth": "http://10.0.0.132:8085/graphql/query/noauth",
-    // "GraphQLLogin": "http://10.0.0.132:8085/graphql/login",
-    // "GraphQLCurrentUser": "http://10.0.0.132:8085/graphql/me",
-    // "GraphQLRefreshToken": "http://10.0.0.132:8085/graphql/jwtrefresh",
-    // "RestApiCard": "http://10.0.0.132:8085/graphql/card",
-
+    /*
+     "GraphQLServer": "http://10.0.0.132:8085/graphql/query",
+     "GraphQLServerNoAuth": "http://10.0.0.132:8085/graphql/query/noauth",
+     "GraphQLLogin": "http://10.0.0.132:8085/graphql/login",
+     "GraphQLCurrentUser": "http://10.0.0.132:8085/graphql/me",
+     "GraphQLRefreshToken": "http://10.0.0.132:8085/graphql/jwtrefresh",
+     "RestApiCard": "http://10.0.0.132:8085/graphql/card",
+     */
     // HOMEPAGE MESSAGE
     "blue_text_header": "To test this Demo",
     "blue_text_content": "<p>Username: user</p>Password: user",

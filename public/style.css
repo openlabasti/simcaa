@@ -121,6 +121,7 @@ body {
     color: rgba(0,0,0,.95) !important;
 }
 
+/* Fix for autoexpand of the card */
 .ui.card {
     width: auto;
 }

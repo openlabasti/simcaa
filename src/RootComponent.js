@@ -376,6 +376,7 @@ class RootComponent extends Component {
                             updateProject={this.updateProject.bind(this)}
                             optionsProfiles={this.state.optionsProfiles}
                             optionsLayouts={this.state.optionsLayouts}
+                            disabled={this.props.user.id !== item.proj_owner ? true : false}
                         />
                         <div style={{display: 'inline-block'}}>
                             <Icon name='trash' color='red' size='big'
@@ -405,6 +406,7 @@ class RootComponent extends Component {
                             edit='icon'
                             data={item.profile_conf}
                             updateProfile={this.updateProfile.bind(this, item.id)}
+                            disabled={item.id === 1 ? true : false}
                         />
                         <div style={{display: 'inline-block'}}>
                             <Icon name='trash' color='red' size='big'

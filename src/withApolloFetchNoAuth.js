@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { createApolloFetch } from 'apollo-fetch'
 import { Redirect } from 'react-router-dom'
 
-export const withApolloFetchNoAuth = (WrappedComponent) => {
+export const withApolloFetchNoAuth = (WrappedComponent, styleDiv) => {
     return class withApolloFetchNoAuth extends Component {
         constructor(props) {
             super(props)
@@ -36,7 +36,7 @@ export const withApolloFetchNoAuth = (WrappedComponent) => {
                 )
             } else {
                 return (
-                    <div>
+                    <div style={styleDiv}>
                         <WrappedComponent {...this.props} apolloFetchNoAuth={this.state.apolloFetchNoAuth} />
                     </div>
                 )

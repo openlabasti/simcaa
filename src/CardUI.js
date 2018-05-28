@@ -14,7 +14,7 @@ class CardUI extends Component {
                     lemmaPrevious: 'React',
                     img: 'react.png',
                     sinonimi: 0,
-                    imgAlt: [{voice_human: 'react',voice_start: 'react', img: 'react.png'}],
+                    imgAlt: [{voice_human: 'react',voice_master: 'react', img: 'react.png'}],
                     lock: 'unlock',
                     codClass: 'Altro',
                     complex: '0',
@@ -25,7 +25,7 @@ class CardUI extends Component {
                     lemmaPrevious: 'React',
                     img: 'react.png',
                     sinonimi: 0,
-                    imgAlt: [{voice_human: 'react',voice_start: 'react', img: 'react.png'}],
+                    imgAlt: [{voice_human: 'react',voice_master: 'react', img: 'react.png'}],
                     lock: 'unlock',
                     codClass: 'Altro',
                     complex: '0',
@@ -389,7 +389,7 @@ class CardUI extends Component {
 
             for (let i=0; i<completeOrderedArray.length; i++) {
                 array[index].imgAlt.splice(i, 0, {voice_human: completeOrderedArray[i].voice_human,
-                                                voice_start: completeOrderedArray[i].voice_master,
+                                                voice_master: completeOrderedArray[i].voice_master,
                                                 img: completeOrderedArray[i].symbol_sign,
                                                 complex: completeOrderedArray[i].lexical_expr,
                                                 custom: noDataView
@@ -402,7 +402,7 @@ class CardUI extends Component {
                 for (let i = 0; i < imgAltQuery2.length; i++) {
                     array[index].imgAlt.splice(i + array[index].imgAlt.length, 0,
                         {voice_human: imgAltQuery2[i].headword,
-                            voice_start: imgAltQuery2[i].headword,
+                            voice_master: imgAltQuery2[i].headword,
                             img: imgAltQuery2[i].symbol_sign,
                             complex: imgAltQuery2[i].lexical_expr,
                             custom: true,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Segment, Button } from 'semantic-ui-react'
-import { Link, Redirect, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 
@@ -8,6 +8,24 @@ class NavBar extends Component {
     // Triggera il salvataggio del progetto
     triggerSaveProject(page, e) {
         this.props.save(page)
+    }
+
+    toTypoView() {
+        let size = this.getSizeCard()
+        sessionStorage.setItem('cardWidth', size.width)
+        sessionStorage.setItem('cardHeight', size.height)
+        this.props.history.push('/layout/view/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
+    }
+
+    // Get dimension of cards
+    getSizeCard() {
+        let numCard = document.getElementsByClassName('cardUI');
+        let cardHeight = document.getElementById('card-0').offsetHeight
+        let cardWidth = []
+        for (let i = 0; i < numCard.length; i++) {
+            cardWidth[i] = document.getElementById('card-' + i).offsetWidth
+        }
+        return {width: cardWidth, height: cardHeight}
     }
 
     // Sblocca il capitolo alla sua chiusura
@@ -41,6 +59,9 @@ class NavBar extends Component {
             return (
                 <Segment basic>
                     <Button color='red' onClick={this.closeChapter.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
+                    <Button color='violet' onClick={this.toTypoView.bind(this)}>
+                        {t("HEAD_BTN_TYPO")}
+                    </Button>
                 </Segment>
             )
         } else {

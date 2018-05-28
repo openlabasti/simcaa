@@ -173,7 +173,7 @@ class BasicProject extends Component {
                 let size = this.getSizeCard()
                 sessionStorage.setItem('cardWidth', size.width)
                 sessionStorage.setItem('cardHeight', size.height)
-                this.props.history.push('/layout/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
+                this.props.history.push('/layout/edit/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid)
             }
         });
     }

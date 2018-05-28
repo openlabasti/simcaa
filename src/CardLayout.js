@@ -70,6 +70,13 @@ class CardLayout extends Component {
         let inputBorder = this.props.transparent === 'normal' ? false : true
         let imgFullWidth = this.props.imgFullWidth ? 'imgFullWidth' : ''
 
+        let srcImg = ''
+        if (this.props.Card.custom !== undefined && this.props.Card.custom === true) {
+            srcImg = window.env.CustomImage
+        } else {
+            srcImg = this.props.urlImg
+        }
+
         let styles = {}
         if (this.props.Style && this.props.borderCard) {
             styles = Object.assign({}, this.props.Style, this.state.borderCard[this.state.card.codClass]);
@@ -95,17 +102,19 @@ class CardLayout extends Component {
 
         let cardImage = <Card.Content className={this.props.imgPadding}>
                             <Image
-                                src={this.props.urlImg + this.state.card.img}
+                                src={srcImg + this.state.card.img}
                                 className={imgFullWidth}
                                 size={this.props.imgSize}
                             />
                         </Card.Content>
+
         if (this.props.posInput === 'bottom' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'layout-' + this.state.card.id}
+                    id={this.props.isTitle ? null : 'layout-' + this.state.card.id}
                     style={{...styles}}
                     className='uicardlayout'
+                    onClick={this.props.onClick}
                 >
                     {cardImage}
                     {cardInput}
@@ -115,9 +124,10 @@ class CardLayout extends Component {
         else if (this.props.posInput === 'top' && this.props.isTypo === true) {
             return(
                 <Card
-                    id={'layout-' + this.state.card.id}
+                    id={this.props.isTitle ? null : 'layout-' + this.state.card.id}
                     style={{...styles}}
                     className="uicardlayout"
+                    onClick={this.props.onClick}
                 >
                     {cardInput}
                     {cardImage}

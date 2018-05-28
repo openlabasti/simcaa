@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Header, Image, Modal } from 'semantic-ui-react'
+import { Button, Header, Image, Modal, Segment, Icon, Accordion } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
 import { withRouter } from 'react-router-dom'
@@ -12,9 +12,30 @@ class CustomImgsDnDUpload extends Component{
         this.state = {
             message: "MODAL_IMGS_DND_HELPER",
             files: [],
+            filesOld: [],
             loading: false,
             openModal: false,
+            openAccordion: false,
         }
+    }
+
+    componentWillMount() {
+        let projectid = this.props.match.params.projectid
+        let chapterid = this.props.match.params.chapterid
+        let url = window.env.ApiImageUpload + '/' + projectid + '/' + chapterid + '/list'
+        let request = new Request(url,{
+            method : 'GET',
+            mode: 'cors',
+        })
+
+        fetch(request)
+            .then((response) => {return response.json()})
+            .then((data) => {
+                this.setState({filesOld: Object.values(data)})
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     onDrop(file) {
@@ -48,9 +69,20 @@ class CustomImgsDnDUpload extends Component{
         })
     }
 
-    // Toggle open/close of the modal
+    insertOldImg(item, e) {
+        let insertImg = [{name: item, old: true}]
+        this.props.handler(insertImg)
+        this.handleOpenCloseModal()
+    }
+
+    // Toggle open/close of the Modal
     handleOpenCloseModal() {
         this.setState({openModal: !this.state.openModal})
+    }
+
+    // Toggle open/close of the Accordion
+    handleOpenCloseAccordion() {
+        this.setState({openAccordion: !this.state.openAccordion})
     }
 
     render(){
@@ -70,11 +102,49 @@ class CustomImgsDnDUpload extends Component{
                 <Loader color="#26A65B" size="16px" margin="4px"/>
             </div>
 
+        let imgOld = this.state.filesOld
+        imgOld = imgOld.map((item, index) => {
+            return (
+                <div
+                    onClick={this.insertOldImg.bind(this, item)}
+                    key={index}
+                    style={{display: 'inline-block'}}
+                    className='icon-pointer'
+                >
+                    <Image size='small' src={window.env.MediaImage + this.props.match.params.projectid + '/' + item}
+                    />
+                </div>
+            )
+        })
+
+        let triggerButton = <Button disabled={this.props.disabled}
+                                onClick={this.handleOpenCloseModal.bind(this)}
+                                color='yellow'
+                                style={this.props.style}
+                            >
+                                {t("HEAD_BTN_ADD_IMGS")}
+                            </Button>
         return(
-            <Modal trigger={<Button onClick={this.handleOpenCloseModal.bind(this)} color='yellow'>{t("HEAD_BTN_ADD_IMGS")}</Button>} open={this.state.openModal}>
+            <Modal trigger={triggerButton} open={this.state.openModal}>
                 <Modal.Header>{t("MODAL_IMGS_DND_HEADER")}</Modal.Header>
                 <Modal.Content>
-                    <div className="ui center grid">
+                    <Accordion styled>
+                        <Accordion.Title
+                            active={this.state.openAccordion}
+                            index={0}
+                            onClick={this.handleOpenCloseAccordion.bind(this)}
+                        >
+                            <Icon name='dropdown' />
+                            Show old custom images
+                        </Accordion.Title>
+                        <Accordion.Content active={this.state.openAccordion}>
+                            <Image.Group>
+                                {imgOld}
+                            </Image.Group>
+                        </Accordion.Content>
+                    </Accordion>
+
+                    <Segment>
                         {t(this.state.message)}
                         <section>
                             {contentSection}
@@ -87,7 +157,7 @@ class CustomImgsDnDUpload extends Component{
                             }
                             </ul>
                         </section>
-                    </div>
+                    </Segment>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button negative onClick={this.handleOpenCloseModal.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>

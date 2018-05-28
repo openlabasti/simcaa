@@ -110,9 +110,10 @@ class NewProjectForm extends Component {
                 className={this.props.className}
                 size={this.props.size}
                 onClick={this.handleOpenCloseModal.bind(this, 'open')}
+                disabled={this.props.disabled}
             />
         } else if (this.props.edit && this.props.edit === 'button') {
-            iconModal = <Button onClick={this.handleOpenCloseModal.bind(this, 'open')}>
+            iconModal = <Button onClick={this.handleOpenCloseModal.bind(this, 'open')} disabled={this.props.disabled}>
                             {t("PRJ_MNU_OPTIONS")}
                         </Button>
         } else {
@@ -124,6 +125,7 @@ class NewProjectForm extends Component {
                 onMouseOver={this.onMouseOverIcon.bind(this)}
                 onMouseOut={this.onMouseOverIcon.bind(this)}
                 onClick={this.handleOpenCloseModal.bind(this, 'open')}
+                disabled={this.props.disabled}
             />
         }
 

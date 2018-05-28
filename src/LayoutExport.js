@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-import { Segment, Button, Dropdown, Image, Message, Loader } from 'semantic-ui-react'
+import { Segment, Button, Dropdown, Image, Message, Loader, Card } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { translate, Trans } from 'react-i18next'
 import Rnd from 'react-rnd'
 import CardLayout from './CardLayout'
 import CustomImgsDnDUpload from './CustomImgsDnDUpload'
-import { translate, Trans } from 'react-i18next'
+import AddCustomTitle from './AddCustomTitle'
+import DeleteCustomTitle from './DeleteCustomTitle'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { withApolloFetch } from './withApolloFetch'
@@ -19,6 +21,7 @@ class LayoutExport extends Component {
             profile: {},
             layout: {},
             cards: [],
+            title: [],
             classSheet: 'PreviewTypoDocument',
             imageSize: [{type: 'imgsize', value: 35, text: 'mini'},
                         {type: 'imgsize', value: 80, text: 'tiny'},
@@ -35,6 +38,7 @@ class LayoutExport extends Component {
             saveMessage: true,
             finishLoad: false,
             loadingButton: false,
+            hasTypoSaved: false,
         }
     }
 
@@ -131,13 +135,29 @@ class LayoutExport extends Component {
                 } else {
                     let typoCard = savedTypo.card
                     let typoImg = savedTypo.img
-                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard,
-                                    customImgs: typoImg, profile, layout , customSymbolSize: newSymbolSize})
+                    let typoTitle = savedTypo.title
+                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, title: typoTitle,
+                                    customImgs: typoImg, profile, layout , customSymbolSize: newSymbolSize, hasTypoSaved: true})
                 }
             })
             .catch((error) => {
                 console.log(error)
             })
+    }
+
+    // Distanzia le card se serve
+    componentDidUpdate() {
+        if (this.state.finishLoad === false) {
+            let self = this
+            setTimeout(() => {
+                let imgDivs = document.getElementsByClassName('image')
+                for (let i = 0; i < imgDivs.length; i++) {
+                    imgDivs[i].style.setProperty("display", "block", "important")
+                    imgDivs[i].style.setProperty("margin", "auto", "important")
+                }
+                self.setState({finishLoad: true})
+            }, 0)
+        }
     }
 
     // Elimino le card vuote, allineo gli id e aggiungo la pagina
@@ -172,10 +192,10 @@ class LayoutExport extends Component {
             for (let i = 0; i < numCard.length; i++) {
                 let inputResize = document.getElementById('textLayout-' + i)
                 if (inputResize) {
-                    // TODO: RIVEDERE PER IL CALCOLO DELLO SPAZIO
-                    if (inputResize.scrollWidth > inputResize.clientWidth) {
-                        document.getElementsByClassName('typoCard-' + i)[0].style.width = 'auto'
-                    }
+                    // TODO: RIVEDERE PER IL CALCOLO DELLO SPAZIO --- NOT WORKING (NON ENTRA NELLA IF)
+                    // if (inputResize.scrollWidth > inputResize.clientWidth) {
+                    //     document.getElementsByClassName('typoCard-' + i)[0].style.width = 'auto'
+                    // }
                     cardWidth[i] = document.getElementById('layout-' + i).offsetWidth
                 }
             }
@@ -262,23 +282,37 @@ class LayoutExport extends Component {
         this.setState({customImgs: localImgs})
     }
 
+    // DnD of custom titles
+    dragTitle(item, index, e, d){
+        let localTitle = this.state.title
+        let width = document.getElementById('title-' + index).offsetWidth
+        if (d.x < 0) {
+            localTitle[index].x = 0
+        } else if (d.x + width > this.state.layout.width) {
+            localTitle[index].x = this.state.layout.width - width
+        } else {
+            localTitle[index].x = d.x
+        }
+        localTitle[index].y = d.y < 0 ? 0 : d.y
+        this.setState({title: localTitle})
+    }
+
     // Handle custom imgs upload
     handler(imgs){
         //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
         let localImgs = this.state.customImgs
-        imgs.map((img, index)=>{
-            //costruisco oggetto che rappresenta immagine, nome+(x,y)
+        for (let i = 0; i < imgs.length; i++) {
             let imgWithPos = {
-                name: img.name,
+                name: imgs[i].name,
                 x: 0,
                 y: 0,
                 height: 'auto',
-                width: 'auto'
+                width: 'auto',
+                old: imgs[i].old
             }
-            //lo aggiungo ad array nello state
             localImgs.push(imgWithPos)
-        })
-        // console.log(localImgs);
+        }
+
         this.setState({customImgs: localImgs})
     }
 
@@ -319,6 +353,8 @@ class LayoutExport extends Component {
                 document.getElementById('layout-' + item.id).classList.remove('multipleDrag')
                 localListIds.splice(ifInList, 1)
             }
+            // Rimuovo i duplicati degli id se serve
+            localListIds = Array.from(new Set(localListIds))
             this.setState({listMultipleDragIds: localListIds})
         }
     }
@@ -338,7 +374,7 @@ class LayoutExport extends Component {
 
     // Save the current Typo configuration
     saveTypo() {
-        let localProject = { "id":  this.props.match.params.chapterid, "chapt_typo": {"card": this.state.cards, "img": this.state.customImgs}}
+        let localProject = { "id":  this.props.match.params.chapterid, "chapt_typo": {"card": this.state.cards, "img": this.state.customImgs, 'title': this.state.title}}
         localProject.chapt_typo = JSON.stringify(localProject.chapt_typo)
         let url = window.env.RestApiCard
         let self = this
@@ -348,7 +384,7 @@ class LayoutExport extends Component {
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             if (this.status === 200) {
-                self.setState({saveMessage: false, loadingButton: false})
+                self.setState({saveMessage: false, loadingButton: false, hasTypoSaved: true})
                 self.sleep(1000).then(() => {
                     self.setState({saveMessage: true})
                 });
@@ -379,7 +415,9 @@ class LayoutExport extends Component {
                     imgDivs[i].classList.remove("imgFullWidth")
                 }
                 if (mode === 'full') {
-                    this.setState({customImgs: []})
+                    this.setState({customImgs: [], title: [], hasTypoSaved: false})
+                } else {
+                    this.setState({hasTypoSaved: false})
                 }
             })
             .catch((error) => {
@@ -387,28 +425,57 @@ class LayoutExport extends Component {
             })
     }
 
+    // Add the title to page
+    addTitle(title, borderSize, borderType, borderColor) {
+        let localTitle = this.state.title
+        localTitle.splice(localTitle.length, 0, {card: title, border: borderSize + 'px ' + borderColor + ' ' + borderType, x: 0, y: 0})
+        this.setState({title: localTitle})
+    }
+
+    // Delete selected title
+    deleteTitle(title) {
+        let localTitle = this.state.title
+        let index = localTitle.indexOf(title)
+        localTitle.splice(index, 1)
+        this.setState({title: localTitle})
+    }
+
     // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time))
     }
 
-    // Distanzia le card se serve
-    componentDidUpdate() {
-        if (this.state.finishLoad === false) {
-            let self = this
-            setTimeout(() => {
-                let imgDivs = document.getElementsByClassName('image')
-                for (let i = 0; i < imgDivs.length; i++) {
-                    imgDivs[i].style.setProperty("display", "block", "important")
-                    imgDivs[i].style.setProperty("margin", "auto", "important")
-                }
-                self.setState({finishLoad: true})
-            }, 0)
-        }
-    }
-
     render() {
         const { t, i18n } = this.props
+
+        // Vede se si è in view mode e setta lo style per nascondere i pulsanti se serve
+        let isView = this.props.match.params.mode === 'edit' ? false : true
+        let hideButton = {}
+        let enableResizing = {}
+        if (isView === true) {
+            hideButton = {'display': 'none'}
+            enableResizing = {
+                            bottom: false,
+                            bottomLeft: false,
+                            bottomRight: false,
+                            left: false,
+                            right: false,
+                            top: false,
+                            topLeft: false,
+                            topRight: false,
+                            }
+        } else {
+            enableResizing = {
+                            bottom: true,
+                            bottomLeft: true,
+                            bottomRight: true,
+                            left: true,
+                            right: true,
+                            top: true,
+                            topLeft: true,
+                            topRight: true,
+                            }
+        }
 
         if (this.state.savedProject.length === 0) {
             return (
@@ -422,7 +489,12 @@ class LayoutExport extends Component {
                 // Build Src Path for the images
                 let tmpProjectId = this.props.match.params.projectid
                 let tmpChapterId = this.props.match.params.chapterid
-                let fileName = tmpProjectId + '_' + tmpChapterId + '_' + img.name
+                let fileName
+                if (img.old && img.old === true) {
+                    fileName = img.name
+                } else {
+                    fileName = tmpProjectId + '_' + tmpChapterId + '_' + img.name
+                }
                 let composedSrc = window.env.MediaImage + tmpProjectId + '/' + fileName
 
                 //stampo le immagini custom
@@ -435,6 +507,8 @@ class LayoutExport extends Component {
                     size={{ height: img.height, width: img.width}}
                     onDragStop={this.dragImg.bind(this, img, index)}
                     onResize={this.resizeImg.bind(this, img, index)}
+                    disableDragging = {isView}
+                    enableResizing = {enableResizing}
                 >
                     <Image id={'dndImg-' + index} style={{'height': '100%'}} className='imgFullWidth' src={composedSrc}/>
                 </Rnd>
@@ -450,6 +524,8 @@ class LayoutExport extends Component {
                         size={{width: item.rndWidth, height: item.rndHeight}}
                         onDragStop={this.drag.bind(this, item)}
                         onResize={this.resize.bind(this, item)}
+                        disableDragging = {isView}
+                        enableResizing = {enableResizing}
                         minHeight= '150'
                         minWidth= '100'
                         className={'typoCard-' + index}
@@ -481,6 +557,57 @@ class LayoutExport extends Component {
                 )
             })
 
+            // render the titles
+            let title = this.state.title
+            title = title.map((item, index) => {
+                // render card for every title
+                let titleCard = item.card
+                titleCard = titleCard.map((item, index) => {
+                    return (
+                        <CardLayout
+                            key={index}
+                            Card={item}
+                            isTypo={true}
+                            isTitle={true}
+                            imgFullWidth={false}
+                            mode={true}
+                            posInput= {this.state.profile.posInput}
+                            sizeInput= {this.state.profile.sizeInput}
+                            styleInput= {this.state.profile.styleInput}
+                            formatInput= {this.state.profile.formatInput}
+                            colorTextInput= {this.state.profile.colorTextInput}
+                            colorBackgroundInput= {this.state.profile.colorBackgroundInput}
+                            weightInput= {this.state.profile.weightInput}
+                            decorationInput= {this.state.profile.decorationInput}
+                            fontStyleInput= {this.state.profile.fontStyleInput}
+                            imgSize= {this.state.customSymbolSize}
+                            imgPadding= {this.state.profile.imgPadding}
+                            imgType= {this.state.profile.imgType}
+                            urlRest= {window.env.GraphQLServer}
+                            urlImg= {window.env.PathImages}
+                            Style={{'width': 'auto'}}
+                        />
+                    )
+                })
+
+                // return complete title
+                return (
+                    <Rnd
+                        key={index}
+                        z = {99}
+                        position={{ x: item.x, y: item.y }}
+                        onDragStop={this.dragTitle.bind(this, item, index)}
+                        disableDragging = {isView}
+                        enableResizing
+                        style={{border: item.border, padding: '3px'}}
+                    >
+                        <Card.Group id={'title-' + index}>
+                            {titleCard}
+                        </Card.Group>
+                    </Rnd>
+                )
+            })
+
             // render the divs page
             let segmentPage = []
             for (let i = 0; i <= this.state.cards[this.state.cards.length-1].page; i++) {
@@ -499,6 +626,7 @@ class LayoutExport extends Component {
                             <Segment className={this.state.classSheet + ' section-to-print'}
                                 style={{'width': this.state.layout.width, 'height': this.state.layout.height}}
                             >
+                                {title}
                                 {customImgsLayout}
                                 {cardPerPage}
                             </Segment>
@@ -523,27 +651,53 @@ class LayoutExport extends Component {
             return (
                 <div onKeyDown={this.setMultipleDrag.bind(this)} onKeyUp={this.setMultipleDrag.bind(this)} tabIndex="0">
                     <Segment.Group className='no-print'>
-                        <Segment>
-                            <Button color='blue' onClick={this.resetTypo.bind(this)}>{t("HEAD_BTN_RESET")}</Button>
-                            <Button color='blue' onClick={this.resetTypo.bind(this, 'full')}>Full Reset</Button>
+                        <Segment className='fix-display'>
+                            <CustomImgsDnDUpload
+                                disabled={isView}
+                                style={hideButton}
+                                handler={this.handler}
+                            />
+                            <AddCustomTitle
+                                disabled={isView}
+                                style={hideButton}
+                                addTitle={this.addTitle.bind(this)}
+                            />
+                            <DeleteCustomTitle
+                                disabled={isView}
+                                style={hideButton}
+                                title={this.state.title}
+                                deleteTitle={this.deleteTitle.bind(this)}
+                            />
+                            <Button color='blue'
+                                disabled={isView}
+                                style={hideButton}
+                                onClick={this.resetTypo.bind(this)}>{t("HEAD_BTN_RESET")}</Button>
+                            <Button color='blue'
+                                disabled={isView}
+                                style={hideButton}
+                                onClick={this.resetTypo.bind(this, 'full')}>Full Reset</Button>
                             <Button color='green'
                                 disabled={this.state.loadingButton}
                                 loading={this.state.loadingButton}
                                 onClick={this.saveTypo.bind(this)}
+                                style={hideButton}
                             >
                                 {t("HEAD_BTN_SAVE")}
                             </Button>
-                            <Button color='blue' disabled onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
+                            {
+                            // <Button color='blue' disabled onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
+                            }
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link}
-                                to={'/basic/edit/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
+                                to={'/basic/' + this.props.match.params.mode + '/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
                             >
                                 {t("HEAD_BTN_RETURN")}
                             </Button>
-                            <CustomImgsDnDUpload handler={this.handler}/>
                         </Segment>
-                        <Segment>
+                        <Segment style={hideButton} disabled={isView}>
                             <Dropdown placeholder={t("TYPO_FRM_PLACEHOLDER")} selection
+                                disabled={this.state.hasTypoSaved}
+                                style={{'zIndex': 100}}
                                 options={this.state.imageSize}
                                 onChange={this.onChangeDropdown.bind(this)}
                             />

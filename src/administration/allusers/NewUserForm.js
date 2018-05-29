@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Modal, Button, Icon, Form, Select, Message, Dimmer, Loader, Popup } from 'semantic-ui-react'
+import { Modal, Button, Icon, Form, Select, Message, Popup } from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from '../../withApolloFetch'
-import { withRouter} from 'react-router-dom'
 
 class NewUserForm extends Component{
   constructor(props){
@@ -49,6 +48,7 @@ class NewUserForm extends Component{
           text: group.desc_group,
           value: group.id
         })
+        return null;
       });
       this.setState({groups: tmp})
       tmp = []
@@ -57,6 +57,7 @@ class NewUserForm extends Component{
           text: team.name,
           value: team.id
         });
+        return null;
       });
       this.setState({teams: tmp},()=>{
         this.setState({loading: false});
@@ -128,197 +129,117 @@ class NewUserForm extends Component{
   }
   render(){
     const { t, i18n } = this.props
-
-    if(this.state.loading){
+    if(this.state.interror){
+      //messaggio di errore interno
       return(
-        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>}>
+        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
           <Modal.Content>
-          <Dimmer active>
-            <Loader />
-          </Dimmer>
+            <Message negative>
+              <Message.Header>{t("INTERROR_HEADER")}</Message.Header>
+              <p>{t("INTERROR_BODY")}</p>
+            </Message>
           </Modal.Content>
+          <Modal.Actions>
+            <Button primary onClick={()=>this.setState({interror:false, open:false})}>{t("BTN_CONTINUE")}</Button>
+          </Modal.Actions>
+        </Modal>
+      )
+    }else if(this.state.added){
+      //tutto ok, utente creato
+      return(
+        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
+          <Modal.Content>
+            <Message positive>
+              <Message.Header>{t("CREATED_USR_H")}</Message.Header>
+              <p>{t("CREATED_USR_C")}</p>
+            </Message>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button primary onClick={()=>this.setState({open:false, added:false})}>{t("BTN_CONTINUE")}</Button>
+          </Modal.Actions>
         </Modal>
       )
     }else{
-      if(this.state.interror){
-        //messaggio di errore interno
-        return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false, open:false})}>
-            <Modal.Content>
-              <Message negative>
-                <Message.Header>{t("INTERROR_HEADER")}</Message.Header>
-                <p>{t("INTERROR_BODY")}</p>
-              </Message>
-              <Button primary onClick={()=>this.setState({interror:false, open:false})}>{t("BTN_CONTINUE")}</Button>
-            </Modal.Content>
-          </Modal>
-        )
-      }else if(this.state.missingData){
-        //errore dato mancante in form
-        return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open}>
-            <Modal.Header>{t("MODAL_HEADER")}</Modal.Header>
-            <Modal.Content>
-              <Form>
-                <Form.Field required>
-                  <label>{t("TBL_NAME")}</label>
-                  <input placeholder={t("TBL_NAME")}
-                         value={this.state.newName}
-                         onChange={this.newNameChange.bind(this)}
+      //form inserimento
+      return(
+        <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open}>
+          <Modal.Header>{t("MODAL_HEADER")}</Modal.Header>
+          <Modal.Content>
+            <Form>
+              <Form.Field required>
+                <label>{t("TBL_NAME")}</label>
+                <input placeholder={t("TBL_NAME")}
+                       value={this.state.newName}
+                       onChange={this.newNameChange.bind(this)}
+                       />
+              </Form.Field>
+              <Form.Field required>
+                <label>{t("TBL_EMAIL")}</label>
+                <input placeholder={t("TBL_EMAIL")}
+                       value={this.state.newEmail}
+                       onChange={this.newEmailChange.bind(this)}
+                       />
+              </Form.Field>
+              <Form.Field required>
+                <label>Password</label>
+                <input placeholder='Password'
+                       type='password'
+                       value={this.state.newPassword}
+                       onChange={this.newPassChange.bind(this)}
+                       />
+              </Form.Field>
+              <Form.Field required>
+                <label>{t("TBL_USR")}</label>
+                <input placeholder={t("TBL_USR")}
+                       value={this.state.newUsername}
+                       onChange={this.newUsernameChange.bind(this)}
+                       />
+              </Form.Field>
+              <Form.Group widths='equal'>
+                <Form.Field>
+                  <label>{t("TBL_LWEB")}</label>
+                  <input placeholder={t("TBL_LWEB")}
+                         value={this.state.newLinkWeb}
+                         onChange={this.newLinkWebChange.bind(this)}
                          />
                 </Form.Field>
-                <Form.Field required>
-                  <label>{t("TBL_EMAIL")}</label>
-                  <input placeholder={t("TBL_EMAIL")}
-                         value={this.state.newEmail}
-                         onChange={this.newEmailChange.bind(this)}
+                <Form.Field>
+                  <label>{t("TBL_ORG")}</label>
+                  <input placeholder={t("TBL_ORG")}
+                         value={this.state.newOrg}
+                         onChange={this.newOrgChange.bind(this)}
                          />
                 </Form.Field>
-                <Form.Field required>
-                  <label>Password</label>
-                  <input placeholder='Password'
-                         type='password'
-                         value={this.state.newPassword}
-                         onChange={this.newPassChange.bind(this)}
-                         />
+              </Form.Group>
+              <Form.Group widths='equal'>
+                <Form.Field>
+                  <label>{t("TBL_GROUP")}</label>
+                  <Select options={this.state.groups}
+                          onChange={this.selectGroup.bind(this)}
+                          />
                 </Form.Field>
-                <Form.Field required>
-                  <label>{t("TBL_USR")}</label>
-                  <input placeholder={t("TBL_USR")}
-                         value={this.state.newUsername}
-                         onChange={this.newUsernameChange.bind(this)}
-                         />
+                <Form.Field>
+                  <label>{t("TBL_TEAM")}</label>
+                  <Select options={this.state.teams}
+                          onChange={this.selectTeam.bind(this)}
+                          />
                 </Form.Field>
-                <Form.Group widths='equal'>
-                  <Form.Field>
-                    <label>{t("TBL_LWEB")}</label>
-                    <input placeholder={t("TBL_LWEB")}
-                           value={this.state.newLinkWeb}
-                           onChange={this.newLinkWebChange.bind(this)}
-                           />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>{t("TBL_ORG")}</label>
-                    <input placeholder={t("TBL_ORG")}
-                           value={this.state.newOrg}
-                           onChange={this.newOrgChange.bind(this)}
-                           />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Group widths='equal'>
-                  <Form.Field>
-                    <label>{t("TBL_GROUP")}</label>
-                    <Select options={this.state.groups}
-                            onChange={this.selectGroup.bind(this)}
-                            />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>{t("TBL_TEAM")}</label>
-                    <Select options={this.state.teams}
-                            onChange={this.selectTeam.bind(this)}
-                            />
-                  </Form.Field>
-                </Form.Group>
-                <Message negative>
-                  <Message.Header>{t("MISSING_DATA_H")}</Message.Header>
-                  <p>{t("MISSING_DATA_C")}</p>
-                </Message>
-
-                <div>
-                  <Button primary onClick={this.handleSubmit.bind(this)}> {t("BTN_CONFIRM")} </Button>
-                  <Button negative onClick={()=>this.setState({open:false, missingData:false})}> {t("BTN_DENY")} </Button>
-                </div>
-              </Form>
-            </Modal.Content>
-          </Modal>
-        );
-      }else if(this.state.added){
-        return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open} onClose={()=>this.setState({interror:false})}>
-            <Modal.Content>
-              <Message positive>
-                <Message.Header>{t("CREATED_USR_H")}</Message.Header>
-                <p>{t("CREATED_USR_C")}</p>
-              </Message>
-              <Button primary onClick={()=>this.setState({open:false, added:false})}>{t("BTN_CONTINUE")}</Button>
-            </Modal.Content>
-          </Modal>
-        )
-      }else{
-        //form inserimento
-        return(
-          <Modal trigger={<Popup trigger={<Button circular floated="right" icon={<Icon circular name="add user" size="big"/>} onClick={()=>this.setState({open:true})}/>} content={t("POPUP_ADD")}/>} open={this.state.open}>
-            <Modal.Header>{t("MODAL_HEADER")}</Modal.Header>
-            <Modal.Content>
-              <Form>
-                <Form.Field required>
-                  <label>{t("TBL_NAME")}</label>
-                  <input placeholder={t("TBL_NAME")}
-                         value={this.state.newName}
-                         onChange={this.newNameChange.bind(this)}
-                         />
-                </Form.Field>
-                <Form.Field required>
-                  <label>{t("TBL_EMAIL")}</label>
-                  <input placeholder={t("TBL_EMAIL")}
-                         value={this.state.newEmail}
-                         onChange={this.newEmailChange.bind(this)}
-                         />
-                </Form.Field>
-                <Form.Field required>
-                  <label>Password</label>
-                  <input placeholder='Password'
-                         type='password'
-                         value={this.state.newPassword}
-                         onChange={this.newPassChange.bind(this)}
-                         />
-                </Form.Field>
-                <Form.Field required>
-                  <label>{t("TBL_USR")}</label>
-                  <input placeholder={t("TBL_USR")}
-                         value={this.state.newUsername}
-                         onChange={this.newUsernameChange.bind(this)}
-                         />
-                </Form.Field>
-                <Form.Group widths='equal'>
-                  <Form.Field>
-                    <label>{t("TBL_LWEB")}</label>
-                    <input placeholder={t("TBL_LWEB")}
-                           value={this.state.newLinkWeb}
-                           onChange={this.newLinkWebChange.bind(this)}
-                           />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>{t("TBL_ORG")}</label>
-                    <input placeholder={t("TBL_ORG")}
-                           value={this.state.newOrg}
-                           onChange={this.newOrgChange.bind(this)}
-                           />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Group widths='equal'>
-                  <Form.Field>
-                    <label>{t("TBL_GROUP")}</label>
-                    <Select options={this.state.groups}
-                            onChange={this.selectGroup.bind(this)}
-                            />
-                  </Form.Field>
-                  <Form.Field>
-                    <label>{t("TBL_TEAM")}</label>
-                    <Select options={this.state.teams}
-                            onChange={this.selectTeam.bind(this)}
-                            />
-                  </Form.Field>
-                </Form.Group>
-                <div>
-                  <Button primary onClick={this.handleSubmit.bind(this)}> {t("BTN_CONFIRM")} </Button>
-                  <Button negative onClick={()=>this.setState({open:false})}> {t("BTN_DENY")} </Button>
-                </div>
-              </Form>
-            </Modal.Content>
-          </Modal>
-        );
-      }
+              </Form.Group>
+            </Form>
+            <Message negative hidden={!this.state.missingData} onDismiss={()=>{this.setState({missingData: false})}}>
+              <Message.Header>{t("MISSING_DATA_H")}</Message.Header>
+              <p>{t("MISSING_DATA_C")}</p>
+            </Message>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button.Group>
+              <Button primary onClick={this.handleSubmit.bind(this)} loading={this.state.loading}> {t("BTN_CONFIRM")} </Button>
+              <Button.Or text='or'/>
+              <Button negative onClick={()=>this.setState({open:false})}> {t("BTN_DENY")} </Button>
+            </Button.Group>
+          </Modal.Actions>
+        </Modal>
+      );
     }
   }
 }

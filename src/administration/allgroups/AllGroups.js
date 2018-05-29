@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Header, Dimmer, Segment, Loader} from 'semantic-ui-react'
+import {Header, Dimmer, Segment, Loader, Message} from 'semantic-ui-react'
 import { translate, Trans } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import {withApolloFetch} from '../../withApolloFetch'
@@ -11,14 +11,20 @@ class AllGroups extends Component{
   constructor(props){
     super(props)
     this.update = this.update.bind(this)
+    this.showError = this.showError.bind(this)
     this.state={
       lock: 0,
       users: [],
-      teams: []
+      teams: [],
+      groups: [],
+      interror: false
     }
   }
   update(){
     this.componentWillMount();
+  }
+  showError(){
+    this.setState({interror: true});
   }
   componentWillMount(){
     let query = `
@@ -62,6 +68,11 @@ class AllGroups extends Component{
       console.log(error);
     })
   }
+  cancelError(){
+    this.setState({
+      interror: false
+    })
+  }
   render(){
     const { t, i18n } = this.props
     if(this.state.lock===0){
@@ -81,20 +92,25 @@ class AllGroups extends Component{
           }
           let margin = ((idx===0) ? '10px' : '65px')
           //aggiungo tabella di questo team
+
           return(
             <Segment style={{marginTop: margin}} key={idx}>
               <Header as="h4">{team.name}</Header>
-              <UsrTable users={usrs} teams={this.state.teams} groups={this.state.groups}/>
-              <AddUserModal/>
+              <UsrTable update={this.update}  action='delete' users={usrs} team={team.id} groups={this.state.groups} showError={this.showError}/>
+              <AddUserModal team={team.id} update={this.update.bind(this)} showError={this.showError.bind(this)}/>
             </Segment>
           )
           });
       //renderizzo tutte le tabelle
-      return(
-        <div>
-          {teamTables}
-        </div>
-      )
+        return(
+          <div>
+            {teamTables}
+            <Message negative compact style={{position: 'absolute', left:'50%', transform: 'translate(-50%)'}} hidden={!this.state.interror} onDismiss={()=>this.cancelError()}>
+              <Message.Header> {t("INTERROR_HEADER")} </Message.Header>
+             <p>{t("INTERROR_BODY")}</p>
+            </Message>
+          </div>
+        )
     }
   }
 }

@@ -2,15 +2,18 @@ import React, { Component } from 'react'
 import { Segment, Button, Dropdown, Image, Message, Loader, Card } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
 import Rnd from 'react-rnd'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+
+import { withApolloFetch } from './withApolloFetch'
 import CardLayout from './CardLayout'
 import CustomImgsDnDUpload from './CustomImgsDnDUpload'
 import AddCustomTitle from './AddCustomTitle'
 import DeleteCustomTitle from './DeleteCustomTitle'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
-import { withApolloFetch } from './withApolloFetch'
-import { withRouter } from 'react-router-dom'
+import AddCustomText from './AddCustomText'
+
 
 class LayoutExport extends Component {
     constructor(props) {
@@ -22,6 +25,7 @@ class LayoutExport extends Component {
             layout: {},
             cards: [],
             title: [],
+            text: [],
             classSheet: 'PreviewTypoDocument',
             imageSize: [{type: 'imgsize', value: 35, text: 'mini'},
                         {type: 'imgsize', value: 80, text: 'tiny'},
@@ -297,6 +301,29 @@ class LayoutExport extends Component {
         this.setState({title: localTitle})
     }
 
+    // DnD of custom text
+    dragText(item, index, e, d){
+        let localText = this.state.text
+        let width = document.getElementById('customText-' + index).offsetWidth
+        if (d.x < 0) {
+            localText[index].x = 0
+        } else if (d.x + width > this.state.layout.width) {
+            localText[index].x = this.state.layout.width - width
+        } else {
+            localText[index].x = d.x
+        }
+        localText[index].y = d.y < 0 ? 0 : d.y
+        this.setState({text: localText})
+    }
+
+    // Resize of the custom text
+    resizeText(item, index, e, direction, ref, dimensions, position){
+        let localText = this.state.text
+        localText[index].height = document.getElementById('customText-' + index).height
+        localText[index].width = document.getElementById('customText-' + index).width
+        this.setState({text: localText})
+    }
+
     // Handle custom imgs upload
     handler(imgs){
         //handler per ricevere immagini caricate da modale, salvo solo il nome di ciascuna immagine e pos iniziale
@@ -440,6 +467,29 @@ class LayoutExport extends Component {
         this.setState({title: localTitle})
     }
 
+    // Add Text to page
+    addText(text, size, color, inverted) {
+        let localText = this.state.text
+        localText.splice(localText.length, 0, {text: text, size: size, color, inverted, x: 0, y: 0})
+        this.setState({text: localText})
+    }
+
+    // Delete selected text
+    deleteText(text) {
+        let localText = this.state.text
+        let index = localText.indexOf(text)
+        localText.splice(index, 1)
+        this.setState({text: localText})
+    }
+
+    // Delete selected image
+    deleteImage(image) {
+        let localImage = this.state.customImgs
+        let index = localImage.indexOf(image)
+        localImage.splice(index, 1)
+        this.setState({customImgs: localImage})
+    }
+
     // SLEEP (is a test instead of classic setTimeout)
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time))
@@ -514,6 +564,7 @@ class LayoutExport extends Component {
                 </Rnd>
                 )
             })
+
             let cardsLayout = this.state.cards
             cardsLayout = cardsLayout.map((item, index) => {
                 return (
@@ -608,6 +659,30 @@ class LayoutExport extends Component {
                 )
             })
 
+            // render custom text
+            let text = this.state.text
+            text = text.map((item, index) => {
+                return (
+                    <Rnd
+                        key={index}
+                        z = {99}
+                        position={{ x: item.x, y: item.y }}
+                        onDragStop={this.dragText.bind(this, item, index)}
+                        onResize={this.resizeText.bind(this, item, index)}
+                        disableDragging = {isView}
+                        enableResizing = {enableResizing}
+                        style={{border: item.border, padding: '3px'}}
+                    >
+                        <Segment id={'customText-' + index} size={item.size}
+                            color={item.color} inverted={item.inverted}
+                            style={{'height': '100%'}}
+                        >
+                            {item.text}
+                        </Segment>
+                    </Rnd>
+                )
+            })
+
             // render the divs page
             let segmentPage = []
             for (let i = 0; i <= this.state.cards[this.state.cards.length-1].page; i++) {
@@ -627,6 +702,7 @@ class LayoutExport extends Component {
                                 style={{'width': this.state.layout.width, 'height': this.state.layout.height}}
                             >
                                 {title}
+                                {text}
                                 {customImgsLayout}
                                 {cardPerPage}
                             </Segment>
@@ -662,11 +738,21 @@ class LayoutExport extends Component {
                                 style={hideButton}
                                 addTitle={this.addTitle.bind(this)}
                             />
+                            <AddCustomText
+                                disabled={isView}
+                                style={hideButton}
+                                addText={this.addText.bind(this)}
+                            />
                             <DeleteCustomTitle
                                 disabled={isView}
                                 style={hideButton}
                                 title={this.state.title}
+                                text={this.state.text}
+                                image={this.state.customImgs}
+                                projectid ={this.props.match.params.projectid}
                                 deleteTitle={this.deleteTitle.bind(this)}
+                                deleteText={this.deleteText.bind(this)}
+                                deleteImage={this.deleteImage.bind(this)}
                             />
                             <Button color='blue'
                                 disabled={isView}

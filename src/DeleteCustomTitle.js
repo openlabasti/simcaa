@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button, Table, Icon } from 'semantic-ui-react'
+import { Modal, Button, Table, Icon, Image } from 'semantic-ui-react'
 import { withApolloFetchNoAuth } from './withApolloFetchNoAuth'
 import { translate, Trans } from 'react-i18next'
 
@@ -22,17 +22,27 @@ class DeleteCustomTitle extends Component{
         this.openCloseModal()
     }
 
+    // Call the props function to delete the selected text
+    deleteCurrentText(text, e) {
+        this.props.deleteText(text)
+        this.openCloseModal()
+    }
+
+    // Call the props function to delete the selected image
+    deleteCurrentImage(image, e) {
+        this.props.deleteImage(image)
+        this.openCloseModal()
+    }
+
     render() {
         const { t, i18n } = this.props
 
-        let dataTable = this.props.title
-        dataTable = dataTable.map((item, index) => {
+        let dataTableTitle = this.props.title
+        dataTableTitle = dataTableTitle.map((item, index) => {
             let title = item.card.map(x => x.lemma).join(' ').toString()
             return (
                 <Table.Row key={index}>
-                    <Table.Cell collapsing>
-                        {index}
-                    </Table.Cell>
+                    <Table.Cell collapsing>Title</Table.Cell>
                     <Table.Cell>{title}</Table.Cell>
                     <Table.Cell collapsing>
                         <Icon name='trash' color='red' size='big' className='icon-pointer'
@@ -42,6 +52,39 @@ class DeleteCustomTitle extends Component{
                 </Table.Row>
             )
         })
+
+        let dataTableText = this.props.text
+        dataTableText = dataTableText.map((item, index) => {
+            let text = item.text.length > 50 ? item.text.substring(0,50) + '...' : item.text
+            return (
+                <Table.Row key={index}>
+                    <Table.Cell collapsing>Text</Table.Cell>
+                    <Table.Cell>{text}</Table.Cell>
+                    <Table.Cell collapsing>
+                        <Icon name='trash' color='red' size='big' className='icon-pointer'
+                            onClick={this.deleteCurrentText.bind(this, item)}
+                        />
+                    </Table.Cell>
+                </Table.Row>
+            )
+        })
+
+        let dataTableImage = this.props.image
+        dataTableImage = dataTableImage.map((item, index) => {
+            let src = window.env.MediaImage + this.props.projectid + '/' + item.name
+            return (
+                <Table.Row key={index}>
+                    <Table.Cell collapsing>Image</Table.Cell>
+                    <Table.Cell><Image src={src} size='tiny'/></Table.Cell>
+                    <Table.Cell collapsing>
+                        <Icon name='trash' color='red' size='big' className='icon-pointer'
+                            onClick={this.deleteCurrentImage.bind(this, item)}
+                        />
+                    </Table.Cell>
+                </Table.Row>
+            )
+        })
+
         return(
             <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>Delete Title</Button>}
                 open={this.state.open}
@@ -51,13 +94,15 @@ class DeleteCustomTitle extends Component{
                     <Table celled striped>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell>ID</Table.HeaderCell>
+                                <Table.HeaderCell>Type</Table.HeaderCell>
                                 <Table.HeaderCell>Title</Table.HeaderCell>
                                 <Table.HeaderCell>Actions</Table.HeaderCell>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {dataTable}
+                            {dataTableTitle}
+                            {dataTableText}
+                            {dataTableImage}
                         </Table.Body>
                     </Table>
                 </Modal.Content>

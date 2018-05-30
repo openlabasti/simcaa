@@ -7,14 +7,14 @@ class ImageOptions extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            imageSize: [{type: 'imgsize', value: 'mini', text: 'mini'},
-                            {type: 'imgsize', value: 'tiny', text: 'tiny'},
-                            {type: 'imgsize', value: 'small', text: 'small'},
-                            {type: 'imgsize', value: 'medium', text: 'medium'},
-                            {type: 'imgsize', value: 'large', text: 'large'},
-                            {type: 'imgsize', value: 'big', text: 'big'},
-                            {type: 'imgsize', value: 'huge', text: 'huge'},
-                            {type: 'imgsize', value: 'massive', text: 'massive'}],
+            imageSize: [{type: 'imgsize', value: 'mini', text: props.t("OPT_FRM_MINI")},
+                        {type: 'imgsize', value: 'tiny', text: props.t("OPT_FRM_TINY")},
+                        {type: 'imgsize', value: 'small', text: props.t("OPT_FRM_SMALL")},
+                        {type: 'imgsize', value: 'medium', text: props.t("OPT_FRM_MEDIUM")},
+                        {type: 'imgsize', value: 'large', text: props.t("OPT_FRM_LARGE")},
+                        {type: 'imgsize', value: 'big', text: props.t("OPT_FRM_BIG")},
+                        {type: 'imgsize', value: 'huge', text: props.t("OPT_FRM_HUGE")},
+                        {type: 'imgsize', value: 'massive', text: props.t("OPT_FRM_MASSIVE")}],
             imagePadding: [{type: 'imgpadding', value: 'imgpadding1', text: '1 em'},
                                 {type: 'imgpadding', value: 'imgpadding2', text: '2 em'},
                                 {type: 'imgpadding', value: 'imgpadding3', text: '3 em'},

@@ -39,7 +39,7 @@ class NewChapterForm extends Component {
 
     render() {
         const { t, i18n } = this.props
-        
+
         let iconModal = <Icon name='add square'
             className={this.props.className}
             size={this.props.size}
@@ -66,8 +66,8 @@ class NewChapterForm extends Component {
                         <Message
                             hidden={this.state.errorMessage}
                             error
-                            header='Error'
-                            content='Chapter title cannot be empty'
+                            header={t("PRJ_FRM_ERROR_HEADER")}
+                            content={t("PRJ_FRM_ERROR_CONTENT")}
                         />
                     </Modal.Content>
                     <Modal.Actions>

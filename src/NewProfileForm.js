@@ -247,7 +247,7 @@ class NewProfileForm extends Component {
                             onClick={this.handleOpenCloseModal.bind(this, 'open')}
                             disabled={this.props.disabled}
                         >
-                                Add Profile
+                            {t("PRJ_MNU_ADDUSER")}
                         </Dropdown.Item>
         } else {
             iconModal = <Icon name='add square'

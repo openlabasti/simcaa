@@ -144,7 +144,7 @@ class NewProjectForm extends Component {
                             <Form.Field>
                                 <label>{t("MAIN_FRM_PROFILE")}</label>
                                 <Dropdown placeholder='Profile' selection options={this.props.optionsProfiles}
-                                    placeholder='Cannot change profile now'
+                                    placeholder={t("MAIN_FRM_PLACEHOLDER_USER")}
                                     disabled={this.props.edit ? true : false}
                                     defaultValue={this.props.edit ? '' : this.props.optionsProfiles[0].value}
                                     onChange={this.handleDropdownChange.bind(this, 'profile')}
@@ -153,7 +153,7 @@ class NewProjectForm extends Component {
                             <Form.Field>
                                 <label>{t("MAIN_FRM_LAYOUT")}</label>
                                 <Dropdown placeholder='Layout' selection options={this.props.optionsLayouts}
-                                    placeholder='Cannot change layout now'
+                                    placeholder={t("MAIN_FRM_PLACEHOLDER_LAYOUT")}
                                     defaultValue={this.props.edit ? this.props.data.proj_layout : this.props.optionsLayouts[0].value}
                                     onChange={this.handleDropdownChange.bind(this, 'layout')}
                                 />
@@ -176,8 +176,8 @@ class NewProjectForm extends Component {
                         <Message
                             hidden={this.state.errorMessage}
                             error
-                            header='Error'
-                            content='Chapter title cannot be empty'
+                            header={t("PRJ_FRM_ERROR_HEADER")}
+                            content={t("PRJ_FRM_ERROR_CONTENT")}
                         />
                     </Modal.Content>
                     <Modal.Actions>

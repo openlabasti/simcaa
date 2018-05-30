@@ -241,8 +241,8 @@ class Project extends Component {
                     </Card.Group>
                     <Confirm
                         open={this.state.openConfirm}
-                        header='This action cannot be reversed'
-                        content='Are you sure to want to delete this chapter?'
+                        header={t("DELETE_CNF_H")}
+                        content={t("DELETE_CNF_P")}
                         onCancel={this.handleCancel.bind(this)}
                         onConfirm={this.handleConfirm.bind(this)}
                     />

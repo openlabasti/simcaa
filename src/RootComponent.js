@@ -476,7 +476,7 @@ class RootComponent extends Component {
                                     <Header.Content>
                                         {t("MAIN_LBL_ALL")}
                                         <Header.Subheader>
-                                            Manage your project
+                                            {t("MAIN_LBL_ALL")}
                                         </Header.Subheader>
                                     </Header.Content>
                                 </Header>
@@ -499,7 +499,7 @@ class RootComponent extends Component {
                                                 sorted={this.state.column === 'updated_at' ? this.state.direction : null}
                                                 onClick={this.handleSort.bind(this, 'updated_at')}
                                             >
-                                                Date Update
+                                                {t("MAIN_TBL_DATEUPDATE")}
                                             </Table.HeaderCell>
                                             <Table.HeaderCell
                                                 sorted={this.state.column === 'proj_share' ? this.state.direction : null}
@@ -507,7 +507,7 @@ class RootComponent extends Component {
                                             >
                                                 {t("MAIN_TBL_SHARE")}
                                             </Table.HeaderCell>
-                                            <Table.HeaderCell>User Owner</Table.HeaderCell>
+                                            <Table.HeaderCell>{t("MAIN_TBL_USEROWN")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -538,7 +538,7 @@ class RootComponent extends Component {
                                     <Header.Content>
                                         {t("MAIN_LBL_ALLPROFILE")}
                                         <Header.Subheader>
-                                            Manage your profile
+                                            {t("MAIN_LBL_MANAGEPROFILE")}
                                         </Header.Subheader>
                                     </Header.Content>
                                 </Header>
@@ -547,8 +547,8 @@ class RootComponent extends Component {
                                         <Table.Row>
                                             <Table.HeaderCell>ID</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_NAME")}</Table.HeaderCell>
-                                            <Table.HeaderCell>Profile Owner</Table.HeaderCell>
-                                            <Table.HeaderCell>Profile System</Table.HeaderCell>
+                                            <Table.HeaderCell>{t("MAIN_TBL_PROFILEOWN")}</Table.HeaderCell>
+                                            <Table.HeaderCell>{t("MAIN_TBL_SHARE")}</Table.HeaderCell>
                                             <Table.HeaderCell>{t("MAIN_TBL_ACTIONS")}</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
@@ -563,15 +563,15 @@ class RootComponent extends Component {
                 </Grid>
                 <Confirm
                     open={this.state.openConfirmProject}
-                    header='This action cannot be reversed'
-                    content='Are you sure to want to delete this chapter?'
+                    header={t("DELETE_CNF_H")}
+                    content={t("DELETE_CNF_P")}
                     onCancel={this.handleCancel.bind(this)}
                     onConfirm={this.handleConfirmProject.bind(this)}
                 />
                 <Confirm
                     open={this.state.openConfirmProfile}
-                    header='This action cannot be reversed'
-                    content='Are you sure to want to delete this profile?'
+                    header={t("DELETE_CNF_H")}
+                    content={t("DELETE_CNF_C")}
                     onCancel={this.handleCancel.bind(this)}
                     onConfirm={this.handleConfirmProfile.bind(this)}
                 />

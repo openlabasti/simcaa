@@ -15,7 +15,7 @@ class UploadSymbol extends Component {
             confirmOpen: false,
             classOptions: [],
             styleOptions: [],
-            colorOptions: [{value: 1, text: 'Black and White'}, {value: 2, text: 'Color'}],
+            colorOptions: [{value: 1, text: props.t("UPSY_IMGCOLOR_BW")}, {value: 2, text: props.t("UPSY_IMGCOLOR_COL")}],
             file: [{preview: '', size: 0}],
             card: {id: 0, lemma: 'Custom Images', img: 'react.png'},
             urlImg: window.env.PathImages,
@@ -238,7 +238,7 @@ class UploadSymbol extends Component {
 
         return (
             <Modal trigger={triggerModal} open={this.state.modalOpen}>
-                <Modal.Header>Select an Image</Modal.Header>
+                <Modal.Header>{t("UPSY_SELECTIMG")}</Modal.Header>
                 <Modal.Content>
                     <Message negative hidden={this.state.error.hidden}>
                         <Message.Header>Error detected</Message.Header>
@@ -246,11 +246,11 @@ class UploadSymbol extends Component {
                     </Message>
                     <Form>
                         <Form.Field>
-                            <label>Word</label>
-                            <input placeholder='Word' value={this.state.word} onChange={this.wordChange.bind(this)} />
+                            <label>{t("UPSY_WORD")}</label>
+                            <input placeholder={t("UPSY_CLASS")} value={this.state.word} onChange={this.wordChange.bind(this)} />
                         </Form.Field>
                         <Form.Field width={6}>
-                            <label>Class</label>
+                            <label>{t("UPSY_CLASS")}</label>
                             <Dropdown placeholder='Select Class' selection
                                 options={this.state.classOptions}
                                 defaultValue={defaultClass}
@@ -258,14 +258,14 @@ class UploadSymbol extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <label>Image Type</label>
-                            <Checkbox label='This image is a private photo'
+                            <label>{t("UPSY_IMGTYPE")}</label>
+                            <Checkbox label={t("UPSY_PRIVATEIMG")}
                                 checked={this.state.privatePhoto}
                                 onChange={this.checkboxPrivate.bind(this)}
                             />
                         </Form.Field>
                         <Form.Field width={6}>
-                            <label>Image Color</label>
+                            <label>{t("UPSY_IMGCOLOR")}</label>
                             <Dropdown placeholder='Image Color' selection
                                 options={this.state.colorOptions}
                                 defaultValue={1}
@@ -273,8 +273,8 @@ class UploadSymbol extends Component {
                             />
                         </Form.Field>
                         <Form.Field width={6}>
-                            <label>Image Style</label>
-                            <Dropdown placeholder='Select Style' selection
+                            <label>{t("UPSY_IMGSTYLE")}</label>
+                            <Dropdown placeholder={t("UPSY_IMGCOLOR")} selection
                                 options={this.state.styleOptions}
                                 defaultValue={defaultStyle}
                                 onChange={this.dropdownChange.bind(this, 'style')}
@@ -286,13 +286,13 @@ class UploadSymbol extends Component {
                             onDrop={this.onDrop.bind(this)}
                         />
                         <Button onClick={() => { dropzoneRef.open() }}>
-                            Open File Dialog
+                            {t("UPSY_OPENDIALOG")}
                         </Button>
                         <Image hidden src={this.state.urlImg + this.state.card.img} id='imgTmp' />
                         <br />
-                        <Segment vertical>Width: {this.state.imgStat.width} px</Segment>
-                        <Segment vertical>Height: {this.state.imgStat.height} px</Segment>
-                        <Segment vertical>Size: {this.state.imgStat.size} byte</Segment>
+                        <Segment vertical>{t("UPSY_WIDTH")} {this.state.imgStat.width} px</Segment>
+                        <Segment vertical>{t("UPSY_HEIGHT")} {this.state.imgStat.height} px</Segment>
+                        <Segment vertical>{t("UPSY_SIZE")} {this.state.imgStat.size} byte</Segment>
                         <Grid padded>
                             <Grid.Row columns='equal'>
                                 <Grid.Column>

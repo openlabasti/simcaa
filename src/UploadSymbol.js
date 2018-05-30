@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Segment, Dropdown, Modal, Header, Image, Form, Checkbox, Grid, Message, Confirm, Icon } from 'semantic-ui-react'
+import { Button, Segment, Dropdown, Modal, Header, Image, Form, Checkbox, Grid, Message, Confirm, Icon, Popup } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetchNoAuth } from './withApolloFetchNoAuth'
@@ -222,13 +222,15 @@ class UploadSymbol extends Component {
                                 {t("HOME_NAVBAR_MANAGE_SYMBOL")}
                         </Button>
         } else if (this.props.type === 'icon') {
-            triggerModal = <Icon
-                            name='upload'
-                            bordered inverted color="teal" size='large'
-                            className={'icon-pointer ' + this.props.className}
-                            style={this.props.style}
-                            onClick={this.openCloseModal.bind(this)}
-                        />
+            triggerModal =  <Popup
+                                trigger={<Icon name='upload' bordered inverted color="teal"
+                                size='large'
+                                className={'icon-pointer ' + this.props.className}
+                                style={this.props.style}
+                                onClick={() => {this.openCloseModal.bind(this)}}/>}
+                                content={t("POPUP_IMPORT")}
+                            />
+
         }
 
         let defaultClass = this.state.classOptions.length === 0 ? '' : this.state.classOptions[this.state.classOptions.length - 1].value

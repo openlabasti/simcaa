@@ -300,79 +300,87 @@ class BasicProject extends Component {
                             <Popup
                                 trigger={<Icon name='arrow left' bordered inverted color="teal"
                                     size='large'
+                                    className="icon-pointer"
                                     onClick={() => {this.shiftLeft()}}/>}
-                                content='Merge with left Card'
+                                content={t("POPUP_MERGE_SX")}
                             />
+                            
                             <Popup
                                 trigger={<Icon name='arrow right' bordered inverted color="teal"
                                     size='large'
+                                    className="icon-pointer"
                                     onClick={() => {this.shiftRight()}}/>}
-                                content='Merge with right Card'
+                                content={t("POPUP_MERGE_DX")}
                             />
+
                             <Popup
                                 trigger={<Icon name='unlinkify' bordered inverted color="teal"
                                     size='large'
+                                    className="icon-pointer"
                                     onClick={() => {this.linkCard()}}/>}
-                                content='Unlink Card when are linked'
+                                content={t("POPUP_UNLINK")}
                             />
-                            <Icon
-                                name='image'
-                                bordered
-                                inverted
-                                color='teal'
-                                size='large'
-                                onClick={() => {this.triggerImg()}}
-                                style={{cursor: 'pointer'}}
+                            <Popup
+                                trigger={<Icon name='image' bordered inverted color="teal"
+                                    size='large'
+                                    className="icon-pointer"
+                                    onClick={() => {this.triggerImg()}}/>}
+                                content={t("POPUP_SHOW")}
                             />
-                            <Icon name={this.state.navbarCard.lock} bordered inverted
-                                color="teal"
-                                size='large'
-                                onClick={() => {this.lockCard()}}/>
+
+                            <Popup
+                                trigger={<Icon name={this.state.navbarCard.lock} bordered inverted color="teal"
+                                    size='large'
+                                    className="icon-pointer"
+                                    onClick={() => {this.lockCard()}}/>}
+                                content={t("POPUP_LOCK")}
+                            />
+
                             <Popup
                                 trigger={
                                     <Icon name='clone' bordered inverted color="teal"
                                         size='large'
-                                        onClick={() => {this.copyCard()}}/>
+                                        className="icon-pointer"
+                                        onClick={() => {this.copyCard()}}/>}
+
+                                content={t("POPUP_COPY")}
+                            />
+
+                            <Popup
+                                trigger={
+                                    <Icon name='search' bordered inverted color="teal"
+                                        size='large'
+                                        onClick={() => {this.searchLemma()}}
+                                        className="icon-pointer"
+                                        />
                                 }
-                                content='Copy current Card'
+                                content={t("POPUP_SEARCH")}
                             />
-                            <Icon
-                                name='search'
-                                bordered
-                                inverted
-                                color='teal'
-                                size='large'
-                                onClick={() => {this.searchLemma()}}
-                                style={{cursor: 'pointer'}}
+
+                            <Popup
+                                trigger={<Icon name='external share' flipped='horizontally' bordered inverted color="teal"
+                                    size='large'
+                                    className="icon-pointer"
+                                    onClick={() => {this.addCardBefore()}}/>}
+                                content={t("POPUP_ADD_SX")}
                             />
-                            <Icon
-                                name='external share'
-                                flipped='horizontally'
-                                bordered
-                                inverted
-                                color='teal'
-                                size='large'
-                                onClick={() => {this.addCardBefore()}}
-                                style={{cursor: 'pointer'}}
+
+                            <Popup
+                                trigger={<Icon name='external share' bordered inverted color="teal"
+                                    size='large'
+                                    className="icon-pointer"
+                                    onClick={() => {this.addCardAfter()}}/>}
+                                content={t("POPUP_ADD_DX")}
                             />
-                            <Icon
-                                name='external share'
-                                bordered
-                                inverted
-                                color='teal'
-                                size='large'
-                                onClick={() => {this.addCardAfter()}}
-                                style={{cursor: 'pointer'}}
+
+                            <Popup
+                                trigger={<Icon name='delete' bordered inverted color="teal"
+                                    size='large'
+                                    className="icon-pointer"
+                                    onClick={() => {this.deleteCard()}}/>}
+                                content={t("POPUP_DELETE")}
                             />
-                            <Icon
-                                name='delete'
-                                bordered
-                                inverted
-                                color='teal'
-                                size='large'
-                                onClick={() => {this.deleteCard()}}
-                                style={{cursor: 'pointer'}}
-                            />
+
                             <img src={srcImg}
                                 style={{'verticalAlign': 'middle',
                                         'marginRight': '10px',

@@ -226,6 +226,26 @@ i18n
                     "UPSY_HEIGHT": "Altezza: ",
                     "UPSY_SIZE": "Grandezza: ",
                     "UPSY_CUSTOMIMG": "Immagine personalizzata ",
+
+                    //Popup
+                    "POPUP_IMPORT": "Importa immagine",
+                    "POPUP_MERGE_SX": "Unisci con la carta a sinistra",
+                    "POPUP_MERGE_DX": "Unisci con la carta a destra",
+                    "POPUP_UNLINK": "Dividi carte unite",
+                    "POPUP_SHOW": "Mostra immagini alternative",
+                    "POPUP_LOCK": "Blocca/Sblocca carte",
+                    "POPUP_COPY": "Copia carta selezionata",
+                    "POPUP_SEARCH": "Cerca",
+                    "POPUP_ADD_SX": "Aggiungi carta prima",
+                    "POPUP_ADD_DX": "Aggiungi carta dopo",
+                    "POPUP_DELETE": "Elimina carta",
+
+
+
+
+
+
+
                 }
             },
             en: {
@@ -428,6 +448,7 @@ i18n
                     "ADDUSR_SEARCH_BTN": "Search",
                     "ADDUSR_MISSING_DATA": "You must specify at least one of the search parameters",
 
+
                     //UPLOAD Symbol
                     "UPSY_SELECTIMG": "Select an Image",
                     "UPSY_WORD": "Word: ",
@@ -444,6 +465,19 @@ i18n
                     "UPSY_HEIGHT": "Height: ",
                     "UPSY_SIZE": "Size: ",
                     "UPSY_CUSTOMIMG": "Custom Image ",
+
+                    //Popup
+                    "POPUP_IMPORT": "Import image",
+                    "POPUP_MERGE_SX": "Merge with left card",
+                    "POPUP_MERGE_DX": "Merge with right card",
+                    "POPUP_UNLINK": "Unlink card linked",
+                    "POPUP_SHOW": "Show alternatives images",
+                    "POPUP_LOCK": "Lock/Unlock cards",
+                    "POPUP_COPY": "Copy current card",
+                    "POPUP_SEARCH": "Search",
+                    "POPUP_ADD_SX": "Add a card before",
+                    "POPUP_ADD_DX": "Add a card after",
+                    "POPUP_DELETE": "Delete card",
                 }
             }
         },

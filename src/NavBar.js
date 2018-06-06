@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Button } from 'semantic-ui-react'
+import { Segment, Button, Breadcrumb } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
@@ -29,7 +29,7 @@ class NavBar extends Component {
     }
 
     // Sblocca il capitolo alla sua chiusura
-    closeChapter() {
+    closeChapter(url, e) {
         if (this.props.match.params.mode === 'edit') {
             let query = `
             mutation UnlockChapter {
@@ -40,18 +40,22 @@ class NavBar extends Component {
             `
             this.props.apolloFetch({ query })
             .then((data) => {
-                this.props.history.push('/project/' + this.props.match.params.projectid)
+                if (typeof url === 'string' || url instanceof String) {
+                    this.props.history.push(url)
+                } else {
+                    this.props.history.push('/project/' + this.props.match.params.projectid)
+                }
             })
             .catch((error) => {
                 console.log(error);
             })
         } else {
             this.props.history.push('/project/' + this.props.match.params.projectid)
-
         }
     }
 
     render() {
+        // console.log(this.props);
         const { t, i18n } = this.props
         let mode = this.props.checked ? t("HEAD_BTN_EDIT") : t("HEAD_BTN_VIEW")
 
@@ -96,6 +100,13 @@ class NavBar extends Component {
                     >
                         {t("HEAD_BTN_TYPO")}
                     </Button>
+                    <Breadcrumb style={{'float': 'right'}}>
+                        <Breadcrumb.Section link onClick={this.closeChapter.bind(this, '/')}>home</Breadcrumb.Section>
+                        <Breadcrumb.Divider />
+                        <Breadcrumb.Section link onClick={this.closeChapter.bind(this)}>{this.props.projName}</Breadcrumb.Section>
+                        <Breadcrumb.Divider />
+                        <Breadcrumb.Section active>{this.props.chaptName}</Breadcrumb.Section>
+                    </Breadcrumb>
                 </Segment>
             )
         }

@@ -61,43 +61,43 @@ class AddCustomText extends Component{
         const { t, i18n } = this.props
 
         return(
-            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>Add Text</Button>}
+            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>{t("TYPO_BTN_CUSTOMTEXT")}</Button>}
                 open={this.state.open}
                 size='fullscreen'
             >
-                <Modal.Header>Add Custom Text</Modal.Header>
+                <Modal.Header>{t("TYPO_HDR_CUSTOMTEXT")}</Modal.Header>
                 <Modal.Content>
                 <Form>
                     <Form.Group width='equal'>
-                        <Form.Field control={Dropdown} label='Text Size' selection
-                            options={this.state.optionsSize} placeholder='text size'
+                        <Form.Field control={Dropdown} label={t("TYPO_LBL_SIZETEXT")} selection
+                            options={this.state.optionsSize} placeholder={t("TYPO_LBL_SIZETEXT")}
                             onChange={this.onChangeDropdown.bind(this, 'textsize')}
                         />
-                        <Form.Field control={Dropdown} label='Segment Color' selection
-                            options={this.state.optionsColor} placeholder='Segment Color'
+                        <Form.Field control={Dropdown} label={t("TYPO_LBL_COLORTEXT")} selection
+                            options={this.state.optionsColor} placeholder={t("TYPO_LBL_COLORTEXT")}
                             onChange={this.onChangeDropdown.bind(this, 'color')}
                         />
                     </Form.Group>
-                    <Form.Field control={Checkbox} label='Inverted Color'
+                    <Form.Field control={Checkbox} label={t("TYPO_LBL_INVERTEDTEXT")}
                         onChange={this.onChangeCheckbox.bind(this)}
                         checked={this.state.inverted}
                     />
                     <Form.Field>
-                        <label>Testo</label>
+                        <label>{t("TYPO_LBL_TEXT")}</label>
                         <TextArea onChange={this.handleTextAreaChange.bind(this)} value={this.state.valueTextArea}/>
                     </Form.Field>
                 </Form>
                 <br />
-                Preview:
+                {t("TYPO_LBL_PREVIEW")}:
                 <Segment compact size={this.state.segmentSize} color={this.state.segmentColor} inverted={this.state.inverted}>
                     {this.state.valueTextArea}
                 </Segment>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button.Group>
-                        <Button negative onClick={this.openCloseModal.bind(this)}>Close</Button>
+                        <Button negative onClick={this.openCloseModal.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                     <Button.Or />
-                        <Button positive onClick={this.addText.bind(this)}>Insert Text</Button>
+                        <Button positive onClick={this.addText.bind(this)}>{t("TYPO_BTN_CUSTOMTEXT")}</Button>
                     </Button.Group>
                 </Modal.Actions>
             </Modal>

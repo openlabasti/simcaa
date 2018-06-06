@@ -386,6 +386,7 @@ class CardUI extends Component {
             array[index].imgAlt = []
             array[index].complex = completeOrderedArray[0].lexical_expr
             array[index].row = row
+            array[index].custom = noDataView
 
             for (let i=0; i<completeOrderedArray.length; i++) {
                 array[index].imgAlt.splice(i, 0, {voice_human: completeOrderedArray[i].voice_human,
@@ -412,7 +413,7 @@ class CardUI extends Component {
 
             this.setState({card: array})
             this.setComplexVerbs(array[index])
-            this.props.setNavbarCard(array[index])
+            this.setFocusedCard(array[index])
             this.setExpandAll()
         }
 
@@ -448,6 +449,7 @@ class CardUI extends Component {
                 self.props.apolloFetch({ query })
                     .then((data) => {
                         if (data.data.query_view.data.length > 0) {
+                            self.setFocusedCard(localCards[currentCard.id])
                             self.mergeCard('left', previousId, data.data.query_view.data[0].voice_human)
                             self.setFocus(currentCard.id)
                         }

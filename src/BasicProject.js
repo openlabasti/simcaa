@@ -31,6 +31,7 @@ class BasicProject extends Component {
                     codClass: 'Altro',
                     complex: '0',
                 },
+            chapterName: '',
             // Unsaved Card Variables
             cardStyle: { 'top': '0px', 'width': '100%' },
             posInput: 'bottom',
@@ -115,13 +116,14 @@ class BasicProject extends Component {
             let query = `
             mutation BlockChapter {
                 updateCaaChapter(id: ${this.props.match.params.chapterid}, chapt_user_block: ${this.props.user.id}) {
+                    chapt_title
                     id
                 }
             }
             `
             this.props.apolloFetch({ query })
             .then((data) => {
-
+                this.setState({chapterName: data.data.updateCaaChapter.chapt_title})
             })
             .catch((error) => {
                 console.log(error);
@@ -293,6 +295,8 @@ class BasicProject extends Component {
                                 save={this.triggerSave}
                                 openPreviewA4={this.openPreviewA4}
                                 loadingButton={this.state.loadingButton}
+                                projName={this.props.project.proj_name}
+                                chaptName={this.state.chapterName}
                             />
                         </Menu.Item>
                         <Menu.Item className='navbar-icon fix-display' id='navbar-icon'>
@@ -304,7 +308,7 @@ class BasicProject extends Component {
                                     onClick={() => {this.shiftLeft()}}/>}
                                 content={t("POPUP_MERGE_SX")}
                             />
-                            
+
                             <Popup
                                 trigger={<Icon name='arrow right' bordered inverted color="teal"
                                     size='large'

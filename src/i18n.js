@@ -70,6 +70,16 @@ i18n
                     "HEAD_BTN_PRINT": "Stampa",
                     "HEAD_BTN_RETURN": "Ritorna al Progetto",
                     "TYPO_FRM_PLACEHOLDER": "Seleziona la dimensione delle immagini",
+                    "TYPO_HDR_CUSTOMTITLE": "Inserisci titolo",
+                    "TYPO_BTN_CUSTOMTITLE": "Aggiungi titolo",
+                    "TYPO_BTN_CUSTOMTEXT": "Aggiungi testo",
+                    "TYPO_HDR_CUSTOMTEXT": "Inserisci testo",
+                    "TYPO_LBL_TEXT": "Testo",
+                    "TYPO_LBL_SIZETEXT": "Dimensioni del testo",
+                    "TYPO_LBL_COLORTEXT": "Colore dell'area di testo",
+                    "TYPO_LBL_INVERTEDTEXT": "Colore invertito",
+                    "TYPO_LBL_PREVIEW": "Anteprima",
+                    "TYPO_HDR_DELETECUSTOM": "Cancella elementi aggiuntivi",
 
                     //MODAL TO UPLOAD IMGS VIA DnD
                     "MODAL_IMGS_DND_HEADER": "Caricamento di immagini personali!",
@@ -136,7 +146,7 @@ i18n
                     // PROJECT
                     "PRJ_MNU_BACK": "Torna alla Home",
                     "PRJ_MNU_OPTIONS": "Opzioni",
-                    "PRJ_MNU_ADDUSER": "Aggiungi Utente",
+                    "PRJ_MNU_ADDPROFILE": "Aggiungi Profilo",
                     "PRJ_BTN_EDIT": "Gestisci",
                     "PRJ_BTN_VIEW": "Visualizza",
                     "PRJ_BTN_DELETE": "Elimina",
@@ -208,7 +218,6 @@ i18n
                     "ADDUSR_SEARCH_BTN": "Cerca",
                     "ADDUSR_MISSING_DATA": "Devi inserire almeno un valore nei campi di ricerca!",
 
-
                     //UPLOAD Symbol
                     "UPSY_SELECTIMG": "Seleziona un'immagine",
                     "UPSY_WORD": "Parola",
@@ -239,12 +248,6 @@ i18n
                     "POPUP_ADD_SX": "Aggiungi carta prima",
                     "POPUP_ADD_DX": "Aggiungi carta dopo",
                     "POPUP_DELETE": "Elimina carta",
-
-
-
-
-
-
 
                 }
             },
@@ -312,6 +315,16 @@ i18n
                     "HEAD_BTN_PRINT": "Print",
                     "HEAD_BTN_RETURN": "Return to Project",
                     "TYPO_FRM_PLACEHOLDER": "Select image size",
+                    "TYPO_HDR_CUSTOMTITLE": "Add custom title",
+                    "TYPO_BTN_CUSTOMTITLE": "Add title",
+                    "TYPO_BTN_CUSTOMTEXT": "Add text",
+                    "TYPO_HDR_CUSTOMTEXT": "Add custom text",
+                    "TYPO_LBL_TEXT": "Text",
+                    "TYPO_LBL_SIZETEXT": "Text size",
+                    "TYPO_LBL_COLORTEXT": "Text background color",
+                    "TYPO_LBL_INVERTEDTEXT": "Inverted color",
+                    "TYPO_LBL_PREVIEW": "Preview",
+                    "TYPO_HDR_DELETECUSTOM": "Delete custom elements",
 
                     //MODAL TO UPLOAD IMGS VIA DnD
                     "MODAL_IMGS_DND_HEADER": "Upload custom images!",
@@ -376,7 +389,7 @@ i18n
                     // PROJECT
                     "PRJ_MNU_BACK": "Turn to Homepage",
                     "PRJ_MNU_OPTIONS": "Options",
-                    "PRJ_MNU_ADDUSER": "Add User",
+                    "PRJ_MNU_ADDPROFILE": "Add Profile",
                     "PRJ_BTN_EDIT": "Edit",
                     "PRJ_BTN_VIEW": "View",
                     "PRJ_BTN_DELETE": "Delete",
@@ -447,7 +460,6 @@ i18n
                     "ADDUSR_SEARCH_USER": "By username",
                     "ADDUSR_SEARCH_BTN": "Search",
                     "ADDUSR_MISSING_DATA": "You must specify at least one of the search parameters",
-
 
                     //UPLOAD Symbol
                     "UPSY_SELECTIMG": "Select an Image",

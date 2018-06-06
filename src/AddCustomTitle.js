@@ -56,11 +56,12 @@ class AddCustomTitle extends Component{
             .then((data) => {
                 let localTitleCard = this.state.titleCard
                 let completeData = data.data.query_view.data.concat(data.data.preload_headword.data)
-                let newElementArray = {id: localTitleCard.length, lemma: lemma, img: completeData[0].symbol_sign, imgAlt: []}
+                let custom = completeData[0].voice_human ? false : true
+                let newElementArray = {id: localTitleCard.length, lemma: lemma, img: completeData[0].symbol_sign, imgAlt: [], custom}
 
                 localTitleCard.splice(localTitleCard.length, 0, newElementArray)
                 for (let i = 0; i < completeData.length; i++) {
-                    let custom = completeData[i]. voice_human ? false : true
+                    custom = completeData[i].voice_human ? false : true
                     localTitleCard[localTitleCard.length - 1].imgAlt.splice(i, 0, {img: completeData[i].symbol_sign, custom})
                 }
 
@@ -131,6 +132,7 @@ class AddCustomTitle extends Component{
 
     // Call the function in the parent component to add the title in the page
     addTitle() {
+        console.log(this.state.titleCard);
         this.props.addTitle(this.state.titleCard, this.state.titleBorderSize, this.state.titleBorderType, this.state.color)
         this.openCloseModal()
     }
@@ -178,11 +180,11 @@ class AddCustomTitle extends Component{
         })
 
         return(
-            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>Add Title</Button>}
+            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>{t("TYPO_BTN_CUSTOMTITLE")}</Button>}
                 open={this.state.open}
                 size='fullscreen'
             >
-                <Modal.Header>Add Custom Title</Modal.Header>
+                <Modal.Header>{t("TYPO_HDR_CUSTOMTITLE")}</Modal.Header>
                 <Modal.Content>
                 <Accordion styled fluid>
                     <Accordion.Title
@@ -263,9 +265,9 @@ class AddCustomTitle extends Component{
                 </Modal.Content>
                 <Modal.Actions>
                     <Button.Group>
-                        <Button negative onClick={this.openCloseModal.bind(this)}>Close</Button>
+                        <Button negative onClick={this.openCloseModal.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                     <Button.Or />
-                        <Button positive onClick={this.addTitle.bind(this)}>Insert Title</Button>
+                        <Button positive onClick={this.addTitle.bind(this)}>{t("TYPO_BTN_CUSTOMTITLE")}</Button>
                     </Button.Group>
                 </Modal.Actions>
             </Modal>

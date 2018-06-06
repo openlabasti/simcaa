@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader, Menu, Dropdown, Dimmer, Pagination } from 'semantic-ui-react'
+import { Container, Grid, Segment, Button, Header, Table, Icon, Confirm, Loader, Menu, Dropdown, Dimmer, Pagination, Input } from 'semantic-ui-react'
 import { Link, withRouter } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withApolloFetch } from './withApolloFetch'
@@ -14,6 +14,7 @@ class RootComponent extends Component {
         super(props)
         this.state= {
             projects: [{}],
+            projectsSearch: [{}],
             profiles: [{}],
             layouts: [{}],
             openConfirmProject: false,
@@ -23,6 +24,7 @@ class RootComponent extends Component {
             optionsProfiles: [{}],
             optionsLayouts: [{}],
             fetchFinished: false,
+            valueSearch: '',
 
             // Pagination state variables
             currentPage: 1,
@@ -91,7 +93,8 @@ class RootComponent extends Component {
                                                 text: data.data.layouts.data[i].layout_name}
                 }
 
-                this.setState({projects: data.data.projects.data,
+                this.setState({projects: data.data.projects.data.sort((a, b) => {return new Date(b.updated_at) - new Date(a.updated_at)}),
+                                projectsSearch: data.data.projects.data.sort((a, b) => {return new Date(b.updated_at) - new Date(a.updated_at)}),
                                 profiles: data.data.profiles.data,
                                 layouts: data.data.layouts.data,
                                 optionsProfiles: localOptionsProfile,
@@ -336,6 +339,20 @@ class RootComponent extends Component {
 
     }
 
+    // Search bar in table header
+    projectSearch(e) {
+        let localProjectSearch = this.state.projectsSearch
+        let localProjectResult = []
+        let re = new RegExp(e.target.value, "gi")
+        for (let i = 0; i < localProjectSearch.length; i++) {
+            let matchResult = localProjectSearch[i].proj_name.match(re)
+            if (matchResult !== null && matchResult.length > 0) {
+                localProjectResult.splice(i, 0, localProjectSearch[i])
+            }
+        }
+        this.setState({valueSearch: e.target.value, projects: localProjectResult})
+    }
+
     // Escape quotes if needed
     escapeQuotes(item) {
         if (typeof item === 'string' || item instanceof String) {
@@ -482,6 +499,16 @@ class RootComponent extends Component {
                                 </Header>
                                 <Table celled striped color='blue' sortable>
                                     <Table.Header>
+                                        <Table.Row>
+                                            <Table.HeaderCell colSpan={6}>
+                                                <Input
+                                                    icon={<Icon name='search' inverted circular />}
+                                                    placeholder='Search...'
+                                                    onChange={this.projectSearch.bind(this)}
+                                                    value={this.valueSearch}
+                                                />
+                                            </Table.HeaderCell>
+                                        </Table.Row>
                                         <Table.Row>
                                             <Table.HeaderCell
                                                 sorted={this.state.column === 'id' ? this.state.direction : null}

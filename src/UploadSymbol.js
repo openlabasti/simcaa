@@ -227,7 +227,7 @@ class UploadSymbol extends Component {
                                 size='large'
                                 className={'icon-pointer ' + this.props.className}
                                 style={this.props.style}
-                                onClick={() => {this.openCloseModal.bind(this)}}/>}
+                                onClick={this.openCloseModal.bind(this)}/>}
                                 content={t("POPUP_IMPORT")}
                             />
 

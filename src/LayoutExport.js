@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Button, Dropdown, Image, Message, Loader, Card } from 'semantic-ui-react'
+import { Segment, Button, Dropdown, Image, Message, Loader, Card, Dimmer } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
@@ -71,8 +71,14 @@ class LayoutExport extends Component {
                 // Parse del capitolo e del profilo
                 let profile = JSON.parse(data.data.projects.data[0].proj_profile)
                 let stateCard = JSON.parse(data.data.chapters.data[0].chapt_content)
-                let savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
                 let layout = JSON.parse(data.data.projects.data[0].proj_layout)
+                let savedTypo
+                try {
+                    savedTypo = JSON.parse(data.data.chapters.data[0].chapt_typo)
+                }
+                catch(e) {
+                    savedTypo = null
+                }
 
                 // Pulisco dalle card vuote
                 this.cleanCard(stateCard)
@@ -140,7 +146,8 @@ class LayoutExport extends Component {
                     let typoCard = savedTypo.card
                     let typoImg = savedTypo.img
                     let typoTitle = savedTypo.title
-                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, title: typoTitle,
+                    let typoText = savedTypo.text
+                    this.setState({savedProject: data.data.chapters.data[0], cards: typoCard, title: typoTitle, text: typoText,
                                     customImgs: typoImg, profile, layout , customSymbolSize: newSymbolSize, hasTypoSaved: true})
                 }
             })
@@ -162,6 +169,21 @@ class LayoutExport extends Component {
                 self.setState({finishLoad: true})
             }, 0)
         }
+    }
+
+    expandInputAll(globalWidth) {
+        let localCard = this.state.cards
+        for (var i = 0; i < localCard.length; i++) {
+            let inputResize = document.getElementById('textLayout-' + i)
+            if (inputResize) {
+                inputResize.style.width = '0px'
+                if (inputResize.scrollWidth > inputResize.clientWidth) {
+                    inputResize.style.width = inputResize.scrollWidth + 20 + 'px'
+                    globalWidth[i] = inputResize.scrollWidth + 30
+                }
+            }
+        }
+        sessionStorage.setItem('cardWidth', globalWidth)
     }
 
     // Elimino le card vuote, allineo gli id e aggiungo la pagina
@@ -206,9 +228,8 @@ class LayoutExport extends Component {
 
             sessionStorage.setItem('cardWidth', cardWidth)
             sessionStorage.setItem('cardHeight', cardHeight)
+            this.expandInputAll(cardWidth)
             this.componentWillMount()
-
-
         })
     }
 
@@ -298,6 +319,17 @@ class LayoutExport extends Component {
             localTitle[index].x = d.x
         }
         localTitle[index].y = d.y < 0 ? 0 : d.y
+        this.setState({title: localTitle})
+    }
+
+    // TODO: RIVEDERE
+    // Resize of the custom Title
+    resizeTitle(item, index, e, direction, ref, dimensions, position){
+        let localTitle = this.state.title
+        for (var i = 0; i < item.card.length; i++) {
+            localTitle[index].card[i].height += dimensions.height
+            localTitle[index].card[i].width += dimensions.width
+        }
         this.setState({title: localTitle})
     }
 
@@ -401,7 +433,9 @@ class LayoutExport extends Component {
 
     // Save the current Typo configuration
     saveTypo() {
-        let localProject = { "id":  this.props.match.params.chapterid, "chapt_typo": {"card": this.state.cards, "img": this.state.customImgs, 'title': this.state.title}}
+        let localProject = { "id":  this.props.match.params.chapterid,
+                                "chapt_typo": {'card': this.state.cards, 'img': this.state.customImgs,
+                                                'title': this.state.title, 'text': this.state.text}}
         localProject.chapt_typo = JSON.stringify(localProject.chapt_typo)
         let url = window.env.RestApiCard
         let self = this
@@ -455,7 +489,7 @@ class LayoutExport extends Component {
     // Add the title to page
     addTitle(title, borderSize, borderType, borderColor) {
         let localTitle = this.state.title
-        localTitle.splice(localTitle.length, 0, {card: title, border: borderSize + 'px ' + borderColor + ' ' + borderType, x: 0, y: 0})
+        localTitle.splice(localTitle.length, 0, {card: title, border: borderSize + 'px ' + borderColor + ' ' + borderType, x: 0, y: 0, rndWidth: 'auto', rndHeight: 'auto'})
         this.setState({title: localTitle})
     }
 
@@ -529,9 +563,18 @@ class LayoutExport extends Component {
 
         if (this.state.savedProject.length === 0) {
             return (
-                <Segment className={this.state.classSheet}>
-                    <Loader active inline='centered' size='massive'/>
-                </Segment>
+                <Dimmer
+                    active={!this.state.finishLoad}
+                    page
+                >
+                    <Loader active inline='centered' size='massive' />
+                    <br />
+                    <Button color='red' as={Link}
+                        to={'/basic/' + this.props.match.params.mode + '/' + this.props.match.params.projectid + '/' + this.props.match.params.chapterid}
+                    >
+                        {t("HEAD_BTN_RETURN")}
+                    </Button>
+                </Dimmer>
             )
         } else {
             let customImgsLayout = this.state.customImgs
@@ -648,6 +691,7 @@ class LayoutExport extends Component {
                         z = {99}
                         position={{ x: item.x, y: item.y }}
                         onDragStop={this.dragTitle.bind(this, item, index)}
+                        // onResize={this.resizeTitle.bind(this, item, index)}
                         disableDragging = {isView}
                         enableResizing
                         style={{border: item.border, padding: '3px'}}

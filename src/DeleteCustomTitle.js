@@ -89,7 +89,7 @@ class DeleteCustomTitle extends Component{
             <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>Delete Title</Button>}
                 open={this.state.open}
             >
-                <Modal.Header>Delete Custom Title</Modal.Header>
+                <Modal.Header>{t("TYPO_HDR_DELETECUSTOM")}</Modal.Header>
                 <Modal.Content>
                     <Table celled striped>
                         <Table.Header>
@@ -107,7 +107,7 @@ class DeleteCustomTitle extends Component{
                     </Table>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button negative onClick={this.openCloseModal.bind(this)}>Close</Button>
+                    <Button negative onClick={this.openCloseModal.bind(this)}>{t("HEAD_BTN_CLOSE")}</Button>
                 </Modal.Actions>
             </Modal>
         )

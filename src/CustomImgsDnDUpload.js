@@ -42,7 +42,7 @@ class CustomImgsDnDUpload extends Component{
         //incapsulo immagine in oggetto form-data
         let imgToSend = new FormData()
         for (let i = 0; i < file.length; i++) {
-            imgToSend.append('img' + i,file[i])
+            imgToSend.append('img' + i, file[i])
         }
         imgToSend.append('nImgs', file.length)
         imgToSend.append('projectid', this.props.match.params.projectid)

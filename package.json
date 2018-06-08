@@ -5,6 +5,7 @@
   "homepage": ".",
   "dependencies": {
     "apollo-fetch": "^0.7.0",
+    "draft-js": "^0.10.5",
     "draftjs-to-html": "^0.8.4",
     "graphql": "^0.12.3",
     "graphql-tag": "^2.6.1",

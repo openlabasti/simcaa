@@ -705,6 +705,7 @@ class CardUI extends Component {
             index > 0 ? this.setFocus(index-1) : this.setFocus(index)
         }
         this.setState({card: localCards})
+        this.setExpandAll()
     }
 
     // toggle della visibilità delle immagini alternative della card

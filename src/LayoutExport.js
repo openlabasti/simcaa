@@ -14,7 +14,6 @@ import AddCustomTitle from './AddCustomTitle'
 import DeleteCustomTitle from './DeleteCustomTitle'
 import AddCustomText from './AddCustomText'
 
-
 class LayoutExport extends Component {
     constructor(props) {
         super(props)
@@ -502,9 +501,9 @@ class LayoutExport extends Component {
     }
 
     // Add Text to page
-    addText(text, size, color, inverted) {
+    addText(html, inverted, color) {
         let localText = this.state.text
-        localText.splice(localText.length, 0, {text: text, size: size, color, inverted, x: 0, y: 0})
+        localText.splice(localText.length, 0, {text: html,inverted, color, x: 0, y: 0})
         this.setState({text: localText})
     }
 
@@ -718,10 +717,12 @@ class LayoutExport extends Component {
                         style={{border: item.border, padding: '3px'}}
                     >
                         <Segment id={'customText-' + index} size={item.size}
-                            color={item.color} inverted={item.inverted}
+                            color={item.color}
+                            inverted={item.inverted}
                             style={{'height': '100%'}}
+
                         >
-                            {item.text}
+                            <div dangerouslySetInnerHTML={{__html: item.text}} />
                         </Segment>
                     </Rnd>
                 )
@@ -783,8 +784,6 @@ class LayoutExport extends Component {
                                 addTitle={this.addTitle.bind(this)}
                             />
                             <AddCustomText
-                                disabled={isView}
-                                style={hideButton}
                                 addText={this.addText.bind(this)}
                             />
                             <DeleteCustomTitle

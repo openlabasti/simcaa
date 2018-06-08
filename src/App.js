@@ -6,9 +6,11 @@ import LayoutExport from './LayoutExport'
 import Project from './Project'
 import Login from './Login'
 import Admin from './administration/Administration'
+
 // Import CSS files
 import './css/grid_styles.css'
 import './css/resizable_styles.css'
+import './css/react-draft-wysiwyg.css'
 
 class App extends Component {
 

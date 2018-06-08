@@ -59,7 +59,9 @@ class DeleteCustomTitle extends Component{
             return (
                 <Table.Row key={index}>
                     <Table.Cell collapsing>Text</Table.Cell>
-                    <Table.Cell>{text}</Table.Cell>
+                    <Table.Cell>
+                        <div dangerouslySetInnerHTML={{__html: text}}></div>
+                    </Table.Cell>
                     <Table.Cell collapsing>
                         <Icon name='trash' color='red' size='big' className='icon-pointer'
                             onClick={this.deleteCurrentText.bind(this, item)}
@@ -86,7 +88,11 @@ class DeleteCustomTitle extends Component{
         })
 
         return(
-            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>Delete Title</Button>}
+            <Modal trigger={<Button color='yellow'
+                            onClick={this.openCloseModal.bind(this)}
+                            disabled={this.props.disabled}
+                            style={this.props.style}>{t("TYPO_HDR_DELETECUSTOM")}
+                            </Button>}
                 open={this.state.open}
             >
                 <Modal.Header>{t("TYPO_HDR_DELETECUSTOM")}</Modal.Header>

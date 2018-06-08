@@ -73,36 +73,44 @@ class UploadSymbol extends Component {
         let self = this
         let imgName = testImg !== null ? testImg.src.split("/").pop() : ''
         if (testImg !== null && imgName !== prevState.card.img) {
-            setTimeout(() => {
-                // Riprendo i dati dalla div perchè in caso di reupload
+            var interval = setInterval(() => {
+                // Riprendo i dati dalla div ad ogni ciclo
                 testImg = document.getElementById('imgTmp')
+                let complete = testImg.complete
 
-                // Aggiorno in tempo reale le info sull'immagine
-                localStat.width = testImg.width
-                localStat.height = testImg.height
-                localStat.size = this.state.file[0].size
-                self.setState({imgStat: localStat})
-            }, 0)
+                if (complete === true) {
+                    // Aggiorno in tempo reale le info sull'immagine
+                    localStat.width = testImg.width
+                    localStat.height = testImg.height
+                    localStat.size = this.state.file[0].size
+                    self.setState({imgStat: localStat})
+                     clearInterval(interval)
+                }
+            }, 100)
         }
     }
 
     onDrop(files) {
-        // Prendo il nome dell'immagine dalla preview
-        let newImgName = files[0].preview
-        newImgName = newImgName.substring(0, (newImgName.indexOf("#") === -1) ? newImgName.length : newImgName.indexOf("#"))
-        newImgName = newImgName.substring(0, (newImgName.indexOf("?") === -1) ? newImgName.length : newImgName.indexOf("?"))
-        newImgName = newImgName.substring(newImgName.lastIndexOf("/") + 1, newImgName.length)
+        if (files.length === 0) {
+            this.setState({error: {hidden: false, text: this.props.t("ERR_FILESIZE_EXCEED")}})
+        } else {
+            // Prendo il nome dell'immagine dalla preview
+            let newImgName = files[0].preview
+            newImgName = newImgName.substring(0, (newImgName.indexOf("#") === -1) ? newImgName.length : newImgName.indexOf("#"))
+            newImgName = newImgName.substring(0, (newImgName.indexOf("?") === -1) ? newImgName.length : newImgName.indexOf("?"))
+            newImgName = newImgName.substring(newImgName.lastIndexOf("/") + 1, newImgName.length)
 
-        // Prendo il nuovo path dell'immagine dalla preview
-        let newUrlImg = files[0].preview.substring(0, files[0].preview.lastIndexOf("/") + 1)
+            // Prendo il nuovo path dell'immagine dalla preview
+            let newUrlImg = files[0].preview.substring(0, files[0].preview.lastIndexOf("/") + 1)
 
-        // Unisco i 2 nuovi valori per formare la nuova card
-        let localCard = this.state.card
-        let localUrl = this.state.urlImg
-        localCard.img = newImgName
-        localUrl = newUrlImg
+            // Unisco i 2 nuovi valori per formare la nuova card
+            let localCard = this.state.card
+            let localUrl = this.state.urlImg
+            localCard.img = newImgName
+            localUrl = newUrlImg
 
-        this.setState({file: files, card: localCard, urlImg: localUrl})
+            this.setState({file: files, card: localCard, urlImg: localUrl, error: {hidden: true, text: ''}})
+        }
     }
 
     openCloseModal() {
@@ -115,7 +123,9 @@ class UploadSymbol extends Component {
                         color: 0,
                         class: 0,
                         privatePhoto: false,
-                        error: {hidden: true, text: ''}
+                        error: {hidden: true, text: ''},
+                        urlImg: window.env.PathImages,
+                        card: {id: 0, lemma: 'Custom Images', img: 'react.png'}
             })
         } else {
             this.setState({modalOpen: !this.state.modalOpen, confirmOpen: false})
@@ -230,7 +240,6 @@ class UploadSymbol extends Component {
                                 onClick={this.openCloseModal.bind(this)}/>}
                                 content={t("POPUP_IMPORT")}
                             />
-
         }
 
         let defaultClass = this.state.classOptions.length === 0 ? '' : this.state.classOptions[this.state.classOptions.length - 1].value
@@ -286,6 +295,7 @@ class UploadSymbol extends Component {
                             accept="image/jpeg, image/png"
                             style={{'display': 'none'}}
                             onDrop={this.onDrop.bind(this)}
+                            maxSize={500000}
                         />
                         <Button onClick={() => { dropzoneRef.open() }}>
                             {t("UPSY_OPENDIALOG")}

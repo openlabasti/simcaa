@@ -249,6 +249,8 @@ i18n
                     "POPUP_ADD_DX": "Aggiungi carta dopo",
                     "POPUP_DELETE": "Elimina carta",
 
+                    // ERROR
+                    "ERR_FILESIZE_EXCEED": "Le dimensioni dell'immagine sono troppo alte (Max: 500Kb)",
                 }
             },
             en: {
@@ -490,6 +492,9 @@ i18n
                     "POPUP_ADD_SX": "Add a card before",
                     "POPUP_ADD_DX": "Add a card after",
                     "POPUP_DELETE": "Delete card",
+
+                    // ERROR
+                    "ERR_FILESIZE_EXCEED": "The size of the image is too high (Max: 500Kb)",
                 }
             }
         },

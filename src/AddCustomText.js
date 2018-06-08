@@ -1,97 +1,117 @@
 import React, { Component } from 'react'
-import { Modal, Button, Segment, Input, Form, TextArea, Dropdown, Checkbox } from 'semantic-ui-react'
-import { ChromePicker } from 'react-color';
+import { Modal, Button, Dropdown, Checkbox, Segment } from 'semantic-ui-react'
+import { EditorState, convertToRaw, ContentState } from 'draft-js'
+import { Editor } from 'react-draft-wysiwyg'
+import draftToHtml from 'draftjs-to-html'
+import htmlToDraft from 'html-to-draftjs'
 import { translate, Trans } from 'react-i18next'
 
-class AddCustomText extends Component{
+class AddCustomText extends Component {
     constructor(props) {
         super(props)
-        this.state = {
-            open: false,
-            valueTextArea: '',
-            optionsSize: [{value: 'mini', text: 'mini'}, {value: 'tiny', text: 'tiny'},
-                        {value: 'small', text: 'small'}, {value: 'large', text: 'large'},
-                        {value: 'big', text: 'big'}, {value: 'huge', text: 'huge'}, {value: 'massive', text: 'massive'}],
-            optionsColor: [{value: 'red', text: 'red'}, {value: 'orange', text: 'orange'}, {value: 'yellow', text: 'yellow'},
-                        {value: 'olive', text: 'olive'}, {value: 'green', text: 'green'}, {value: 'teal', text: 'teal'},
-                        {value: 'blue', text: 'blue'}, {value: 'violet', text: 'violet'}, {value: 'purple', text: 'purple'},
-                        {value: 'pink', text: 'pink'}, {value: 'brown', text: 'brown'}, {value: 'grey', text: 'grey'},
-                        {value: 'black', text: 'black'}],
-            segmentSize: 'small',
-            segmentColor: null,
-            inverted: false,
+        const html = ''
+        const contentBlock = htmlToDraft(html)
+        if (contentBlock) {
+            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+            const editorState = EditorState.createWithContent(contentState)
+            this.state = {
+                editorState,
+                optionsColor: [{value: 'red', text: 'red'}, {value: 'orange', text: 'orange'}, {value: 'yellow', text: 'yellow'},
+                            {value: 'olive', text: 'olive'}, {value: 'green', text: 'green'}, {value: 'teal', text: 'teal'},
+                            {value: 'blue', text: 'blue'}, {value: 'violet', text: 'violet'}, {value: 'purple', text: 'purple'},
+                            {value: 'pink', text: 'pink'}, {value: 'brown', text: 'brown'}, {value: 'grey', text: 'grey'},
+                            {value: 'black', text: 'black'}],
+                segmentColor: null,
+                inverted: false,
+            }
         }
     }
 
     // Handle open and close of the modal
     openCloseModal() {
-        if (this.state.open === true) {
-            this.setState({open: !this.state.open, valueTextArea: '', segmentColor: null, segmentSize: 'small', inverted: false})
+        const html = ''
+        const contentBlock = htmlToDraft(html)
+        if (contentBlock) {
+            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+            const editorState = EditorState.createWithContent(contentState)
+            this.setState({open: !this.state.open, editorState, segmentColor: null, inverted: false})
         } else {
-            this.setState({open: !this.state.open})
+            this.setState({open: !this.state.open, segmentColor: null, inverted: false})
         }
     }
 
-    // Handle change of the textarea text
-    handleTextAreaChange(e, data) {
-        this.setState({valueTextArea: data.value})
+    // handle Editor change
+    onEditorStateChange(editorState) {
+        let html = draftToHtml(convertToRaw(editorState.getCurrentContent()))
+        this.setState({editorState})
     }
 
-    // Dropdown change size
-    onChangeDropdown(type, e, data) {
-        if (type === 'color') {
-            this.setState({segmentColor: data.value})
-        } else {
-            this.setState({segmentSize: data.value})
-        }
+    // Dropdown change color
+    onChangeDropdown(e, data) {
+        this.setState({segmentColor: data.value})
     }
 
+    // handle chackbox inverted color change
     onChangeCheckbox() {
         this.setState({inverted: !this.state.inverted})
     }
 
-    // Call the props to add text
+    // add the text to page
     addText() {
-        let text = this.state.valueTextArea.trim()
-        this.props.addText(text, this.state.segmentSize, this.state.segmentColor, this.state.inverted)
+        let html = draftToHtml(convertToRaw(this.state.editorState.getCurrentContent()))
+        this.props.addText(html, this.state.inverted, this.state.segmentColor)
         this.openCloseModal()
     }
 
+    // MAIN RENDER
     render() {
         const { t, i18n } = this.props
+        const { editorState } = this.state
 
-        return(
-            <Modal trigger={<Button color='yellow' onClick={this.openCloseModal.bind(this)} disabled={this.props.disabled} style={this.props.style}>{t("TYPO_BTN_CUSTOMTEXT")}</Button>}
+        return (
+            <Modal trigger={<Button color='yellow'
+                            onClick={this.openCloseModal.bind(this)}
+                            disabled={this.props.disabled}
+                            style={this.props.style}>{t("TYPO_BTN_CUSTOMTEXT")}
+                            </Button>}
                 open={this.state.open}
-                size='fullscreen'
+                size='large'
             >
                 <Modal.Header>{t("TYPO_HDR_CUSTOMTEXT")}</Modal.Header>
                 <Modal.Content>
-                <Form>
-                    <Form.Group width='equal'>
-                        <Form.Field control={Dropdown} label={t("TYPO_LBL_SIZETEXT")} selection
-                            options={this.state.optionsSize} placeholder={t("TYPO_LBL_SIZETEXT")}
-                            onChange={this.onChangeDropdown.bind(this, 'textsize')}
-                        />
-                        <Form.Field control={Dropdown} label={t("TYPO_LBL_COLORTEXT")} selection
-                            options={this.state.optionsColor} placeholder={t("TYPO_LBL_COLORTEXT")}
-                            onChange={this.onChangeDropdown.bind(this, 'color')}
-                        />
-                    </Form.Group>
-                    <Form.Field control={Checkbox} label={t("TYPO_LBL_INVERTEDTEXT")}
+                    <Editor
+                        editorState={editorState}
+                        wrapperClassName="demo-wrapper"
+                        editorClassName="demo-editor"
+                        onEditorStateChange={this.onEditorStateChange.bind(this)}
+                        toolbar={{
+                              options: ['inline',
+                                  'blockType',
+                                  'list',
+                                  'textAlign',
+                                  'colorPicker',
+                                  'remove',
+                                  'history'],
+                        }}
+                    />
+                    <br />
+                    {t("TYPO_LBL_COLORTEXT")}
+                    <br />
+                    <Dropdown selection
+                        options={this.state.optionsColor} placeholder={t("TYPO_LBL_COLORTEXT")}
+                        onChange={this.onChangeDropdown.bind(this)}
+                    />
+                    <br />
+                    <br />
+                    <Checkbox
                         onChange={this.onChangeCheckbox.bind(this)}
                         checked={this.state.inverted}
+                        label={t("TYPO_LBL_INVERTEDTEXT")}
                     />
-                    <Form.Field>
-                        <label>{t("TYPO_LBL_TEXT")}</label>
-                        <TextArea onChange={this.handleTextAreaChange.bind(this)} value={this.state.valueTextArea}/>
-                    </Form.Field>
-                </Form>
-                <br />
-                {t("TYPO_LBL_PREVIEW")}:
-                <Segment compact size={this.state.segmentSize} color={this.state.segmentColor} inverted={this.state.inverted}>
-                    {this.state.valueTextArea}
-                </Segment>
+                    <br />
+                    <Segment inverted={this.state.inverted} color={this.state.segmentColor}>
+                        <div dangerouslySetInnerHTML={{__html: draftToHtml(convertToRaw(this.state.editorState.getCurrentContent()))}} />
+                    </Segment>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button.Group>

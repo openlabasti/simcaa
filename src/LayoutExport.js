@@ -419,15 +419,49 @@ class LayoutExport extends Component {
 
     // Save to PDF, NON FUNZIONANTE TODO: DA RIVEDERE
     printDocument() {
-      const input = document.getElementById('printable-div');
-      html2canvas(document.body, {allowTaint: true, useCORS: true, proxy:'127.0.0.1'})
-        .then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'png', 0, 0);
-            // pdf.output('dataurlnewwindow');
-            // pdf.save("download.pdf");
+        // const input = document.getElementById('printable-div');
+        // html2canvas(document.body, {allowTaint: true, useCORS: true, proxy:'127.0.0.1'})
+        //     .then((canvas) => {
+        //         const imgData = canvas.toDataURL('image/png');
+        //         const pdf = new jsPDF();
+        //         pdf.addImage(imgData, 'png', 0, 0);
+        //         // pdf.output('dataurlnewwindow');
+        //         // pdf.save("download.pdf");
+        //     })
+
+        let htmlToSend = new FormData()
+        // let page = document.getElementsByClassName('PreviewTypoDocument')[0].innerHTML
+        let page = document.documentElement.outerHTML
+        htmlToSend.append('html', page)
+        console.log(page);
+        let request = new Request('http://10.0.0.132:8085/graphql/convertpdf',{
+            method : 'POST',
+            mode: 'cors',
+            mimeType: 'multipart/form-data',
+            body: htmlToSend
         })
+
+        fetch(request)
+            .then((response) => {
+                return response.blob()
+            })
+            .then((myBlob) => {
+                let pdfURL = URL.createObjectURL(myBlob)
+
+                let a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style = "display: none";
+                a.href = pdfURL;
+                a.download = 'simcaa.pdf';
+                a.click();
+                window.URL.revokeObjectURL(pdfURL);
+
+                window.open(pdfURL);
+            })
+            .catch((error) => {
+                //errore, lo comunico all'utente
+                console.log('errore nel pdf ->' + error)
+            })
     }
 
     // Save the current Typo configuration
@@ -814,7 +848,7 @@ class LayoutExport extends Component {
                                 {t("HEAD_BTN_SAVE")}
                             </Button>
                             {
-                            // <Button color='blue' disabled onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
+                            // <Button color='blue' onClick={this.printDocument}>{t("HEAD_BTN_EXPORTPDF")}</Button>
                             }
                             <Button color='blue' onClick={() => {window.print()}}>{t("HEAD_BTN_PRINT")}</Button>
                             <Button color='red' as={Link}

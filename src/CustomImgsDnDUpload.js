@@ -29,7 +29,9 @@ class CustomImgsDnDUpload extends Component{
         })
 
         fetch(request)
-            .then((response) => {return response.json()})
+            .then((response) => {
+                return response.json()
+            })
             .then((data) => {
                 this.setState({filesOld: Object.values(data)})
             })

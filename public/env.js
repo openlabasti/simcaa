@@ -42,6 +42,18 @@ window.env = {
     // "GraphQLRefreshToken": "http://10.0.0.132:8085/graphql/jwtrefresh",
     // "RestApiCard": "http://10.0.0.132:8085/graphql/card",
 
+    // CSS - remote
+    // "SemanticCSS": "http://10.0.0.132/includes/css/semantic.min.css",
+    // "StyleCSS": "http://10.0.0.132/includes/css/style.css",
+
+    // CSS - Local
+    "SemanticCSS": "./semantic.min.css",
+    "StyleCSS": "./style.css",
+
+    // CSS - Local
+    // "SemanticCSS": "%PUBLIC_URL%/semantic.min.css",
+    // "StyleCSS": "%PUBLIC_URL%/style.css",
+
     // HOMEPAGE MESSAGE
     "blue_text_header": "To test this Demo",
     "blue_text_content": "<p>Username: user</p>Password: user",

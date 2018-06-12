@@ -41,12 +41,7 @@ class CardUI extends Component {
     }
 
     componentDidMount() {
-        if (this.props.colorTextInput) {
-            document.styleSheets[1].cssRules[1].style.setProperty('color', this.props.colorTextInput, 'important')
-        }
-        if (this.props.colorBackgroundInput) {
-            document.styleSheets[1].cssRules[2].style.setProperty('background-color', this.props.colorBackgroundInput, 'important')
-        }
+        this.checkPropsColorCard()
         let styleCard = this.props.borderCard ?
         {
             Aggettivo: {border: this.props.borderCard['Aggettivo'].size + 'px ' + this.props.borderCard['Aggettivo'].type + ' ' + this.props.borderCard['Aggettivo'].color},
@@ -160,14 +155,22 @@ class CardUI extends Component {
     }
 
     componentDidUpdate() {
-        if (this.props.colorTextInput) {
-            document.styleSheets[1].cssRules[1].style.setProperty('color', this.props.colorTextInput, 'important')
-        }
-        if (this.props.colorBackgroundInput) {
-            document.styleSheets[1].cssRules[2].style.setProperty('background-color', this.props.colorBackgroundInput, 'important')
+        this.checkPropsColorCard()
+    }
+
+    // Setto il colore delle input in caso di profilo non base
+    checkPropsColorCard() {
+        let nCard = document.getElementsByClassName('cardUI')
+        for (let i = 0; i < nCard.length; i++) {
+            let cardElement = document.getElementById('text-' + i)
+            if (cardElement) {
+                cardElement.style.setProperty('color', this.props.colorTextInput, 'important')
+                cardElement.style.setProperty('background-color', this.props.colorBackgroundInput, 'important')
+            }
         }
     }
 
+    // Guardo se c'è un card fissa oppure no
     checkPropsCard() {
         if (this.props.Card) {
             return true
